@@ -3,7 +3,6 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <!-- Title will be updated by JS -->
     <title>‘정확도 99 %’에 속지 않는 이유</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -11,30 +10,28 @@
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700&family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
     <style>
         body {
-            /* Default to Korean font */
             font-family: 'Noto Sans KR', sans-serif;
             -webkit-font-smoothing: antialiased;
             -moz-osx-font-smoothing: grayscale;
         }
         .en body {
-            /* Switch to English font when 'en' class is on html tag */
             font-family: 'Roboto', sans-serif;
         }
         .prose h1, .prose h2, .prose h3, .prose strong {
-            color: #1f2937; /* 다크 그레이 */
+            color: #1f2937;
         }
         .prose p, .prose li, .prose th, .prose td {
-            color: #4b5563; /* 중간 그레이 */
+            color: #4b5563;
         }
         .quote-block {
-            border-left: 4px solid #93c5fd; /* 연한 파랑 */
+            border-left: 4px solid #93c5fd;
             padding-left: 1rem;
             font-style: italic;
-            color: #374151; /* 진한 그레이 */
+            color: #374151;
         }
         .tip-box {
-            background-color: #eff6ff; /* 아주 연한 파랑 */
-            border: 1px solid #dbeafe; /* 연한 파랑 */
+            background-color: #eff6ff;
+            border: 1px solid #dbeafe;
             border-radius: 0.5rem;
             padding: 1.5rem;
             margin-top: 2rem;
@@ -61,13 +58,13 @@
         }
         .lang-btn.active {
             font-weight: 700;
-            color: #2563eb; /* 진한 파랑 */
+            color: #2563eb;
             text-decoration: underline;
         }
     </style>
 </head>
 <body class="bg-slate-50">
-    <div class="container mx-auto max-w-3xl px-4 py-12 sm:py-20">
+    <div class="container mx-auto max-w-6xl px-4 py-12 sm:py-20">
         
         <!-- Language Switcher -->
         <div class="text-right mb-4">
@@ -132,8 +129,6 @@
                 <p class="lang lang-en" style="display:none;">This shows that to truly understand a model's performance, we must look beyond accuracy.</p>
             </section>
             
-            <!-- And so on for all other sections... -->
-
             <!-- Section 2 -->
             <section class="mt-12">
                 <h2 class="lang lang-ko text-3xl font-bold mb-6 border-b pb-2">2. 모델 성능을 제대로 묻는 두 가지 질문: 정밀도와 재현율</h2>
@@ -311,14 +306,11 @@
         };
 
         function switchLang(lang) {
-            // Set html tag's lang attribute and class
             document.documentElement.lang = lang;
             document.documentElement.className = lang;
 
-            // Update page title
             document.title = titles[lang];
 
-            // Show/hide all elements with 'lang' class
             document.querySelectorAll('.lang').forEach(el => {
                 if (el.classList.contains(`lang-${lang}`)) {
                     el.style.display = '';
@@ -327,17 +319,15 @@
                 }
             });
 
-            // Update active button style
             document.querySelectorAll('.lang-btn').forEach(btn => {
                 btn.classList.remove('active');
             });
             document.getElementById(`btn-${lang}`).classList.add('active');
         }
-
-        // Initialize with Korean
+        
         document.addEventListener('DOMContentLoaded', () => {
             switchLang('ko');
         });
     </script>
 </body>
-</html>
+</ht
