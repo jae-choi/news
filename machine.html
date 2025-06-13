@@ -1,0 +1,343 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- Title will be updated by JS -->
+    <title>‘정확도 99 %’에 속지 않는 이유</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700&family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            /* Default to Korean font */
+            font-family: 'Noto Sans KR', sans-serif;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+        .en body {
+            /* Switch to English font when 'en' class is on html tag */
+            font-family: 'Roboto', sans-serif;
+        }
+        .prose h1, .prose h2, .prose h3, .prose strong {
+            color: #1f2937; /* 다크 그레이 */
+        }
+        .prose p, .prose li, .prose th, .prose td {
+            color: #4b5563; /* 중간 그레이 */
+        }
+        .quote-block {
+            border-left: 4px solid #93c5fd; /* 연한 파랑 */
+            padding-left: 1rem;
+            font-style: italic;
+            color: #374151; /* 진한 그레이 */
+        }
+        .tip-box {
+            background-color: #eff6ff; /* 아주 연한 파랑 */
+            border: 1px solid #dbeafe; /* 연한 파랑 */
+            border-radius: 0.5rem;
+            padding: 1.5rem;
+            margin-top: 2rem;
+            margin-bottom: 2rem;
+        }
+        .content-table {
+            width: 100%;
+            margin-top: 1.5rem;
+            margin-bottom: 1.5rem;
+            border-collapse: collapse;
+            font-size: 0.9em;
+        }
+        .content-table th, .content-table td {
+            border: 1px solid #e5e7eb;
+            padding: 0.75rem 1rem;
+            text-align: left;
+        }
+        .content-table th {
+            background-color: #f9fafb;
+            font-weight: 500;
+        }
+        .content-table td {
+            background-color: #ffffff;
+        }
+        .lang-btn.active {
+            font-weight: 700;
+            color: #2563eb; /* 진한 파랑 */
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body class="bg-slate-50">
+    <div class="container mx-auto max-w-3xl px-4 py-12 sm:py-20">
+        
+        <!-- Language Switcher -->
+        <div class="text-right mb-4">
+            <button id="btn-ko" class="lang-btn active" onclick="switchLang('ko')">한국어</button>
+            <span class="text-gray-400">/</span>
+            <button id="btn-en" class="lang-btn" onclick="switchLang('en')">English</button>
+        </div>
+
+        <article class="bg-white rounded-lg shadow-lg p-8 sm:p-12 prose lg:prose-lg max-w-none">
+            
+            <!-- Header -->
+            <header class="mb-8 text-center">
+                <h1 class="lang lang-ko text-4xl font-bold tracking-tight text-gray-900 sm:text-5xl">‘정확도 99 %’에 속지 않는 이유</h1>
+                <h1 class="lang lang-en text-4xl font-bold tracking-tight text-gray-900 sm:text-5xl" style="display:none;">Why You Shouldn't Be Fooled by "99% Accuracy"</h1>
+            </header>
+            
+            <!-- Main Visual -->
+            <figure class="my-8">
+                <img class="w-full rounded-lg shadow-md" src="image_24c014.jpg" alt="그물로 많은 회색 물고기를 잡았지만, 정작 중요한 노란색 물고기 하나를 놓치는 그림" onerror="this.onerror=null;this.src='https://placehold.co/800x500/f0f0f0/333333?text=중요한+1%25를+놓치는+모습';">
+                <figcaption class="lang lang-ko text-center text-sm text-gray-500 mt-2">정확도는 높지만 정작 중요한 가치는 놓칠 수 있습니다.</figcaption>
+                <figcaption class="lang lang-en text-center text-sm text-gray-500 mt-2" style="display:none;">High accuracy might still miss what's truly valuable.</figcaption>
+            </figure>
+
+            <!-- Intro Quote -->
+            <div class="quote-block my-12">
+                <h2 class="lang lang-ko text-2xl font-semibold mb-4">“측정의 그림자”</h2>
+                <h2 class="lang lang-en text-2xl font-semibold mb-4" style="display:none;">“The Shadow of Measurement”</h2>
+                <p class="lang lang-ko text-lg leading-relaxed">“숫자는 세계를 단순화해 줍니다. 하지만 단순함은 언제나 그림자를 남깁니다. 우리는 머신러닝 모델의 ‘정확도 99 %’라는 밝은 숫자를 보는 동안, 그 뒤에 드리운 1 %의 어둠을 잊기 쉽습니다. 기술은 빛과 그림자를 함께 보라 요구합니다 — 숫자가 가리키는 방향뿐 아니라, 숫자가 놓치고 있는 삶의 결까지.”</p>
+                <p class="lang lang-en text-lg leading-relaxed" style="display:none;">“Numbers simplify the world. But simplicity always leaves a shadow. While we see the bright number of ‘99% accuracy’ from a machine learning model, it’s easy to forget the 1% of darkness behind it. Technology demands that we see both the light and the shadow—not just the direction the numbers point to, but also the texture of life they miss.”</p>
+            </div>
+
+            <!-- Section 1 -->
+            <section class="mt-12">
+                <h2 class="lang lang-ko text-3xl font-bold mb-6 border-b pb-2">1. 머신러닝 모델의 ‘정확도’가 숨기는 함정</h2>
+                <h2 class="lang lang-en text-3xl font-bold mb-6 border-b pb-2" style="display:none;">1. The Hidden Pitfall of 'Accuracy' in ML Models</h2>
+                <div class="lang lang-ko">
+                    <p class="mb-4">특히 소수의 정답(예: 구매, 사기, 불량)을 예측해야 하는 <strong>불균형 데이터셋(Imbalanced Dataset)</strong> 문제에서, 머신러닝 모델의 정확도는 쉽게 함정이 됩니다. 100명 중 1명만 구매하는 쇼핑몰을 예로 들어보죠.</p>
+                    <p>만약 모델이 모든 방문자를 '미구매'로 예측한다면, 99명을 맞혔으니 <strong>정확도는 99%</strong>가 됩니다. 하지만 정작 비즈니스에 중요한 <strong>‘돈 쓰는 1명’</strong>을 완전히 놓치게 됩니다.</p>
+                </div>
+                <div class="lang lang-en" style="display:none;">
+                    <p class="mb-4">Especially in problems with an <strong>Imbalanced Dataset</strong>, where the goal is to predict a minority class (e.g., purchase, fraud, defect), a model's accuracy can be a trap. Let's take an example of a shopping site where only 1 out of 100 visitors makes a purchase.</p>
+                    <p>If a model predicts every visitor as 'will not purchase,' it correctly identifies 99 people, resulting in an <strong>accuracy of 99%</strong>. However, it completely misses the one person who actually spends money—the very target that matters to the business.</p>
+                </div>
+                
+                <table class="content-table">
+                    <thead>
+                        <tr>
+                            <th class="lang lang-ko">방문자</th><th class="lang lang-en" style="display:none;">Visitors</th>
+                            <th class="lang lang-ko">실제 구매</th><th class="lang lang-en" style="display:none;">Actual Purchases</th>
+                            <th class="lang lang-ko">모델 예측</th><th class="lang lang-en" style="display:none;">Model Prediction</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>100</td>
+                            <td>1</td>
+                            <td class="lang lang-ko">전원 '미구매'</td><td class="lang lang-en" style="display:none;">All 'No Purchase'</td>
+                        </tr>
+                    </tbody>
+                </table>
+                <p class="lang lang-ko">이처럼 모델의 예측 성능을 제대로 이해하려면 정확도 너머를 봐야 합니다.</p>
+                <p class="lang lang-en" style="display:none;">This shows that to truly understand a model's performance, we must look beyond accuracy.</p>
+            </section>
+            
+            <!-- And so on for all other sections... -->
+
+            <!-- Section 2 -->
+            <section class="mt-12">
+                <h2 class="lang lang-ko text-3xl font-bold mb-6 border-b pb-2">2. 모델 성능을 제대로 묻는 두 가지 질문: 정밀도와 재현율</h2>
+                <h2 class="lang lang-en text-3xl font-bold mb-6 border-b pb-2" style="display:none;">2. Two Key Questions for Model Performance: Precision & Recall</h2>
+                <div class="lang lang-ko">
+                    <p>모델의 예측 결과를 네 가지 경우로 나눈 표, <strong>혼동 행렬(Confusion Matrix)</strong>을 보면 모델의 진짜 성능을 파악할 수 있습니다. 이 혼동 행렬을 기반으로 계산되는 ‘정밀도’와 ‘재현율’이 바로 우리가 던져야 할 진짜 질문입니다.</p>
+                </div>
+                <div class="lang lang-en" style="display:none;">
+                    <p>The <strong>Confusion Matrix</strong>, which categorizes prediction results into four outcomes, reveals a model's true performance. The real questions we should be asking are about 'Precision' and 'Recall,' which are calculated from this matrix.</p>
+                </div>
+                
+                 <table class="content-table">
+                    <thead>
+                        <tr>
+                            <th class="lang lang-ko">당신이 던질 질문</th><th class="lang lang-en" style="display:none;">The Question to Ask</th>
+                            <th class="lang lang-ko">핵심 지표</th><th class="lang lang-en" style="display:none;">Key Metric</th>
+                            <th class="lang lang-ko">머신러닝 관점의 의미</th><th class="lang lang-en" style="display:none;">Meaning in ML Terms</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td class="lang lang-ko">“모델이 '구매'라고 예측한 것 중 진짜는?”</td><td class="lang lang-en" style="display:none;">“Of those the model predicted as 'purchase', how many actually did?”</td>
+                            <td><strong>Precision</strong></td>
+                            <td class="lang lang-ko">False Positive(오탐)를 얼마나 줄였나? (헛발질 비용)</td><td class="lang lang-en" style="display:none;">How well did it reduce False Positives? (Cost of mistakes)</td>
+                        </tr>
+                        <tr>
+                            <td class="lang lang-ko">“실제 구매자 중 모델이 맞춘 비율은?”</td><td class="lang lang-en" style="display:none;">“Of all actual purchasers, what percentage did the model identify?”</td>
+                            <td><strong>Recall</strong></td>
+                            <td class="lang lang-ko">False Negative(미탐)를 얼마나 줄였나? (기회 손실)</td><td class="lang lang-en" style="display:none;">How well did it reduce False Negatives? (Cost of missed opportunities)</td>
+                        </tr>
+                    </tbody>
+                </table>
+                <ul class="list-none space-y-2 mt-4 text-lg">
+                    <li class="lang lang-ko"><strong class="font-semibold text-sky-700">비용이 아까우면</strong> (e.g. VIP 쿠폰) 정밀도를 우선하세요.</li>
+                    <li class="lang lang-ko"><strong class="font-semibold text-teal-700">놓치면 치명적이면</strong> (e.g. 암 진단) 재현율을 우선하세요.</li>
+                    <li class="lang lang-en" style="display:none;"><strong class="font-semibold text-sky-700">If costs are a concern</strong> (e.g., VIP coupons), prioritize Precision.</li>
+                    <li class="lang lang-en" style="display:none;"><strong class="font-semibold text-teal-700">If missing out is critical</strong> (e.g., cancer diagnosis), prioritize Recall.</li>
+                </ul>
+            </section>
+
+            <!-- Section 3 -->
+            <section class="mt-12">
+                <h2 class="lang lang-ko text-3xl font-bold mb-6 border-b pb-2">3. 숫자가 말해주는 비즈니스 성장 기회</h2>
+                <h2 class="lang lang-en text-3xl font-bold mb-6 border-b pb-2" style="display:none;">3. The Business Growth Opportunity in the Numbers</h2>
+                <div class="lang lang-ko">
+                    <p>만약 머신러닝 모델의 정밀도와 재현율이 모두 낮다면, 이는 곧 성장 기회를 의미합니다. 다음은 한 웹사이트의 실제 모델 평가 사례입니다.</p>
+                </div>
+                 <div class="lang lang-en" style="display:none;">
+                    <p>If both precision and recall for a model are low, it signifies a growth opportunity. Here is a real-world model evaluation case from a website.</p>
+                </div>
+
+                 <table class="content-table">
+                    <thead>
+                        <tr>
+                            <th class="lang lang-ko">지표</th><th class="lang lang-en" style="display:none;">Metric</th>
+                            <th class="lang lang-ko">값</th><th class="lang lang-en" style="display:none;">Value</th>
+                            <th class="lang lang-ko">해석</th><th class="lang lang-en" style="display:none;">Interpretation</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>Accuracy</td>
+                            <td>98 %</td>
+                            <td class="lang lang-ko text-blue-600">겉보기엔 완벽해 보임</td><td class="lang lang-en text-blue-600" style="display:none;">Looks perfect on the surface</td>
+                        </tr>
+                        <tr>
+                            <td>Precision</td>
+                            <td>38 %</td>
+                            <td class="lang lang-ko text-slate-600">마케팅 예산 62 % 낭비 (False Positive)</td><td class="lang lang-en text-slate-600" style="display:none;">62% of marketing budget wasted (False Positives)</td>
+                        </tr>
+                         <tr>
+                            <td>Recall</td>
+                            <td>32 %</td>
+                            <td class="lang lang-ko text-slate-600">구매 고객 68 % 놓침 (False Negative)</td><td class="lang lang-en text-slate-600" style="display:none;">Missed 68% of potential customers (False Negatives)</td>
+                        </tr>
+                    </tbody>
+                </table>
+                <p class="lang lang-ko">이처럼 정확도 뒤에 숨은 낮은 정밀도와 재현율을 개선하면 큰 성과를 만들 수 있습니다. 둘 중 하나만 <strong>50%</strong>로 올려도 연 매출 <strong>+▲ 억 원</strong>, 마케팅비 <strong>–▼ %</strong>가 가능할 수 있습니다.</p>
+                <p class="lang lang-en" style="display:none;">Improving the low precision and recall hidden behind high accuracy can lead to significant results. Raising just one of them to <strong>50%</strong> could increase annual revenue by <strong>millions</strong> and decrease marketing costs by a significant <strong>percentage</strong>.</p>
+            </section>
+            
+            <!-- Section 4 -->
+            <section class="mt-12">
+                <h2 class="lang lang-ko text-3xl font-bold mb-6 border-b pb-2">4. 정밀도-재현율 트레이드오프: 모델 튜닝의 핵심</h2>
+                <h2 class="lang lang-en text-3xl font-bold mb-6 border-b pb-2" style="display:none;">4. Precision-Recall Trade-off: The Core of Model Tuning</h2>
+                <div class="lang lang-ko">
+                    <p>정밀도와 재현율은 종종 시소처럼 움직입니다. 이 균형을 조절하는 것이 모델 튜닝의 핵심이며, 주로 <strong>결정 임계값(Decision Threshold)</strong>을 조정하여 이뤄집니다. 모델이 예측을 '긍정'으로 판단하는 기준점을 높이면 정밀도가 올라가고(더 확실할 때만 긍정으로 판단), 낮추면 재현율이 올라갑니다(조금이라도 가능성 있으면 긍정으로 판단).</p>
+                </div>
+                 <div class="lang lang-en" style="display:none;">
+                    <p>Precision and recall often have a seesaw-like relationship. Balancing them is the core of model tuning, typically done by adjusting the <strong>Decision Threshold</strong>. Raising the threshold for the model to classify a prediction as 'positive' increases precision (predicting positive only when certain), while lowering it increases recall (predicting positive even with slight potential).</p>
+                </div>
+
+                <div class="grid md:grid-cols-2 gap-8 mt-6">
+                    <div class="bg-sky-50 p-6 rounded-lg">
+                        <h3 class="lang lang-ko font-bold text-xl text-sky-800">정밀도 우선 (임계값 상향)</h3>
+                        <h3 class="lang lang-en font-bold text-xl text-sky-800" style="display:none;">Prioritize Precision (Increase Threshold)</h3>
+                        <ul class="lang lang-ko list-disc list-inside mt-2 text-gray-700">
+                            <li>스팸 필터 (일반 메일을 스팸으로 보내면 안 됨)</li>
+                            <li>VIP 쿠폰 발송 (비용 낭비 최소화)</li>
+                            <li>고가 의료 기기 추천</li>
+                        </ul>
+                         <ul class="lang lang-en list-disc list-inside mt-2 text-gray-700" style="display:none;">
+                            <li>Spam Filter (Must not classify normal mail as spam)</li>
+                            <li>VIP Coupon Dispatch (Minimize budget waste)</li>
+                            <li>High-cost Medical Device Recommendations</li>
+                        </ul>
+                    </div>
+                    <div class="bg-teal-50 p-6 rounded-lg">
+                        <h3 class="lang lang-ko font-bold text-xl text-teal-800">재현율 우선 (임계값 하향)</h3>
+                        <h3 class="lang lang-en font-bold text-xl text-teal-800" style="display:none;">Prioritize Recall (Decrease Threshold)</h3>
+                         <ul class="lang lang-ko list-disc list-inside mt-2 text-gray-700">
+                            <li>암 진단 (한 명의 환자라도 놓치면 치명적)</li>
+                            <li>금융 사기 탐지</li>
+                            <li>신규 고객 발굴</li>
+                        </ul>
+                         <ul class="lang lang-en list-disc list-inside mt-2 text-gray-700" style="display:none;">
+                            <li>Cancer Diagnosis (Missing a single patient is critical)</li>
+                            <li>Financial Fraud Detection</li>
+                            <li>New Customer Acquisition</li>
+                        </ul>
+                    </div>
+                </div>
+            </section>
+
+            <!-- TIP Box -->
+            <div class="tip-box">
+                <h3 class="lang lang-ko font-bold text-lg mb-2 text-gray-800">TIP | 현실적인 모델 개선 목표 설정하기</h3>
+                <h3 class="lang lang-en font-bold text-lg mb-2 text-gray-800" style="display:none;">TIP | Setting Realistic Model Improvement Goals</h3>
+                <ol class="lang lang-ko list-decimal list-inside space-y-1 text-gray-700">
+                    <li>모델의 현재 정밀도·재현율을 <strong>혼동 행렬</strong>을 통해 구한다.</li>
+                    <li>각 지표를 비즈니스 비용·수익으로 환산한다.</li>
+                    <li>‘손익이 0이 되는 임계값’을 찾는다.</li>
+                    <li>그보다 +5 ~ 10%를 <strong>모델 튜닝</strong>의 다음 분기 목표로 설정한다.</li>
+                </ol>
+                <ol class="lang lang-en list-decimal list-inside space-y-1 text-gray-700" style="display:none;">
+                    <li>Calculate the model's current precision and recall using the <strong>Confusion Matrix</strong>.</li>
+                    <li>Translate each metric into business costs and revenues.</li>
+                    <li>Find the 'break-even threshold' where profit is zero.</li>
+                    <li>Set the next quarter's goal for <strong>model tuning</strong> at +5 ~ 10% above that.</li>
+                </ol>
+            </div>
+
+            <!-- Section 5 -->
+            <section>
+                 <h2 class="lang lang-ko text-3xl font-bold mb-6 border-b pb-2">5. 다음 모델 평가 회의에서 써먹어 보세요</h2>
+                 <h2 class="lang lang-en text-3xl font-bold mb-6 border-b pb-2" style="display:none;">5. Try These at Your Next Model Review Meeting</h2>
+                 <div class="lang lang-ko space-y-4">
+                    <p class="bg-gray-100 p-4 rounded-lg shadow-sm">“정확도 말고 이 모델의 <strong class="text-blue-600">혼동 행렬(Confusion Matrix)</strong>을 보여주시겠어요?”</p>
+                    <p class="bg-gray-100 p-4 rounded-lg shadow-sm">“<strong class="text-blue-600">결정 임계값</strong>을 조정했을 때 정밀도와 재현율이 어떻게 변하는지 시뮬레이션해볼 수 있나요?”</p>
+                    <p class="bg-gray-100 p-4 rounded-lg shadow-sm">“그래서 <strong class="text-blue-600">False Positive로 인한 비용</strong>과 <strong class="text-blue-600">False Negative로 인한 기회 손실</strong>이 각각 얼마인가요?”</p>
+                 </div>
+                  <div class="lang lang-en space-y-4" style="display:none;">
+                    <p class="bg-gray-100 p-4 rounded-lg shadow-sm">“Instead of accuracy, could you show me the <strong class="text-blue-600">Confusion Matrix</strong> for this model?”</p>
+                    <p class="bg-gray-100 p-4 rounded-lg shadow-sm">“Can we simulate how precision and recall change when we adjust the <strong class="text-blue-600">decision threshold</strong>?”</p>
+                    <p class="bg-gray-100 p-4 rounded-lg shadow-sm">“So what are the respective <strong class="text-blue-600">costs from False Positives</strong> and <strong class="text-blue-600">lost opportunities from False Negatives</strong>?”</p>
+                 </div>
+            </section>
+
+            <!-- Footer -->
+            <footer class="mt-16 pt-8 border-t">
+                 <div class="quote-block">
+                    <h2 class="lang lang-ko text-2xl font-semibold mb-4">“측정 이후의 책임”</h2>
+                    <h2 class="lang lang-en text-2xl font-semibold mb-4" style="display:none;">“Responsibility After Measurement”</h2>
+                    <p class="lang lang-ko text-lg leading-relaxed">“측정은 끝이 아니라 시작입니다. 99%가 말해 주지 않는 1%의 실패, 38%가 남긴 62%의 낭비 — 이 숫자들은 ‘무엇을 할 것인가’라는 질문을 우리에게 돌려줍니다. 기술은 문제를 드러내 주지만, 문제를 해결할 책임은 결국 사람에게 있습니다. 우리가 데이터를 묻는 방식이 바뀔 때, 비즈니스는 이익을 넘어서 ‘더 나은 선택’을 증명할 수 있습니다.”</p>
+                    <p class="lang lang-en text-lg leading-relaxed" style="display:none;">“Measurement is not the end, but the beginning. The 1% failure not told by 99% accuracy, the 62% waste left by 38% precision—these numbers return to us the question of ‘what to do next.’ Technology reveals problems, but the responsibility to solve them ultimately lies with people. When we change the way we question data, business can prove it's making ‘better choices’ beyond just profit.”</p>
+                </div>
+            </footer>
+        </article>
+    </div>
+
+    <script>
+        const titles = {
+            ko: '‘정확도 99 %’에 속지 않는 이유',
+            en: 'Why You Shouldn\'t Be Fooled by "99% Accuracy"'
+        };
+
+        function switchLang(lang) {
+            // Set html tag's lang attribute and class
+            document.documentElement.lang = lang;
+            document.documentElement.className = lang;
+
+            // Update page title
+            document.title = titles[lang];
+
+            // Show/hide all elements with 'lang' class
+            document.querySelectorAll('.lang').forEach(el => {
+                if (el.classList.contains(`lang-${lang}`)) {
+                    el.style.display = '';
+                } else {
+                    el.style.display = 'none';
+                }
+            });
+
+            // Update active button style
+            document.querySelectorAll('.lang-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            document.getElementById(`btn-${lang}`).classList.add('active');
+        }
+
+        // Initialize with Korean
+        document.addEventListener('DOMContentLoaded', () => {
+            switchLang('ko');
+        });
+    </script>
+</body>
+</html>
