@@ -64,7 +64,7 @@
     </style>
 </head>
 <body class="bg-slate-50">
-    <div class="container mx-auto max-w-6xl px-4 py-12 sm:py-20">
+    <div class="container mx-auto max-w-4xl px-4 py-12 sm:py-20">
         
         <!-- Language Switcher -->
         <div class="text-right mb-4">
@@ -73,7 +73,7 @@
             <button id="btn-en" class="lang-btn" onclick="switchLang('en')">English</button>
         </div>
 
-        <article class="bg-white rounded-lg shadow-lg p-8 sm:p-12 prose lg:prose-lg max-w-none">
+        <article class="bg-white rounded-lg shadow-lg p-8 sm:p-12 prose lg:prose-lg">
             
             <!-- Header -->
             <header class="mb-8 text-center">
@@ -82,7 +82,7 @@
             </header>
             
             <!-- Main Visual: Adjusted width and centered -->
-            <figure class="my-8 max-w-4xl mx-auto">
+            <figure class="my-8">
                 <img class="w-full rounded-lg shadow-md" src="https://storage.googleapis.com/static.prompthunt.com/image_24c014.jpg" alt="그물로 많은 회색 물고기를 잡았지만, 정작 중요한 노란색 물고기 하나를 놓치는 그림" onerror="this.onerror=null;this.src='https://placehold.co/800x500/f0f0f0/333333?text=중요한+1%25를+놓치는+모습';">
                 <figcaption class="lang lang-ko text-center text-sm text-gray-500 mt-2">정확도는 높지만 정작 중요한 가치는 놓칠 수 있습니다.</figcaption>
                 <figcaption class="lang lang-en text-center text-sm text-gray-500 mt-2" style="display:none;">High accuracy might still miss what's truly valuable.</figcaption>
@@ -280,7 +280,7 @@
                     <p class="bg-gray-100 p-4 rounded-lg shadow-sm">“<strong class="text-blue-600">결정 임계값</strong>을 조정했을 때 정밀도와 재현율이 어떻게 변하는지 시뮬레이션해볼 수 있나요?”</p>
                     <p class="bg-gray-100 p-4 rounded-lg shadow-sm">“그래서 <strong class="text-blue-600">False Positive로 인한 비용</strong>과 <strong class="text-blue-600">False Negative로 인한 기회 손실</strong>이 각각 얼마인가요?”</p>
                  </div>
-                  <div class="lang lang-en space-y-4" style="display:none;">
+                 <div class="lang lang-en space-y-4" style="display:none;">
                     <p class="bg-gray-100 p-4 rounded-lg shadow-sm">“Instead of accuracy, could you show me the <strong class="text-blue-600">Confusion Matrix</strong> for this model?”</p>
                     <p class="bg-gray-100 p-4 rounded-lg shadow-sm">“Can we simulate how precision and recall change when we adjust the <strong class="text-blue-600">decision threshold</strong>?”</p>
                     <p class="bg-gray-100 p-4 rounded-lg shadow-sm">“So what are the respective <strong class="text-blue-600">costs from False Positives</strong> and <strong class="text-blue-600">lost opportunities from False Negatives</strong>?”</p>
