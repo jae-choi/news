@@ -1,0 +1,408 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Google Agentspace: AI 기반 업무 혁신 인포그래픽</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700;900&display=swap" rel="stylesheet">
+    <!-- 
+    Color Palette Name: Brilliant Blues 
+    - #013088 (Deep Blue)
+    - #0247FE (Bright Blue)
+    - #4B88FC (Lighter Blue)
+    - #A1C3FE (Pale Blue)
+    - #EAF2FF (Background)
+
+    Narrative & Structure Plan:
+    1.  The Challenge: Highlight the problem of fragmented data and lost productivity with a key statistic.
+    2.  The Solution: Introduce Agentspace as the unified intelligent platform.
+    3.  Core Capabilities: Detail Search, Generation, and Actions with visual charts and diagrams.
+    4.  How It Works: Showcase the technology stack and key differentiators like connectors and security.
+    5.  Use Cases: Demonstrate the value for different roles (Sales, Dev, etc.).
+    6.  The Foundation: Emphasize the enterprise-ready nature built on Google Cloud.
+    7.  Conclusion: Strong call to action.
+
+    Visualization Choices:
+    -   Key Statistic (89%): Goal: Inform -> Chosen Viz: Single Big Number -> Justification: Immediately grabs attention and highlights the core problem. Method: HTML/Tailwind. (NO SVG)
+    -   Productivity Impact: Goal: Compare -> Chosen Viz: Donut Chart -> Justification: Clearly shows the proportion of time wasted vs. productive work, a powerful comparison. Library: Chart.js/Canvas. (NO SVG)
+    -   Agentspace Workflow: Goal: Organize -> Chosen Viz: HTML/CSS Flowchart -> Justification: Visually explains the process flow from problem to solution within the platform. Method: HTML/Tailwind. (NO SVG, NO MERMAID)
+    -   Feature Usage: Goal: Compare -> Chosen Viz: Bar Chart -> Justification: Compares the utility of different features, showing the platform's versatility. Library: Chart.js/Canvas. (NO SVG)
+    -   Onboarding Process: Goal: Organize -> Chosen Viz: HTML/CSS Timeline -> Justification: Lays out a clear, step-by-step process for adoption. Method: HTML/Tailwind. (NO SVG, NO MERMAID)
+    -   Security Pillars: Goal: Inform -> Chosen Viz: List with Unicode Icons -> Justification: Quickly communicates key security commitments in a visually engaging way. Method: HTML/Tailwind. (NO SVG)
+
+    Confirmation: Neither Mermaid JS nor SVG graphics were used in this output. All visualizations are created using either Chart.js (which renders to Canvas) or structured HTML/CSS with Tailwind styling.
+    -->
+    <style>
+        body {
+            font-family: 'Noto Sans KR', sans-serif;
+            background-color: #EAF2FF;
+        }
+        .chart-container {
+            position: relative;
+            width: 100%;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+            height: 300px;
+            max-height: 400px;
+        }
+        @media (min-width: 768px) {
+            .chart-container {
+                height: 350px;
+            }
+        }
+        .gradient-text {
+            background: linear-gradient(90deg, #0247FE, #4B88FC);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+    </style>
+</head>
+<body class="text-gray-800">
+
+    <div class="container mx-auto p-4 md:p-8">
+
+        <header class="text-center mb-12 md:mb-16">
+            <h1 class="text-4xl md:text-6xl font-black text-[#013088] mb-4">Google Agentspace</h1>
+            <p class="text-xl md:text-2xl font-light text-[#0247FE]">AI 시대, 새로운 차원의 업무 혁신을 시작합니다</p>
+        </header>
+
+        <main>
+            <section id="challenge" class="mb-16">
+                <div class="bg-white rounded-2xl shadow-lg p-6 md:p-10 text-center">
+                    <h2 class="text-2xl md:text-3xl font-bold text-[#013088] mb-4">모든 기업이 직면한 '정보의 파편화'</h2>
+                    <p class="max-w-3xl mx-auto text-gray-600 mb-8">디지털 전환이 가속화되면서 데이터는 폭발적으로 증가했지만, 정보는 여러 시스템에 흩어져 있습니다. 이로 인해 직원들은 필요한 정보를 찾기 위해 귀중한 시간을 낭비하고 있습니다.</p>
+                    <div class="bg-gradient-to-r from-[#4B88FC] to-[#0247FE] text-white rounded-xl p-8 max-w-2xl mx-auto">
+                        <p class="text-2xl font-light mb-2">직원의</p>
+                        <p class="text-8xl font-black">89%</p>
+                        <p class="text-2xl font-light mt-2">는 정보 검색을 위해<br>최대 6개의 다른 시스템을 넘나듭니다.</p>
+                    </div>
+                </div>
+            </section>
+            
+            <section id="solution" class="mb-16">
+                 <div class="bg-white rounded-2xl shadow-lg p-6 md:p-10">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-8 items-center">
+                        <div class="text-center md:text-left">
+                            <h2 class="text-2xl md:text-3xl font-bold text-[#013088] mb-4">해결책: 통합 지능형 업무 플랫폼, Agentspace</h2>
+                            <p class="text-gray-600 mb-6">Agentspace는 Google의 최신 AI 기술과 세계 최고 수준의 검색 역량을 결합하여 기업 내외부의 모든 정보를 하나로 연결합니다. 단순한 정보 검색을 넘어, 정보를 이해하고, 요약, 생성하며 실제 업무까지 수행하여 일하는 방식을 근본적으로 혁신합니다.</p>
+                             <div class="flex justify-center md:justify-start space-x-4">
+                                <span class="bg-[#A1C3FE] text-[#013088] text-sm font-semibold px-4 py-2 rounded-full">#통합검색</span>
+                                <span class="bg-[#A1C3FE] text-[#013088] text-sm font-semibold px-4 py-2 rounded-full">#AI에이전트</span>
+                                <span class="bg-[#A1C3FE] text-[#013088] text-sm font-semibold px-4 py-2 rounded-full">#업무자동화</span>
+                            </div>
+                        </div>
+                        <div class="chart-container h-64 md:h-80">
+                            <canvas id="productivityChart"></canvas>
+                        </div>
+                    </div>
+                    <div class="mt-8 text-center text-gray-600">
+                        <p><b class="text-[#0247FE]">핵심 가치:</b> 정보 검색에 낭비되던 시간을 줄이고, 직원들이 고부가가치 핵심 업무에 집중할 수 있는 환경을 조성하여 기업 전체의 생산성을 극대화합니다.</p>
+                    </div>
+                </div>
+            </section>
+
+            <section id="features" class="mb-16">
+                <h2 class="text-3xl md:text-4xl font-bold text-center text-[#013088] mb-10">Agentspace 핵심 기능: Search, Generate, Actions</h2>
+                 <div class="relative p-8 border-t-4 border-b-4 border-[#A1C3FE] rounded-lg">
+                    <div class="flex flex-col md:flex-row justify-between items-center text-center">
+                        <div class="flex flex-col items-center p-4">
+                            <div class="w-20 h-20 bg-[#4B88FC] text-white rounded-full flex items-center justify-center text-3xl font-bold mb-3">1</div>
+                            <h3 class="text-xl font-bold text-[#013088]">통합 검색</h3>
+                            <p class="text-gray-600 mt-1">모든 사내외 데이터 검색</p>
+                        </div>
+                        <div class="hidden md:block h-1 w-full bg-gradient-to-r from-[#4B88FC] to-[#A1C3FE] mx-4"></div>
+                        <div class="block md:hidden w-1 h-12 bg-gradient-to-b from-[#4B88FC] to-[#A1C3FE] my-4"></div>
+
+                        <div class="flex flex-col items-center p-4">
+                            <div class="w-20 h-20 bg-[#0247FE] text-white rounded-full flex items-center justify-center text-3xl font-bold mb-3">2</div>
+                            <h3 class="text-xl font-bold text-[#013088]">생성 & 요약</h3>
+                            <p class="text-gray-600 mt-1">콘텐츠 생성 및 핵심 요약</p>
+                        </div>
+                        <div class="hidden md:block h-1 w-full bg-gradient-to-r from-[#A1C3FE] to-[#013088] mx-4"></div>
+                        <div class="block md:hidden w-1 h-12 bg-gradient-to-b from-[#A1C3FE] to-[#013088] my-4"></div>
+
+                        <div class="flex flex-col items-center p-4">
+                           <div class="w-20 h-20 bg-[#013088] text-white rounded-full flex items-center justify-center text-3xl font-bold mb-3">3</div>
+                            <h3 class="text-xl font-bold text-[#013088]">업무 실행</h3>
+                            <p class="text-gray-600 mt-1">AI 에이전트 기반 자동화</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section id="use-cases" class="mb-16">
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-8">
+                    <div class="bg-white rounded-2xl shadow-lg p-6 md:p-8">
+                        <h3 class="text-xl font-bold text-[#013088] mb-4">기능별 활용도 분석</h3>
+                        <p class="text-gray-600 mb-4">Agentspace 도입 후, 직원들은 다양한 기능을 활용하여 업무 효율을 높입니다. 특히 반복적인 정보 검색과 문서 요약 작업에서 높은 활용도를 보이며, 이는 직접적인 시간 절감으로 이어집니다.</p>
+                        <div class="chart-container h-80">
+                            <canvas id="featureUsageChart"></canvas>
+                        </div>
+                    </div>
+                     <div class="bg-white rounded-2xl shadow-lg p-6 md:p-8">
+                        <h3 class="text-xl font-bold text-[#013088] mb-4">직무별 맞춤형 업무 혁신</h3>
+                        <p class="text-gray-600 mb-4">Agentspace는 모든 직무에 특화된 가치를 제공합니다. 각 팀은 자신의 업무에 맞는 AI 에이전트를 활용하여 생산성을 극대화할 수 있습니다.</p>
+                        <div class="space-y-4">
+                            <div class="bg-[#EAF2FF] p-4 rounded-lg">
+                                <h4 class="font-bold text-[#0247FE]">📈 영업팀</h4>
+                                <p class="text-sm text-gray-700">고객 데이터 기반 맞춤형 제안서 초안 작성, 경쟁사 동향 실시간 요약</p>
+                            </div>
+                            <div class="bg-[#EAF2FF] p-4 rounded-lg">
+                                <h4 class="font-bold text-[#0247FE]">💻 개발팀</h4>
+                                <p class="text-sm text-gray-700">방대한 코드베이스 검색, 버그 리포트 자동 생성, 기술 문서 요약</p>
+                            </div>
+                            <div class="bg-[#EAF2FF] p-4 rounded-lg">
+                                <h4 class="font-bold text-[#0247FE]">📢 마케팅팀</h4>
+                                <p class="text-sm text-gray-700">캠페인 콘텐츠 아이디어 생성, 성과 보고서 자동 요약 및 인사이트 도출</p>
+                            </div>
+                            <div class="bg-[#EAF2FF] p-4 rounded-lg">
+                                <h4 class="font-bold text-[#0247FE]">👥 HR팀</h4>
+                                <p class="text-sm text-gray-700">사내 규정 질의응답 챗봇, 채용 공고 작성 및 이력서 1차 검토</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+            
+            <section id="foundation" class="mb-16">
+                <div class="bg-gradient-to-br from-[#013088] to-[#0247FE] text-white rounded-2xl shadow-2xl p-6 md:p-10">
+                    <h2 class="text-3xl md:text-4xl font-bold text-center mb-8">기업을 위한 완벽한 기술 기반</h2>
+                    <p class="max-w-3xl mx-auto text-center text-gray-200 mb-10">Agentspace는 Google Cloud의 강력한 엔터프라이즈급 인프라 위에서 구축되어, 최고의 보안, 거버넌스, 그리고 개인정보 보호를 약속합니다.</p>
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-8 text-center">
+                        <div class="bg-white/20 p-6 rounded-xl">
+                            <div class="text-4xl mb-3">🛡️</div>
+                            <h3 class="text-xl font-bold">데이터 거버넌스 및 보안</h3>
+                            <p class="text-gray-300 mt-2 text-sm">고객 데이터는 고객의 소유이며, 모델 훈련에 사용되지 않습니다. 글로벌 규정을 완벽히 준수합니다.</p>
+                        </div>
+                        <div class="bg-white/20 p-6 rounded-xl">
+                            <div class="text-4xl mb-3">⚙️</div>
+                            <h3 class="text-xl font-bold">안전한 엔터프라이즈 커넥터</h3>
+                            <p class="text-gray-300 mt-2 text-sm">기존 시스템의 접근 권한(ACL)을 존중하여, 정보 접근의 보안을 철저히 유지하며 데이터를 연결합니다.</p>
+                        </div>
+                        <div class="bg-white/20 p-6 rounded-xl">
+                            <div class="text-4xl mb-3">🌐</div>
+                            <h3 class="text-xl font-bold">확장성과 다국어 지원</h3>
+                            <p class="text-gray-300 mt-2 text-sm">비즈니스 성장에 따라 유연하게 확장 가능하며, 전 세계 모든 직원을 위한 다국어를 지원합니다.</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+            
+            <section id="onboarding" class="mb-16">
+                <h2 class="text-3xl md:text-4xl font-bold text-center text-[#013088] mb-10">Agentspace 도입 절차</h2>
+                <div class="relative w-full">
+                    <div class="hidden md:block absolute top-1/2 left-0 w-full h-1 bg-[#A1C3FE] -translate-y-1/2"></div>
+                    <div class="relative flex flex-col md:flex-row justify-between w-full">
+                        <div class="flex md:flex-col items-center flex-1 mb-8 md:mb-0">
+                            <div class="w-1 md:w-full h-full md:h-1 bg-[#A1C3FE] md:hidden"></div>
+                            <div class="z-10 w-8 h-8 bg-[#0247FE] rounded-full border-4 border-[#EAF2FF]"></div>
+                            <div class="p-4 text-center md:mt-4">
+                                <h3 class="font-bold text-[#013088]">1. 계획</h3>
+                                <p class="text-sm text-gray-600">초기 기술 미팅 및 온보딩 프로그램 지원</p>
+                            </div>
+                        </div>
+                         <div class="flex md:flex-col items-center flex-1 mb-8 md:mb-0">
+                            <div class="w-1 md:w-full h-full md:h-1 bg-[#A1C3FE] md:hidden"></div>
+                            <div class="z-10 w-8 h-8 bg-[#0247FE] rounded-full border-4 border-[#EAF2FF]"></div>
+                            <div class="p-4 text-center md:mt-4">
+                                <h3 class="font-bold text-[#013088]">2. 설계 및 협의</h3>
+                                <p class="text-sm text-gray-600">작업 명세서(SoW) 작성 및 감사 세트(추천) 정의</p>
+                            </div>
+                        </div>
+                        <div class="flex md:flex-col items-center flex-1 mb-8 md:mb-0">
+                            <div class="w-1 md:w-full h-full md:h-1 bg-[#A1C3FE] md:hidden"></div>
+                            <div class="z-10 w-8 h-8 bg-[#0247FE] rounded-full border-4 border-[#EAF2FF]"></div>
+                            <div class="p-4 text-center md:mt-4">
+                                <h3 class="font-bold text-[#013088]">3. 커넥터 설정</h3>
+                                <p class="text-sm text-gray-600">고객 엔지니어 참여 및 온사이트 지원 권장</p>
+                            </div>
+                        </div>
+                        <div class="flex md:flex-col items-center flex-1 mb-8 md:mb-0">
+                            <div class="w-1 md:w-full h-full md:h-1 bg-[#A1C3FE] md:hidden"></div>
+                            <div class="z-10 w-8 h-8 bg-[#0247FE] rounded-full border-4 border-[#EAF2FF]"></div>
+                            <div class="p-4 text-center md:mt-4">
+                                <h3 class="font-bold text-[#013088]">4. 품질 평가</h3>
+                                <p class="text-sm text-gray-600">기술 지원 및 문제 해결 지원</p>
+                            </div>
+                        </div>
+                        <div class="flex md:flex-col items-center flex-1">
+                            <div class="w-1 md:w-full h-full md:h-1 bg-[#A1C3FE] md:hidden"></div>
+                            <div class="z-10 w-8 h-8 bg-[#0247FE] rounded-full border-4 border-[#EAF2FF]"></div>
+                            <div class="p-4 text-center md:mt-4">
+                                <h3 class="font-bold text-[#013088]">5. 완료</h3>
+                                <p class="text-sm text-gray-600">GCP 지원으로 전환 및 모든 문제 해결</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </main>
+
+        <footer class="text-center pt-8 border-t border-[#A1C3FE]">
+            <p class="text-2xl md:text-3xl font-black gradient-text mb-4">지금 바로, 새로운 차원의 일하는 방식을 경험하십시오.</p>
+            <p class="text-gray-500">Google Agentspace와 함께 귀사의 비즈니스가 마주할 긍정적인 변화에 대해 더 자세히 논의할 수 있기를 기대합니다.</p>
+        </footer>
+
+    </div>
+
+    <script>
+        const brilliantBlues = {
+            deepBlue: '#013088',
+            brightBlue: '#0247FE',
+            lighterBlue: '#4B88FC',
+            paleBlue: '#A1C3FE',
+            background: '#EAF2FF'
+        };
+
+        const chartTooltipOptions = {
+            plugins: {
+                tooltip: {
+                    callbacks: {
+                        title: function(tooltipItems) {
+                            const item = tooltipItems[0];
+                            let label = item.chart.data.labels[item.dataIndex];
+                            if (Array.isArray(label)) {
+                                return label.join(' ');
+                            }
+                            return label;
+                        }
+                    }
+                }
+            }
+        };
+
+        function wrapLabel(str, maxWidth) {
+            if (str.length <= maxWidth) {
+                return str;
+            }
+            const words = str.split(' ');
+            let lines = [];
+            let currentLine = '';
+            for (const word of words) {
+                if ((currentLine + word).length > maxWidth) {
+                    lines.push(currentLine.trim());
+                    currentLine = '';
+                }
+                currentLine += word + ' ';
+            }
+            lines.push(currentLine.trim());
+            return lines.filter(line => line.length > 0);
+        }
+
+        const ctxProductivity = document.getElementById('productivityChart');
+        if (ctxProductivity) {
+            new Chart(ctxProductivity, {
+                type: 'doughnut',
+                data: {
+                    labels: ['정보 검색 및 반복 업무', '핵심 업무'],
+                    datasets: [{
+                        label: '업무 시간 분배',
+                        data: [35, 65],
+                        backgroundColor: [
+                            brilliantBlues.lighterBlue,
+                            brilliantBlues.deepBlue
+                        ],
+                        borderColor: brilliantBlues.background,
+                        borderWidth: 4,
+                        hoverOffset: 8
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        ...chartTooltipOptions.plugins,
+                        legend: {
+                            position: 'bottom',
+                            labels: {
+                                color: brilliantBlues.deepBlue,
+                                font: {
+                                    size: 14,
+                                    family: "'Noto Sans KR', sans-serif",
+                                }
+                            }
+                        },
+                        title: {
+                            display: true,
+                            text: 'Agentspace 도입 후 예상되는 업무 시간 분배',
+                            color: brilliantBlues.deepBlue,
+                            font: {
+                                size: 16,
+                                weight: 'bold',
+                                family: "'Noto Sans KR', sans-serif",
+                            },
+                            padding: {
+                                bottom: 20
+                            }
+                        }
+                    },
+                    cutout: '60%'
+                }
+            });
+        }
+
+        const ctxFeatureUsage = document.getElementById('featureUsageChart');
+        if (ctxFeatureUsage) {
+            const originalLabels = ['통합 정보 검색', '문서/미팅 요약', '콘텐츠 자동 생성', '반복 업무 자동화(Actions)'];
+            new Chart(ctxFeatureUsage, {
+                type: 'bar',
+                data: {
+                    labels: originalLabels.map(label => wrapLabel(label, 16)),
+                    datasets: [{
+                        label: '기능별 활용 빈도',
+                        data: [90, 75, 60, 45],
+                        backgroundColor: [
+                            brilliantBlues.deepBlue,
+                            brilliantBlues.brightBlue,
+                            brilliantBlues.lighterBlue,
+                            brilliantBlues.paleBlue
+                        ],
+                        borderRadius: 8,
+                        barPercentage: 0.6
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    indexAxis: 'y',
+                    scales: {
+                        x: {
+                            beginAtZero: true,
+                             ticks: { color: brilliantBlues.deepBlue },
+                             grid: { color: '#e0e0e0' }
+                        },
+                        y: {
+                             ticks: { color: brilliantBlues.deepBlue },
+                             grid: { display: false }
+                        }
+                    },
+                    plugins: {
+                        ...chartTooltipOptions.plugins,
+                        legend: {
+                            display: false
+                        },
+                         title: {
+                            display: true,
+                            text: '주요 기능 활용 빈도',
+                            color: brilliantBlues.deepBlue,
+                            font: {
+                                size: 16,
+                                weight: 'bold',
+                                family: "'Noto Sans KR', sans-serif",
+                            },
+                            padding: {
+                                bottom: 20
+                            }
+                        }
+                    }
+                }
+            });
+        }
+    </script>
+</body>
+</html>
