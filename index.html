@@ -14,7 +14,7 @@
             background-color: #FFFBF7;
             color: #4A403A;
         }
-        .en body {
+        .en {
              font-family: 'Roboto', sans-serif;
         }
         .project-card {
@@ -34,10 +34,13 @@
         .card-text {
             flex-grow: 1;
         }
-        /* Enforce consistent font sizes for card content */
         .project-card h3 {
             font-size: 1.25rem; /* 20px */
             line-height: 1.75rem; /* 28px */
+            font-weight: 700;
+        }
+        .en .project-card h3 {
+            font-size: 1.3rem;
         }
         .project-card .card-text p {
             font-size: 1rem; /* 16px */
@@ -110,11 +113,15 @@
                 
                 <!-- Project Card 1: Google Agentspace -->
                 <div class="project-card bg-white rounded-lg shadow-md overflow-hidden">
-                    <img src="https://placehold.co/600x400/D75A4A/FFFBF7?text=Agentspace+Report" alt="Google Agentspace Project" class="w-full h-48 object-cover">
+                    <svg class="w-full h-48" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Placeholder: Agentspace Report">
+                        <title>Agentspace Report</title>
+                        <rect width="100%" height="100%" fill="#D75A4A"></rect>
+                        <text x="50%" y="50%" fill="#FFFBF7" dy=".3em" text-anchor="middle" font-size="20" font-weight="bold" font-family="Roboto, sans-serif">Agentspace Report</text>
+                    </svg>
                     <div class="p-6 md:p-8 card-content">
                         <div class="card-text">
-                            <h3 class="lang lang-ko font-bold text-xl mb-3 primary-heading">Google Agentspace 인터랙티브 리포트</h3>
-                            <h3 class="lang lang-en font-bold text-xl mb-3 primary-heading" style="display:none;">Google Agentspace Interactive Report</h3>
+                            <h3 class="lang lang-ko mb-3 primary-heading">Google Agentspace 인터랙티브 리포트</h3>
+                            <h3 class="lang lang-en mb-3 primary-heading" style="display:none;">Google Agentspace Interactive Report</h3>
 
                             <p class="lang lang-ko secondary-text mb-6">복잡한 기업용 AI 플랫폼 제안서를 사용자가 쉽게 탐색할 수 있는 인터랙티브 웹 앱으로 시각화했습니다.</p>
                             <p class="lang lang-en secondary-text mb-6" style="display:none;">Visualized a complex enterprise AI platform proposal into an interactive web app for easy user exploration.</p>
@@ -126,11 +133,15 @@
 
                 <!-- Project Card 2: 99% Accuracy Article -->
                 <div class="project-card bg-white rounded-lg shadow-md overflow-hidden">
-                    <img src="image_24c014.jpg" alt="A net catching many gray fish but missing a single important yellow fish" class="w-full h-48 object-cover" onerror="this.onerror=null;this.src='https://placehold.co/600x400/B94545/FFFBF7?text=Analysis+Image';">
+                    <svg class="w-full h-48" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Placeholder: Analysis Image">
+                        <title>Analysis(ML)</title>
+                        <rect width="100%" height="100%" fill="#D75A4A"></rect>
+                        <text x="50%" y="50%" fill="#FFFBF7" dy=".3em" text-anchor="middle" font-size="20" font-weight="bold" font-family="Roboto, sans-serif">Analysis Image</text>
+                    </svg>
                     <div class="p-6 md:p-8 card-content">
                         <div class="card-text">
-                            <h3 class="lang lang-ko font-bold text-xl mb-3 primary-heading">'정확도 99%'에 속지 않는 이유</h3>
-                            <h3 class="lang lang-en font-bold text-xl mb-3 primary-heading" style="display:none;">Why You Shouldn't Be Fooled by '99% Accuracy'</h3>
+                            <h3 class="lang lang-ko mb-3 primary-heading">'정확도 99%'에 속지 않는 이유</h3>
+                            <h3 class="lang lang-en mb-3 primary-heading" style="display:none;">Why You Shouldn't Be Fooled by '99% Accuracy'</h3>
                             
                             <p class="lang lang-ko secondary-text mb-6">머신러닝 모델의 정확도가 비즈니스 가치를 왜곡하는 방식을 분석하고, 정밀도와 재현율의 중요성을 탐구하는 기술 분석 글입니다.</p>
                             <p class="lang lang-en secondary-text mb-6" style="display:none;">A technical analysis exploring how machine learning model accuracy can distort business value and the importance of precision and recall.</p>
@@ -143,11 +154,15 @@
 
                 <!-- Project Card 3: Placeholder -->
                 <div class="project-card bg-white rounded-lg shadow-md overflow-hidden">
-                    <img src="https://placehold.co/600x400/A23B3B/FFFBF7?text=Project+Three" alt="세 번째 프로젝트" class="w-full h-48 object-cover">
+                    <svg class="w-full h-48" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Placeholder: Project Three">
+                        <title>Project Three</title>
+                        <rect width="100%" height="100%" fill="#A23B3B"></rect>
+                        <text x="50%" y="50%" fill="#FFFBF7" dy=".3em" text-anchor="middle" font-size="20" font-weight="bold" font-family="Roboto, sans-serif">Project Three</text>
+                    </svg>
                     <div class="p-6 md:p-8 card-content">
                         <div class="card-text">
-                            <h3 class="lang lang-ko font-bold text-xl mb-3 primary-heading">세 번째 프로젝트 (예시)</h3>
-                            <h3 class="lang lang-en font-bold text-xl mb-3 primary-heading" style="display:none;">Project Three (Example)</h3>
+                            <h3 class="lang lang-ko mb-3 primary-heading">세 번째 프로젝트 (예시)</h3>
+                            <h3 class="lang lang-en mb-3 primary-heading" style="display:none;">Project Three (Example)</h3>
 
                             <p class="lang lang-ko secondary-text mb-6">세 번째 프로젝트에 대한 설명입니다. 이미지와 링크를 수정하여 사용하세요.</p>
                             <p class="lang lang-en secondary-text mb-6" style="display:none;">Description for the third project. Modify the image and link as needed.</p>
@@ -206,7 +221,6 @@
             document.querySelectorAll('.lang').forEach(el => {
                 const displayValue = el.classList.contains(`lang-${lang}`) ? '' : 'none';
                 if (el.tagName === 'A' || el.tagName === 'SPAN') {
-                     // For inline elements, toggle between 'inline-block' and 'none'
                      el.style.display = el.classList.contains(`lang-${lang}`) ? 'inline-block' : 'none';
                 } else {
                      el.style.display = el.classList.contains(`lang-${lang}`) ? '' : 'none';
