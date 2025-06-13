@@ -3,16 +3,20 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- Title will be updated by JS -->
     <title>Peter Choi | AI & Data Specialist</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700;900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700;900&family=Roboto:wght@300;400;500;700;900&display=swap" rel="stylesheet">
     <style>
         body {
             font-family: 'Noto Sans KR', sans-serif;
             background-color: #FFFBF7; /* 따뜻한 오프화이트 배경 */
             color: #4A403A; /* 따뜻한 회갈색 텍스트 */
+        }
+        .en body {
+             font-family: 'Roboto', sans-serif;
         }
         .project-card {
             transition: transform 0.3s ease, box-shadow 0.3s ease;
@@ -34,16 +38,31 @@
         .btn-primary:hover {
             background-color: #A23B3B; /* 뮤트 레드 */
         }
+        .lang-btn.active {
+            font-weight: 700;
+            color: #B94545;
+            text-decoration: underline;
+        }
     </style>
 </head>
 <body class="antialiased">
+    
+    <!-- Language Switcher -->
+    <div class="container mx-auto px-6 pt-6 text-right">
+        <button id="btn-ko" class="lang-btn" onclick="switchLang('ko')">한국어</button>
+        <span class="text-gray-400">/</span>
+        <button id="btn-en" class="lang-btn" onclick="switchLang('en')">English</button>
+    </div>
 
     <!-- Header & Hero Section -->
     <header class="bg-white">
         <div class="container mx-auto px-6 py-10 md:py-12 text-center">
             <h1 class="text-3xl md:text-5xl font-black primary-heading">Peter Choi</h1>
-            <p class="mt-3 text-base md:text-lg secondary-text max-w-5xl mx-auto mb-6 md:mb-8">
+            <p class="lang lang-ko mt-3 text-base md:text-lg secondary-text max-w-5xl mx-auto mb-6 md:mb-8">
                 AI와 데이터의 최신 트렌드를 공유합니다. 새로운 소식을 넘어, 그것이 왜 중요한지에 대한 통찰을 나눕니다.
+            </p>
+             <p class="lang lang-en mt-3 text-base md:text-lg secondary-text max-w-5xl mx-auto mb-6 md:mb-8" style="display:none;">
+                I share the latest trends in AI and data. Beyond just the news, I offer insights into why it matters.
             </p>
         </div>
     </header>
@@ -52,7 +71,8 @@
 
         <!-- Portfolio Section -->
         <section id="portfolio" class="mb-10 md:mb-16">
-            <h2 class="text-3xl font-bold text-center primary-heading mb-12">Selected Work & Analysis</h2>
+            <h2 class="lang lang-ko text-3xl font-bold text-center primary-heading mb-12">Selected Work & Analysis</h2>
+            <h2 class="lang lang-en text-3xl font-bold text-center primary-heading mb-12" style="display:none;">Selected Work & Analysis</h2>
 
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
                 
@@ -60,23 +80,30 @@
                 <div class="project-card bg-white rounded-lg shadow-md overflow-hidden">
                     <img src="https://placehold.co/600x400/D75A4A/FFFBF7?text=Agentspace+Report" alt="Google Agentspace Project" class="w-full h-48 object-cover">
                     <div class="p-6 md:p-8">
-                        <h3 class="font-bold text-xl mb-3 primary-heading">Google Agentspace 인터랙티브 리포트</h3>
-                        <p class="secondary-text mb-6 text-base leading-relaxed">
-                            기업 내 흩어진 정보와 앱을 통합하는 Google의 지능형 업무 플랫폼, Agentspace의 핵심 가치를 시각화.
-                        </p>
-                        <a href="https://jae-choi.github.io/news/agentspace.html" target="_blank" class="inline-block btn-primary px-5 py-2.5 text-base font-semibold rounded-md transition-colors">프로젝트 보기 &rarr;</a>
+                        <h3 class="lang lang-ko font-bold text-xl mb-3 primary-heading">Google Agentspace 인터랙티브 리포트</h3>
+                        <h3 class="lang lang-en font-bold text-xl mb-3 primary-heading" style="display:none;">Google Agentspace Interactive Report</h3>
+
+                        <p class="lang lang-ko secondary-text mb-6 text-base leading-relaxed">복잡한 기업용 AI 플랫폼 제안서를 사용자가 쉽게 탐색할 수 있는 인터랙티브 웹 앱으로 시각화했습니다.</p>
+                        <p class="lang lang-en secondary-text mb-6 text-base leading-relaxed" style="display:none;">Visualized a complex enterprise AI platform proposal into an interactive web app for easy user exploration.</p>
+
+                        <a href="https://jae-choi.github.io/news/agentspace.html" target="_blank" class="lang lang-ko inline-block btn-primary px-5 py-2.5 text-base font-semibold rounded-md transition-colors">프로젝트 보기 &rarr;</a>
+                        <a href="https://jae-choi.github.io/news/agentspace.html" target="_blank" class="lang lang-en inline-block btn-primary px-5 py-2.5 text-base font-semibold rounded-md transition-colors" style="display:none;">View Project &rarr;</a>
                     </div>
                 </div>
 
-                <!-- Project Card 2: Placeholder -->
+                <!-- Project Card 2: 99% Accuracy Article -->
                 <div class="project-card bg-white rounded-lg shadow-md overflow-hidden">
-                    <img src="https://placehold.co/600x400/B94545/FFFBF7?text=Project+Two" alt="두 번째 프로젝트" class="w-full h-48 object-cover">
+                    <img src="image_24c014.jpg" alt="A net catching many gray fish but missing a single important yellow fish" class="w-full h-48 object-cover" onerror="this.onerror=null;this.src='https://placehold.co/600x400/B94545/FFFBF7?text=Analysis+Image';">
                     <div class="p-6 md:p-8">
-                        <h3 class="font-bold text-xl mb-3 primary-heading">두 번째 프로젝트 (예시)</h3>
-                        <p class="secondary-text mb-6 text-base leading-relaxed">
-                            여기에 두 번째 프로젝트에 대한 간략한 설명을 추가할 수 있습니다.
-                        </p>
-                        <a href="#" class="inline-block bg-gray-300 text-gray-600 px-5 py-2.5 text-base font-semibold rounded-md cursor-not-allowed">준비 중</a>
+                        <h3 class="lang lang-ko font-bold text-xl mb-3 primary-heading">'정확도 99%'에 속지 않는 이유</h3>
+                        <h3 class="lang lang-en font-bold text-xl mb-3 primary-heading" style="display:none;">Why You Shouldn't Be Fooled by '99% Accuracy'</h3>
+                        
+                        <p class="lang lang-ko secondary-text mb-6 text-base leading-relaxed">머신러닝 모델의 정확도가 비즈니스 가치를 왜곡하는 방식을 분석하고, 정밀도와 재현율의 중요성을 탐구하는 기술 분석 글입니다.</p>
+                        <p class="lang lang-en secondary-text mb-6 text-base leading-relaxed" style="display:none;">A technical analysis exploring how machine learning model accuracy can distort business value and the importance of precision and recall.</p>
+
+                        <!-- The link should point to the actual article. For now, it's a placeholder. -->
+                        <a href="https://jae-choi.github.io/news/machine.html" class="lang lang-ko inline-block btn-primary px-5 py-2.5 text-base font-semibold rounded-md transition-colors">분석 보기 &rarr;</a>
+                        <a href="https://jae-choi.github.io/news/machine.html" class="lang lang-en inline-block btn-primary px-5 py-2.5 text-base font-semibold rounded-md transition-colors" style="display:none;">View Analysis &rarr;</a>
                     </div>
                 </div>
 
@@ -84,11 +111,14 @@
                 <div class="project-card bg-white rounded-lg shadow-md overflow-hidden">
                     <img src="https://placehold.co/600x400/A23B3B/FFFBF7?text=Project+Three" alt="세 번째 프로젝트" class="w-full h-48 object-cover">
                     <div class="p-6 md:p-8">
-                        <h3 class="font-bold text-xl mb-3 primary-heading">세 번째 프로젝트 (예시)</h3>
-                        <p class="secondary-text mb-6 text-base leading-relaxed">
-                            세 번째 프로젝트에 대한 설명입니다. 이미지와 링크를 수정하여 사용하세요.
-                        </p>
-                         <a href="#" class="inline-block bg-gray-300 text-gray-600 px-5 py-2.5 text-base font-semibold rounded-md cursor-not-allowed">준비 중</a>
+                        <h3 class="lang lang-ko font-bold text-xl mb-3 primary-heading">세 번째 프로젝트 (예시)</h3>
+                        <h3 class="lang lang-en font-bold text-xl mb-3 primary-heading" style="display:none;">Project Three (Example)</h3>
+
+                        <p class="lang lang-ko secondary-text mb-6 text-base leading-relaxed">세 번째 프로젝트에 대한 설명입니다. 이미지와 링크를 수정하여 사용하세요.</p>
+                        <p class="lang lang-en secondary-text mb-6 text-base leading-relaxed" style="display:none;">Description for the third project. Modify the image and link as needed.</p>
+
+                        <a href="#" class="lang lang-ko inline-block bg-gray-300 text-gray-600 px-5 py-2.5 text-base font-semibold rounded-md cursor-not-allowed">준비 중</a>
+                        <a href="#" class="lang lang-en inline-block bg-gray-300 text-gray-600 px-5 py-2.5 text-base font-semibold rounded-md cursor-not-allowed" style="display:none;">Coming Soon</a>
                     </div>
                 </div>
 
@@ -98,9 +128,13 @@
         <!-- About Section -->
         <section id="about" class="mt-16 md:mt-24">
             <div class="max-w-5xl mx-auto bg-white p-4 md:p-6 rounded-lg shadow-sm">
-                <h2 class="text-xl md:text-2xl font-bold text-center primary-heading mb-4">Tech and Philosophy</h2>
-                <p class="text-center text-sm md:text-base secondary-text leading-relaxed md:leading-loose">
+                <h2 class="lang lang-ko text-xl md:text-2xl font-bold text-center primary-heading mb-4">Tech and Philosophy</h2>
+                <h2 class="lang lang-en text-xl md:text-2xl font-bold text-center primary-heading mb-4" style="display:none;">Tech and Philosophy</h2>
+                <p class="lang lang-ko text-center text-sm md:text-base secondary-text leading-relaxed md:leading-loose">
                     저는 기술과 철학의 교차점에서 생성형 AI, 멀티 에이전트 시스템, 그리고 응용 머신러닝이 우리의 사고방식과 의사결정 과정을 어떻게 바꾸고 있는지 탐구합니다. 이곳에서 정제된 인사이트와 실용적인 아이디어, 그리고 생각해 볼 만한 최신 업데이트를 만나보실 수 있습니다.
+                </p>
+                <p class="lang lang-en text-center text-sm md:text-base secondary-text leading-relaxed md:leading-loose" style="display:none;">
+                    At the intersection of technology and philosophy, I explore how generative AI, multi-agent systems, and applied machine learning are transforming our ways of thinking and decision-making processes. Here, you will find refined insights, practical ideas, and the latest updates worth considering.
                 </p>
             </div>
         </section>
@@ -110,10 +144,12 @@
     <!-- Footer -->
     <footer class="bg-white mt-16 md:mt-24">
         <div class="container mx-auto px-6 py-8">
-            <h2 class="text-2xl font-bold text-center primary-heading mb-6">Connect & Follow</h2>
+            <h2 class="lang lang-ko text-2xl font-bold text-center primary-heading mb-6">Connect & Follow</h2>
+            <h2 class="lang lang-en text-2xl font-bold text-center primary-heading mb-6" style="display:none;">Connect & Follow</h2>
             <div class="flex justify-center space-x-6">
-                <a href="https://www.linkedin.com/in/jaeeun-choi-a660b718b/" target="_blank" class="secondary-text hover:text-[#B94545] font-semibold transition-colors">LinkedIn</a>
+                <a href="#" target="_blank" class="secondary-text hover:text-[#B94545] font-semibold transition-colors">LinkedIn</a>
                 <a href="#" target="_blank" class="secondary-text hover:text-[#B94545] font-semibold transition-colors">Website</a>
+                <a href="#" target="_blank" class="secondary-text hover:text-[#B94545] font-semibold transition-colors">X (Twitter)</a>
                 <a href="https://github.com/jae-choi" target="_blank" class="secondary-text hover:text-[#B94545] font-semibold transition-colors">GitHub</a>
             </div>
             <div class="text-center text-gray-400 mt-8 text-sm">
@@ -123,7 +159,40 @@
     </footer>
 
     <script>
-        document.getElementById('year').textContent = new Date().getFullYear();
+        const titles = {
+            ko: 'Peter Choi | AI & Data Specialist',
+            en: 'Peter Choi | AI & Data Specialist'
+        };
+
+        function switchLang(lang) {
+            // Set html tag's lang attribute and class
+            document.documentElement.lang = lang;
+            document.documentElement.className = lang;
+
+            // Update page title
+            document.title = titles[lang];
+
+            // Show/hide all elements with 'lang' class
+            document.querySelectorAll('.lang').forEach(el => {
+                if (el.classList.contains(`lang-${lang}`)) {
+                    el.style.display = '';
+                } else {
+                    el.style.display = 'none';
+                }
+            });
+
+            // Update active button style
+            document.querySelectorAll('.lang-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            document.getElementById(`btn-${lang}`).classList.add('active');
+        }
+
+        // Initialize with Korean
+        document.addEventListener('DOMContentLoaded', () => {
+            switchLang('ko');
+            document.getElementById('year').textContent = new Date().getFullYear();
+        });
     </script>
 
 </body>
