@@ -3,7 +3,6 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <!-- Title will be updated by JS -->
     <title>Peter Choi | AI & Data Specialist</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -12,31 +11,64 @@
     <style>
         body {
             font-family: 'Noto Sans KR', sans-serif;
-            background-color: #FFFBF7; /* 따뜻한 오프화이트 배경 */
-            color: #4A403A; /* 따뜻한 회갈색 텍스트 */
+            background-color: #FFFBF7;
+            color: #4A403A;
         }
         .en body {
              font-family: 'Roboto', sans-serif;
         }
         .project-card {
+            display: flex;
+            flex-direction: column;
             transition: transform 0.3s ease, box-shadow 0.3s ease;
         }
         .project-card:hover {
             transform: translateY(-5px);
             box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.07), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
         }
+        .card-content {
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+        }
+        .card-text {
+            flex-grow: 1;
+        }
+        /* Enforce consistent font sizes for card content */
+        .project-card h3 {
+            font-size: 1.25rem; /* 20px */
+            line-height: 1.75rem; /* 28px */
+        }
+        .project-card .card-text p {
+            font-size: 1rem; /* 16px */
+            line-height: 1.625; /* Consistent line height */
+        }
         .primary-heading {
-            color: #B94545; /* 딥 테라코타 레드 */
+            color: #B94545;
         }
         .secondary-text {
-            color: #6B5F58; /* Darkened warm gray for better contrast */
+            color: #6B5F58;
+        }
+        .btn-primary, .btn-disabled {
+            display: inline-block;
+            padding: 0.625rem 1.25rem; /* 10px 20px */
+            font-size: 1rem; /* 16px */
+            font-weight: 600;
+            border-radius: 0.375rem; /* 6px */
+            transition: background-color 0.3s;
+            text-align: center;
         }
         .btn-primary {
-            background-color: #D75A4A; /* 번트 시에나 */
+            background-color: #D75A4A;
             color: white;
         }
         .btn-primary:hover {
-            background-color: #A23B3B; /* 뮤트 레드 */
+            background-color: #A23B3B;
+        }
+        .btn-disabled {
+             background-color: #D1D5DB;
+             color: #6B7280;
+             cursor: not-allowed;
         }
         .lang-btn.active {
             font-weight: 700;
@@ -46,7 +78,7 @@
     </style>
 </head>
 <body class="antialiased">
-    
+
     <!-- Language Switcher -->
     <div class="container mx-auto px-6 pt-6 text-right">
         <button id="btn-ko" class="lang-btn" onclick="switchLang('ko')">한국어</button>
@@ -79,46 +111,49 @@
                 <!-- Project Card 1: Google Agentspace -->
                 <div class="project-card bg-white rounded-lg shadow-md overflow-hidden">
                     <img src="https://placehold.co/600x400/D75A4A/FFFBF7?text=Agentspace+Report" alt="Google Agentspace Project" class="w-full h-48 object-cover">
-                    <div class="p-6 md:p-8">
-                        <h3 class="lang lang-ko font-bold text-xl mb-3 primary-heading">Google Agentspace 인터랙티브 리포트</h3>
-                        <h3 class="lang lang-en font-bold text-xl mb-3 primary-heading" style="display:none;">Google Agentspace Interactive Report</h3>
+                    <div class="p-6 md:p-8 card-content">
+                        <div class="card-text">
+                            <h3 class="lang lang-ko font-bold text-xl mb-3 primary-heading">Google Agentspace 인터랙티브 리포트</h3>
+                            <h3 class="lang lang-en font-bold text-xl mb-3 primary-heading" style="display:none;">Google Agentspace Interactive Report</h3>
 
-                        <p class="lang lang-ko secondary-text mb-6 text-base leading-relaxed">복잡한 기업용 AI 플랫폼 제안서를 사용자가 쉽게 탐색할 수 있는 인터랙티브 웹 앱으로 시각화했습니다.</p>
-                        <p class="lang lang-en secondary-text mb-6 text-base leading-relaxed" style="display:none;">Visualized a complex enterprise AI platform proposal into an interactive web app for easy user exploration.</p>
-
-                        <a href="https://jae-choi.github.io/news/agentspace.html" target="_blank" class="lang lang-ko inline-block btn-primary px-5 py-2.5 text-base font-semibold rounded-md transition-colors">프로젝트 보기 &rarr;</a>
-                        <a href="https://jae-choi.github.io/news/agentspace.html" target="_blank" class="lang lang-en inline-block btn-primary px-5 py-2.5 text-base font-semibold rounded-md transition-colors" style="display:none;">View Project &rarr;</a>
+                            <p class="lang lang-ko secondary-text mb-6">복잡한 기업용 AI 플랫폼 제안서를 사용자가 쉽게 탐색할 수 있는 인터랙티브 웹 앱으로 시각화했습니다.</p>
+                            <p class="lang lang-en secondary-text mb-6" style="display:none;">Visualized a complex enterprise AI platform proposal into an interactive web app for easy user exploration.</p>
+                        </div>
+                        <a href="https://jae-choi.github.io/news/agentspace.html" target="_blank" class="lang lang-ko btn-primary">프로젝트 보기 &rarr;</a>
+                        <a href="https://jae-choi.github.io/news/agentspace.html" target="_blank" class="lang lang-en btn-primary" style="display:none;">View Project &rarr;</a>
                     </div>
                 </div>
 
                 <!-- Project Card 2: 99% Accuracy Article -->
                 <div class="project-card bg-white rounded-lg shadow-md overflow-hidden">
                     <img src="image_24c014.jpg" alt="A net catching many gray fish but missing a single important yellow fish" class="w-full h-48 object-cover" onerror="this.onerror=null;this.src='https://placehold.co/600x400/B94545/FFFBF7?text=Analysis+Image';">
-                    <div class="p-6 md:p-8">
-                        <h3 class="lang lang-ko font-bold text-xl mb-3 primary-heading">'정확도 99%'에 속지 않는 이유</h3>
-                        <h3 class="lang lang-en font-bold text-xl mb-3 primary-heading" style="display:none;">Why You Shouldn't Be Fooled by '99% Accuracy'</h3>
-                        
-                        <p class="lang lang-ko secondary-text mb-6 text-base leading-relaxed">머신러닝 모델의 정확도가 비즈니스 가치를 왜곡하는 방식을 분석하고, 정밀도와 재현율의 중요성을 탐구하는 기술 분석 글입니다.</p>
-                        <p class="lang lang-en secondary-text mb-6 text-base leading-relaxed" style="display:none;">A technical analysis exploring how machine learning model accuracy can distort business value and the importance of precision and recall.</p>
-
-                        <!-- The link should point to the actual article. For now, it's a placeholder. -->
-                        <a href="https://jae-choi.github.io/news/machine.html" class="lang lang-ko inline-block btn-primary px-5 py-2.5 text-base font-semibold rounded-md transition-colors">분석 보기 &rarr;</a>
-                        <a href="https://jae-choi.github.io/news/machine.html" class="lang lang-en inline-block btn-primary px-5 py-2.5 text-base font-semibold rounded-md transition-colors" style="display:none;">View Analysis &rarr;</a>
+                    <div class="p-6 md:p-8 card-content">
+                        <div class="card-text">
+                            <h3 class="lang lang-ko font-bold text-xl mb-3 primary-heading">'정확도 99%'에 속지 않는 이유</h3>
+                            <h3 class="lang lang-en font-bold text-xl mb-3 primary-heading" style="display:none;">Why You Shouldn't Be Fooled by '99% Accuracy'</h3>
+                            
+                            <p class="lang lang-ko secondary-text mb-6">머신러닝 모델의 정확도가 비즈니스 가치를 왜곡하는 방식을 분석하고, 정밀도와 재현율의 중요성을 탐구하는 기술 분석 글입니다.</p>
+                            <p class="lang lang-en secondary-text mb-6" style="display:none;">A technical analysis exploring how machine learning model accuracy can distort business value and the importance of precision and recall.</p>
+                        </div>
+                        <a href="https://jae-choi.github.io/news/machine.html" target="_blank" class="lang lang-ko btn-primary">분석 보기 &rarr;</a>
+                        <a href="https://jae-choi.github.io/news/machine.html" target="_blank" class="lang lang-en btn-primary" style="display:none;">View Analysis &rarr;</a>
                     </div>
                 </div>
+
 
                 <!-- Project Card 3: Placeholder -->
                 <div class="project-card bg-white rounded-lg shadow-md overflow-hidden">
                     <img src="https://placehold.co/600x400/A23B3B/FFFBF7?text=Project+Three" alt="세 번째 프로젝트" class="w-full h-48 object-cover">
-                    <div class="p-6 md:p-8">
-                        <h3 class="lang lang-ko font-bold text-xl mb-3 primary-heading">세 번째 프로젝트 (예시)</h3>
-                        <h3 class="lang lang-en font-bold text-xl mb-3 primary-heading" style="display:none;">Project Three (Example)</h3>
+                    <div class="p-6 md:p-8 card-content">
+                        <div class="card-text">
+                            <h3 class="lang lang-ko font-bold text-xl mb-3 primary-heading">세 번째 프로젝트 (예시)</h3>
+                            <h3 class="lang lang-en font-bold text-xl mb-3 primary-heading" style="display:none;">Project Three (Example)</h3>
 
-                        <p class="lang lang-ko secondary-text mb-6 text-base leading-relaxed">세 번째 프로젝트에 대한 설명입니다. 이미지와 링크를 수정하여 사용하세요.</p>
-                        <p class="lang lang-en secondary-text mb-6 text-base leading-relaxed" style="display:none;">Description for the third project. Modify the image and link as needed.</p>
-
-                        <a href="#" class="lang lang-ko inline-block bg-gray-300 text-gray-600 px-5 py-2.5 text-base font-semibold rounded-md cursor-not-allowed">준비 중</a>
-                        <a href="#" class="lang lang-en inline-block bg-gray-300 text-gray-600 px-5 py-2.5 text-base font-semibold rounded-md cursor-not-allowed" style="display:none;">Coming Soon</a>
+                            <p class="lang lang-ko secondary-text mb-6">세 번째 프로젝트에 대한 설명입니다. 이미지와 링크를 수정하여 사용하세요.</p>
+                            <p class="lang lang-en secondary-text mb-6" style="display:none;">Description for the third project. Modify the image and link as needed.</p>
+                        </div>
+                        <span class="lang lang-ko btn-disabled">준비 중</span>
+                        <span class="lang lang-en btn-disabled" style="display:none;">Coming Soon</span>
                     </div>
                 </div>
 
@@ -149,7 +184,6 @@
             <div class="flex justify-center space-x-6">
                 <a href="#" target="_blank" class="secondary-text hover:text-[#B94545] font-semibold transition-colors">LinkedIn</a>
                 <a href="#" target="_blank" class="secondary-text hover:text-[#B94545] font-semibold transition-colors">Website</a>
-                <a href="#" target="_blank" class="secondary-text hover:text-[#B94545] font-semibold transition-colors">X (Twitter)</a>
                 <a href="https://github.com/jae-choi" target="_blank" class="secondary-text hover:text-[#B94545] font-semibold transition-colors">GitHub</a>
             </div>
             <div class="text-center text-gray-400 mt-8 text-sm">
@@ -165,30 +199,25 @@
         };
 
         function switchLang(lang) {
-            // Set html tag's lang attribute and class
             document.documentElement.lang = lang;
-            document.documentElement.className = lang;
-
-            // Update page title
+            document.documentElement.className = lang === 'en' ? 'en' : '';
             document.title = titles[lang];
 
-            // Show/hide all elements with 'lang' class
             document.querySelectorAll('.lang').forEach(el => {
-                if (el.classList.contains(`lang-${lang}`)) {
-                    el.style.display = '';
+                const displayValue = el.classList.contains(`lang-${lang}`) ? '' : 'none';
+                if (el.tagName === 'A' || el.tagName === 'SPAN') {
+                     // For inline elements, toggle between 'inline-block' and 'none'
+                     el.style.display = el.classList.contains(`lang-${lang}`) ? 'inline-block' : 'none';
                 } else {
-                    el.style.display = 'none';
+                     el.style.display = el.classList.contains(`lang-${lang}`) ? '' : 'none';
                 }
             });
 
-            // Update active button style
             document.querySelectorAll('.lang-btn').forEach(btn => {
-                btn.classList.remove('active');
+                btn.classList.toggle('active', btn.id === `btn-${lang}`);
             });
-            document.getElementById(`btn-${lang}`).classList.add('active');
         }
 
-        // Initialize with Korean
         document.addEventListener('DOMContentLoaded', () => {
             switchLang('ko');
             document.getElementById('year').textContent = new Date().getFullYear();
