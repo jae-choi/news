@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ADK 에이전트와 Vertex AI Agent Engine: 개념, 배포 및 관리</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700&family=Roboto:wght@400;500;700&display=swap">
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        body.ko { font-family: 'Noto Sans KR', sans-serif; }
+        body.en { font-family: 'Roboto', sans-serif; }
+        .card-hover {
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        .card-hover:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+        }
+        .prose-custom {
+            max-width: 80ch;
+            color: #374151;
+        }
+        .prose-custom h2 {
+            font-size: 1.875rem;
+            font-weight: 700;
+            margin-bottom: 2rem;
+            color: #111827;
+        }
+         .prose-custom h3 {
+            font-size: 1.25rem;
+            font-weight: 700;
+            margin-top: 2rem;
+            margin-bottom: 1rem;
+            color: #1f2937;
+        }
+        .lang-btn.active {
+            font-weight: 700;
+            color: #2563eb;
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body class="bg-gray-100">
+
+    <div class="container mx-auto px-4 py-8 md:py-16">
+
+        <!-- Language Switcher -->
+        <div class="text-right mb-4 max-w-screen-xl mx-auto">
+            <button id="btn-ko" class="lang-btn" onclick="switchLang('ko')">한국어</button>
+            <span class="text-gray-400">/</span>
+            <button id="btn-en" class="lang-btn" onclick="switchLang('en')">English</button>
+        </div>
+
+        <!-- Header -->
+        <header class="text-center mb-16">
+            <h1 class="text-4xl sm:text-5xl font-bold text-gray-900">
+                <span class="lang lang-ko">ADK 에이전트와 Vertex AI Agent Engine</span>
+                <span class="lang lang-en">ADK Agents and Vertex AI Agent Engine</span>
+            </h1>
+            <p class="text-xl text-gray-600 mt-6 max-w-3xl mx-auto">
+                <span class="lang lang-ko">확장 가능하고 안정적인 AI 에이전트 워크플로우를 위한 개발, 배포 및 관리 가이드</span>
+                <span class="lang lang-en">A Guide to Developing, Deploying, and Managing Scalable and Stable AI Agent Workflows</span>
+            </p>
+        </header>
+
+        <main class="prose-custom mx-auto">
+
+            <!-- Introduction -->
+            <section class="mb-16">
+                <h2 class="lang lang-ko">소개: 왜 Agent Engine을 사용하는가?</h2>
+                <h2 class="lang lang-en">Introduction: Why Use Agent Engine?</h2>
+                <p class="lang lang-ko">AI 기술이 발전함에 따라, 단순한 모델 호출을 넘어 자율적으로 작업을 수행하는 <strong>'AI 에이전트'</strong>의 중요성이 커지고 있습니다. Google Cloud의 <strong>"ADK(Agent Development Kit)"</strong>는 이러한 에이전트를 효율적으로 구축할 수 있는 개발 도구이며, <strong>"Vertex AI Agent Engine"</strong>은 개발된 에이전트를 프로덕션 환경에서 안정적으로 운영할 수 있도록 지원하는 <strong>완전 관리형 서비스</strong>입니다.</p>
+                <p class="lang lang-en">As AI technology advances, the importance of <strong>'AI Agents'</strong> that autonomously perform tasks beyond simple model calls is growing. Google Cloud's <strong>"ADK (Agent Development Kit)"</strong> is a development tool for efficiently building these agents, and <strong>"Vertex AI Agent Engine"</strong> is a <strong>fully managed service</strong> that supports the stable operation of developed agents in a production environment.</p>
+                <p class="lang lang-ko">Agent Engine을 사용하면 개발자는 복잡한 인프라 관리, 확장성, 안정성 문제에서 벗어나 에이전트의 <strong>핵심 비즈니스 로직 개발에만 집중</strong>할 수 있습니다. 이는 개발 사이클을 단축하고, 더 빠르고 효율적으로 아이디어를 현실화할 수 있게 해줍니다.</p>
+                <p class="lang lang-en">Using Agent Engine allows developers to move away from complex infrastructure management, scalability, and stability issues to <strong>focus solely on the core business logic</strong> of the agent. This shortens the development cycle and enables ideas to be realized faster and more efficiently.</p>
+            </section>
+
+            <!-- Architecture Diagram Section -->
+            <section class="mb-16">
+                <h2 class="lang lang-ko">전체 아키텍처</h2>
+                <h2 class="lang lang-en">Overall Architecture</h2>
+                <figure class="my-8">
+                    <img class="w-full rounded-lg shadow-md border" src="https://cloud.google.com/static/vertex-ai/generative-ai/docs/agent-engine/images/agent-engine.png?hl=ko" alt="ADK와 Agent Engine을 포함한 전체 에이전트 아키텍처 다이어그램" onerror="this.onerror=null;this.src='https://placehold.co/1200x600/f0f0f0/333333?text=Architecture+Diagram';">
+                    <figcaption class="text-center text-sm text-gray-500 mt-2">
+                         <span class="lang lang-ko">Agent Engine은 다양한 에이전트 프레임워크, 도구, 모델을 통합하여 확장 가능한 에이전트 워크플로우를 구성합니다.</span>
+                         <span class="lang lang-en">Agent Engine integrates various agent frameworks, tools, and models to build scalable agent workflows.</span>
+                    </figcaption>
+                </figure>
+            </section>
+
+            <!-- Agent Development & Deployment Lifecycle -->
+            <section class="mb-16">
+                <h2 class="lang lang-ko">에이전트 개발 및 배포 생명주기</h2>
+                <h2 class="lang lang-en">Agent Development and Deployment Lifecycle</h2>
+                <p class="lang lang-ko">ADK 에이전트를 개발하고 Agent Engine에 배포하는 과정은 일반적으로 다음과 같은 체계적인 단계를 따릅니다.</p>
+                <p class="lang lang-en">The process of developing an ADK agent and deploying it to Agent Engine generally follows these systematic steps.</p>
+                
+                <div class="space-y-8 mt-8">
+                    <!-- Phase 1 -->
+                    <div class="bg-white p-6 rounded-lg shadow-md border-l-4 border-blue-500 card-hover">
+                        <h3 class="flex items-center space-x-3"><i data-lucide="laptop" class="text-blue-500"></i>
+                            <span class="lang lang-ko">1단계: 로컬 개발 및 테스트</span>
+                            <span class="lang lang-en">Phase 1: Local Development and Testing</span>
+                        </h3>
+                        <p class="lang lang-ko">모든 개발은 <strong>로컬 환경</strong>에서 시작됩니다. ADK를 사용하여 에이전트의 기본 로직, 도구 사용, 응답 생성 방식을 정의합니다. 배포 전에 로컬에서 충분한 테스트를 거치는 것은 필수적이며, 이를 통해 배포 후 발생할 수 있는 문제를 사전에 예방하고 에이전트의 품질을 보장할 수 있습니다.</p>
+                        <p class="lang lang-en">All development begins in a <strong>local environment</strong>. Use ADK to define the agent's basic logic, tool usage, and response generation methods. Thorough local testing before deployment is essential to prevent potential issues and ensure the agent's quality.</p>
+                    </div>
+
+                    <!-- Phase 2 -->
+                    <div class="bg-white p-6 rounded-lg shadow-md border-l-4 border-green-500 card-hover">
+                        <h3 class="flex items-center space-x-3"><i data-lucide="package" class="text-green-500"></i>
+                            <span class="lang lang-ko">2단계: 에이전트 패키징 및 배포</span>
+                            <span class="lang lang-en">Phase 2: Agent Packaging and Deployment</span>
+                        </h3>
+                        <p class="lang lang-ko">로컬 테스트가 완료된 에이전트는 배포를 위해 <strong>패키징</strong>됩니다. 이 과정에서 에이전트 코드와 필요한 라이브러리(requirements.txt) 등이 하나의 번들로 묶입니다. Vertex AI SDK의 <code>agent_engines.create()</code>와 같은 명령어를 사용하여 이 번들을 Agent Engine에 배포합니다. Agent Engine은 이 번들을 받아 컨테이너화하고, 외부에서 호출 가능한 API 엔드포인트를 자동으로 생성합니다.</p>
+                        <p class="lang lang-en">Once local testing is complete, the agent is <strong>packaged</strong> for deployment. This involves bundling the agent code, required libraries (requirements.txt), and other assets. Use commands like <code>agent_engines.create()</code> from the Vertex AI SDK to deploy this bundle to Agent Engine, which then containerizes it and automatically creates a callable API endpoint.</p>
+                    </div>
+
+                    <!-- Phase 3 -->
+                    <div class="bg-white p-6 rounded-lg shadow-md border-l-4 border-yellow-500 card-hover">
+                        <h3 class="flex items-center space-x-3"><i data-lucide="message-circle" class="text-yellow-500"></i>
+                             <span class="lang lang-ko">3단계: 쿼리 및 상호작용</span>
+                             <span class="lang lang-en">Phase 3: Querying and Interaction</span>
+                        </h3>
+                        <p class="lang lang-ko">에이전트 배포가 완료되면 생성된 엔드포인트를 통해 누구나 에이전트와 상호작용할 수 있습니다. 애플리케이션에서는 SDK의 <code>stream_query()</code>와 같은 메서드를 사용하여 배포된 에이전트에게 작업을 요청(쿼리)하고, 실시간으로 응답을 받아 처리할 수 있습니다. 이 단계에서는 적절한 <strong>IAM 권한</strong>(예: Vertex AI 사용자)을 서비스 계정에 부여하는 것이 중요합니다.</p>
+                        <p class="lang lang-en">After deployment, anyone can interact with the agent via its endpoint. In your application, use methods like <code>stream_query()</code> from the SDK to send requests (queries) to the deployed agent and process responses in real-time. It's crucial to grant appropriate <strong>IAM permissions</strong> (e.g., Vertex AI User) to the service account at this stage.</p>
+                    </div>
+
+                    <!-- Phase 4 -->
+                    <div class="bg-white p-6 rounded-lg shadow-md border-l-4 border-red-500 card-hover">
+                        <h3 class="flex items-center space-x-3"><i data-lucide="list-checks" class="text-red-500"></i>
+                             <span class="lang lang-ko">4단계: 모니터링 및 관리</span>
+                             <span class="lang lang-en">Phase 4: Monitoring and Management</span>
+                        </h3>
+                        <p class="lang lang-ko">운영 중인 에이전트는 지속적인 관리가 필요합니다. Google Cloud 콘솔 또는 SDK의 유틸리티 함수(<code>agent_engines.list()</code>, <code>agent_engines.delete()</code>)를 사용하여 현재 배포된 에이전트의 목록을 확인하고, 성능을 모니터링하며, 더 이상 필요 없는 에이전트는 리소스를 정리할 수 있습니다.</p>
+                        <p class="lang lang-en">Agents in operation require ongoing management. Use the Google Cloud Console or SDK utility functions (<code>agent_engines.list()</code>, <code>agent_engines.delete()</code>) to view the list of currently deployed agents, monitor their performance, and clean up resources for those no longer needed.</p>
+                    </div>
+                </div>
+            </section>
+            
+            <!-- Key Benefits -->
+            <section class="mb-16">
+                 <h2 class="lang lang-ko">핵심 장점</h2>
+                 <h2 class="lang lang-en">Key Advantages</h2>
+                 <ul class="list-disc pl-5 space-y-2">
+                     <li>
+                         <strong class="lang lang-ko">인프라 추상화:</strong><span class="lang lang-ko"> 서버, 컨테이너, 네트워크 등 복잡한 인프라를 신경 쓸 필요 없이 코드 배포에만 집중할 수 있습니다.</span>
+                         <strong class="lang lang-en">Infrastructure Abstraction:</strong><span class="lang lang-en"> Focus solely on code deployment without worrying about complex infrastructure like servers, containers, or networks.</span>
+                     </li>
+                     <li>
+                         <strong class="lang lang-ko">자동 확장성:</strong><span class="lang lang-ko"> 사용자 트래픽에 따라 리소스가 자동으로 확장 및 축소되어 안정적인 서비스를 보장합니다.</span>
+                         <strong class="lang lang-en">Automatic Scalability:</strong><span class="lang lang-en"> Resources automatically scale up or down based on user traffic, ensuring a stable service.</span>
+                     </li>
+                     <li>
+                         <strong class="lang lang-ko">멀티 에이전트 시스템 지원:</strong><span class="lang lang-ko"> 여러 에이전트가 유기적으로 협력하는 복잡한 시스템도 단일 애플리케이션으로 쉽게 배포하고 관리할 수 있습니다.</span>
+                         <strong class="lang lang-en">Multi-Agent System Support:</strong><span class="lang lang-en"> Easily deploy and manage complex systems where multiple agents collaborate organically as a single application.</span>
+                     </li>
+                     <li>
+                         <strong class="lang lang-ko">통합된 개발 경험:</strong><span class="lang lang-ko"> ADK를 통한 로컬 개발부터 Agent Engine을 통한 클라우드 배포까지 일관되고 통합된 개발 환경을 제공합니다.</span>
+                         <strong class="lang lang-en">Integrated Development Experience:</strong><span class="lang lang-en"> Provides a consistent and unified development environment from local development with ADK to cloud deployment with Agent Engine.</span>
+                     </li>
+                 </ul>
+            </section>
+            
+            <!-- Next Steps -->
+            <section class="mb-16">
+                <h2 class="lang lang-ko">결론 및 다음 단계</h2>
+                <h2 class="lang lang-en">Conclusion and Next Steps</h2>
+                <p class="lang lang-ko">ADK와 Vertex AI Agent Engine을 함께 사용하면, 아이디어 구상부터 실제 프로덕션 환경에 AI 에이전트를 배포하고 운영하는 전체 과정을 크게 단순화하고 가속화할 수 있습니다. 이는 개발자가 혁신적인 AI 애플리케이션을 만드는 데 더 많은 시간과 노력을 투자할 수 있게 해주는 강력한 조합입니다.</p>
+                <p class="lang lang-en">Using ADK and Vertex AI Agent Engine together can significantly simplify and accelerate the entire process from ideation to deploying and operating AI agents in a production environment. This powerful combination allows developers to invest more time and effort into creating innovative AI applications.</p>
+                <p class="lang lang-ko">다음 단계로는 에이전트에게 외부 API나 데이터베이스와 같은 <strong>"다양한 도구를 연동"</strong>하여 능력을 확장하거나, 여러 에이전트가 협력하여 복잡한 문제를 해결하는 <strong>"멀티 에이전트 시스템"</strong>을 구축할 수 있습니다.</p>
+                <p class="lang lang-en">For the next steps, you can expand the agent's capabilities by <strong>"integrating various tools"</strong> such as external APIs or databases, or build a <strong>"multi-agent system"</strong> where multiple agents collaborate to solve complex problems.</p>
+            </section>
+
+            <!-- References -->
+            <section>
+                <h2 class="lang lang-ko">참고 자료</h2>
+                <h2 class="lang lang-en">References</h2>
+                <ul class="list-disc pl-5">
+                    <li><a href="https://cloud.google.com/vertex-ai/generative-ai/docs/agent-engine/overview?hl=ko" target="_blank" rel="noopener noreferrer" class="text-blue-600 hover:underline">
+                        <span class="lang lang-ko">Vertex AI Agent Engine 개요 - 공식 문서</span>
+                        <span class="lang lang-en">Vertex AI Agent Engine Overview - Official Documentation</span>
+                    </a></li>
+                </ul>
+            </section>
+
+        </main>
+
+        <!-- Footer -->
+        <footer class="text-center mt-16 pt-8 border-t border-gray-200">
+        </footer>
+
+    </div>
+
+    <script>
+        // Function to switch language
+        function switchLang(lang) {
+            // Set the lang attribute on the body
+            document.body.className = `bg-gray-100 ${lang}`;
+
+            // Hide all elements with 'lang' class
+            document.querySelectorAll('.lang').forEach(el => {
+                el.style.display = 'none';
+            });
+
+            // Show elements for the selected language
+            document.querySelectorAll(`.lang-${lang}`).forEach(el => {
+                el.style.display = '';
+            });
+
+            // Update active state on buttons
+            document.querySelectorAll('.lang-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            document.getElementById(`btn-${lang}`).classList.add('active');
+        }
+
+        // Set default language to Korean on page load
+        document.addEventListener('DOMContentLoaded', () => {
+            switchLang('ko');
+            lucide.createIcons();
+        });
+    </script>
+</body>
+</html>
