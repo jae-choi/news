@@ -1,0 +1,493 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ADK + MCP Agent</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Noto+Sans+KR:wght@400;500;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Noto Sans KR', 'Inter', sans-serif;
+            scroll-behavior: smooth;
+        }
+        .en body {
+            font-family: 'Inter', sans-serif;
+        }
+        .content-section { display: none; }
+        .content-section.active { display: block; }
+        .prose img { border-radius: 0.5rem; margin-top: 1rem; margin-bottom: 1rem; }
+        code.inline-code { background-color: #f3f4f6; color: #4b5563; padding: 0.2em 0.4em; margin: 0; font-size: 85%; border-radius: 6px; }
+        pre { background-color: #1f2937; color: #d1d5db; padding: 1rem; border-radius: 0.5rem; overflow-x: auto; margin-top: 1rem; margin-bottom: 1rem; }
+        .nav-link.active { color: #2563eb; background-color: #eff6ff; border-radius: 0.375rem; }
+        .note { background-color: #fefce8; border-left: 4px solid #facc15; padding: 1rem; margin: 1.5rem 0; }
+        .tip { background-color: #ecfdf5; border-left: 4px solid #34d399; padding: 1rem; margin: 1.5rem 0; }
+        .lang-btn.active {
+            font-weight: 700;
+            color: #2563eb;
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body class="bg-gray-50 text-gray-800">
+
+    <div class="container mx-auto px-4 sm:px-6 lg:px-8">
+        <header class="py-12 text-center">
+            <h1 class="text-4xl font-bold tracking-tight text-gray-900 sm:text-5xl lg:text-6xl">ADK + MCP Agent</h1>
+        </header>
+
+        <!-- Language Switcher -->
+        <div class="text-right mb-4">
+            <button id="btn-ko" class="lang-btn active" onclick="switchLang('ko')">한국어</button>
+            <span class="text-gray-400">/</span>
+            <button id="btn-en" class="lang-btn" onclick="switchLang('en')">English</button>
+        </div>
+
+        <div class="lg:grid lg:grid-cols-12 lg:gap-8">
+            <!-- Sidebar Navigation -->
+            <aside class="lg:col-span-3 lg:sticky lg:top-8 self-start">
+                <nav id="navigation-menu" class="p-4 bg-white rounded-lg shadow">
+                    <ul>
+                        <li><a href="#introduction" class="nav-link text-lg font-medium text-gray-600 hover:text-blue-600 block py-2 px-3"><span class="lang lang-ko">ADK 소개</span><span class="lang lang-en" style="display:none;">Introduction to ADK</span></a></li>
+                        <li><a href="#installation" class="nav-link text-lg font-medium text-gray-600 hover:text-blue-600 block py-2 px-3"><span class="lang lang-ko">ADK 설치 및 실행</span><span class="lang lang-en" style="display:none;">ADK Installation & Execution</span></a></li>
+                        <li><a href="#custom-agent" class="nav-link text-lg font-medium text-gray-600 hover:text-blue-600 block py-2 px-3"><span class="lang lang-ko">ADK + MCP Agent</span><span class="lang lang-en" style="display:none;">ADK + MCP Agent</span></a></li>
+                        <li><a href="#agent-examples" class="nav-link text-lg font-medium text-gray-600 hover:text-blue-600 block py-2 px-3"><span class="lang lang-ko">Streamlit에서 ADK로 변환</span><span class="lang lang-en" style="display:none;">Converting from Streamlit to ADK</span></a></li>
+                    </ul>
+                </nav>
+            </aside>
+
+            <!-- Main Content -->
+            <main class="lg:col-span-9 mt-8 lg:mt-0">
+                <div class="prose max-w-none bg-white rounded-lg shadow p-8">
+                    
+                    <section id="introduction" class="content-section">
+                        <h2 class="text-3xl font-bold mt-10 mb-6 pb-2 border-b"><span class="lang lang-ko">ADK (Agent Development Kit) 소개</span><span class="lang lang-en" style="display:none;">Introduction to ADK (Agent Development Kit)</span></h2>
+                        <p class="text-lg mt-4"><span class="lang lang-ko">아래 영상은 로컬에서 `adk web`으로 실행한 모습입니다.</span><span class="lang lang-en" style="display:none;">The video below shows a demo running locally with `adk web`.</span></p>
+                        <div class="aspect-w-16 aspect-h-9 my-6">
+                            <iframe src="https://www.youtube.com/embed/u_wlIhBYI2w" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen style="width: 100%; height: 500px; border-radius: 0.5rem;"></iframe>
+                        </div>
+                        <p class="text-lg"><span class="lang lang-ko">AI 에이전트는 복잡한 질문에 답하고 작업을 완료하는 데 도움을 주는 대화형 파트너입니다. Google Agent Development Kit(ADK)는 개발자가 다중 에이전트 시스템을 신속하게 구축하고 맞춤설정할 수 있도록 지원하는 클라이언트 측 Python SDK입니다.</span><span class="lang lang-en" style="display:none;">An AI agent is a conversational partner that helps answer complex questions and complete tasks. The Google Agent Development Kit (ADK) is a client-side Python SDK that enables developers to quickly build and customize multi-agent systems.</span></p>
+                        <p class="text-lg mt-4"><span class="lang lang-ko">ADK는 복잡한 다중 에이전트 시스템의 개발을 간소화하도록 설계되었습니다. 에이전트 간의 통신, 대화 기록, 상태 공유와 같은 어려운 문제들을 처리해주므로, 개발자는 인프라에 대한 고민 없이 에이전트의 핵심 로직과 상호작용을 구축하는 데 집중할 수 있습니다.</span><span class="lang lang-en" style="display:none;">ADK is designed to simplify the development of complex multi-agent systems. It handles challenging issues like inter-agent communication, conversation history, and state sharing, allowing developers to focus on building the core logic and interactions of their agents without worrying about infrastructure.</span></p>
+                        <img src="https://google.github.io/adk-docs/assets/adk-components.png" alt="ADK Components" class="mt-6">
+                        <h3 class="text-2xl font-bold mt-8 mb-4"><span class="lang lang-ko">주요 특징</span><span class="lang lang-en" style="display:none;">Key Features</span></h3>
+                        <ul class="list-disc list-inside text-lg space-y-2">
+                            <li><b><span class="lang lang-ko">코드 중심 접근 방식:</span><span class="lang lang-en" style="display:none;">Code-centric Approach:</span></b> <span class="lang lang-ko">별도의 AI 전문 지식 없이도 Python 개발자라면 누구나 쉽게 에이전트를 개발할 수 있습니다.</span><span class="lang lang-en" style="display:none;">Any Python developer can easily develop agents without needing specialized AI expertise.</span></li>
+                            <li><b><span class="lang lang-ko">다중 에이전트 시스템 지원:</span><span class="lang lang-en" style="display:none;">Multi-agent System Support:</span></b> <span class="lang lang-ko">순차, 병렬, 루프 등 다양한 워크플로우 에이전트를 통해 여러 에이전트를 계층적으로 구성하고 복잡한 작업을 자동화할 수 있습니다.</span><span class="lang lang-en" style="display:none;">Hierarchically organize multiple agents and automate complex tasks through various workflow agents like sequential, parallel, and loop.</span></li>
+                            <li><b><span class="lang lang-ko">강력한 도구 생태계:</span><span class="lang lang-en" style="display:none;">Powerful Tool Ecosystem:</span></b> <span class="lang lang-ko">Google 검색과 같은 사전 빌드된 도구를 사용하거나, 커뮤니티 도구를 활용하고, 직접 맞춤형 도구를 만들어 에이전트의 능력을 무한히 확장할 수 있습니다.</span><span class="lang lang-en" style="display:none;">Use pre-built tools like Google Search, leverage community tools, or create your own custom tools to infinitely expand your agent's capabilities.</span></li>
+                            <li><b><span class="lang lang-ko">상태 저장 대화 (Session Memory):</span><span class="lang lang-en" style="display:none;">Stateful Conversations (Session Memory):</span></b> <span class="lang lang-ko">세션 메모리를 통해 대화의 맥락을 기억하고, 여러 턴에 걸쳐 이어지는 상태 저장(stateful) 상호작용을 지원합니다.</span><span class="lang lang-en" style="display:none;">Supports stateful interactions that span multiple turns by remembering the conversation context through session memory.</span></li>
+                            <li><b><span class="lang lang-ko">통합된 평가 시스템:</span><span class="lang lang-en" style="display:none;">Integrated Evaluation System:</span></b> <span class="lang lang-ko">에이전트의 최종 응답 품질뿐만 아니라, 목표 달성을 위해 거치는 과정(trajectory)과 도구 사용의 적절성까지 체계적으로 평가할 수 있습니다.</span><span class="lang lang-en" style="display:none;">Systematically evaluate not only the quality of the agent's final response but also the trajectory and appropriateness of tool use in achieving its goal.</span></li>
+                            <li class="mt-4"><b><span class="lang lang-ko">Agent Engine으로의 배포:</span><span class="lang lang-en" style="display:none;">Deployment to Agent Engine:</span></b> <span class="lang lang-ko">개발한 에이전트를 Vertex AI 기반의 완전 관리형 런타임인 Agent Engine에 배포하여, 안정적이고 확장 가능한 운영 환경을 손쉽게 구축할 수 있습니다.</span><span class="lang lang-en" style="display:none;">Easily build a stable and scalable operating environment by deploying your developed agent to Agent Engine, a fully managed runtime based on Vertex AI.</span></li>
+                        </ul>
+                        <div class="mt-6">
+                            <p class="text-lg"><span class="lang lang-ko">Agent Engine은 개발자가 프로덕션 환경에서 AI 에이전트를 손쉽게 배포, 관리, 확장할 수 있도록 지원하는 완전 관리형 Google Cloud 서비스입니다. Agent Engine이 인프라 관리를 처리하므로 개발자는 지능적이고 강력한 애플리케이션을 만드는 데 더 집중할 수 있습니다.</span><span class="lang lang-en" style="display:none;">Agent Engine is a fully managed Google Cloud service that helps developers easily deploy, manage, and scale AI agents in a production environment. Since Agent Engine handles infrastructure management, developers can focus more on creating intelligent and powerful applications.</span></p>
+                            <div class="note">
+                                <p><strong><span class="lang lang-ko">주요 기능:</span><span class="lang lang-en" style="display:none;">Key Features:</span></strong></p>
+                                <ul class="list-disc list-inside mt-2 space-y-1">
+                                    <li><strong><span class="lang lang-ko">완전 관리형:</span><span class="lang lang-en" style="display:none;">Fully Managed:</span></strong> <span class="lang lang-ko">VPC-SC 규정 준수, 포괄적인 엔드 투 엔드 관리, 성능 모니터링 및 Google Cloud Trace를 통한 추적 등 강력한 보안 및 관리 기능을 제공합니다.</span><span class="lang lang-en" style="display:none;">Provides robust security and management features, including VPC-SC compliance, comprehensive end-to-end management, performance monitoring, and tracing via Google Cloud Trace.</span></li>
+                                    <li><strong><span class="lang lang-ko">품질 및 평가:</span><span class="lang lang-en" style="display:none;">Quality and Evaluation:</span></strong> <span class="lang lang-ko">통합된 Gen AI Evaluation Service를 사용하여 에이전트의 품질을 보장하고 지속적으로 개선할 수 있습니다.</span><span class="lang lang-en" style="display:none;">Ensure and continuously improve agent quality using the integrated Gen AI Evaluation Service.</span></li>
+                                    <li><strong><span class="lang lang-ko">간소화된 개발:</span><span class="lang lang-en" style="display:none;">Simplified Development:</span></strong> <span class="lang lang-ko">애플리케이션 서버, 인증, IAM 구성과 같은 복잡한 하위 수준 작업을 추상화하여 개발자가 에이전트의 고유한 동작, 도구, 모델 파라미터에 집중할 수 있도록 합니다.</span><span class="lang lang-en" style="display:none;">Abstracts complex low-level tasks like application servers, authentication, and IAM configuration, allowing developers to focus on the unique behavior, tools, and model parameters of their agent.</span></li>
+                                    <li><strong><span class="lang lang-ko">프레임워크 독립성:</span><span class="lang lang-en" style="display:none;">Framework Agnostic:</span></strong> <span class="lang lang-ko">LangGraph, LangChain, AG2, CrewAI 등 다양한 Python 프레임워크를 지원하여 유연한 배포가 가능합니다.</span><span class="lang lang-en" style="display:none;">Supports various Python frameworks like LangGraph, LangChain, AG2, and CrewAI for flexible deployment.</span></li>
+                                </ul>
+                            </div>
+                            <img src="https://cloud.google.com/static/vertex-ai/generative-ai/docs/agent-engine/images/agent-engine.png?hl=ko&dcb_=0.43273794684805855" alt="Agent Engine Architecture" class="mt-6">
+                        </div>
+                    </section>
+
+                    <section id="installation" class="content-section">
+                        <h2 class="text-3xl font-bold mt-10 mb-6 pb-2 border-b"><span class="lang lang-ko">ADK (Agent Development Kit) 설치 및 실행</span><span class="lang lang-en" style="display:none;">ADK (Agent Development Kit) Installation & Execution</span></h2>
+                        <h3 class="text-2xl font-bold mt-8 mb-4"><span class="lang lang-ko">ADK 설치</span><span class="lang lang-en" style="display:none;">ADK Installation</span></h3>
+                        <p><span class="lang lang-ko">ADK를 사용하기 위해서는 먼저 패키지를 설치해야 합니다. 터미널을 열고 다음 명령어를 실행하여 ADK를 설치하세요.</span><span class="lang lang-en" style="display:none;">To use ADK, you first need to install the package. Open a terminal and run the following command to install ADK.</span></p>
+                        <pre><code>pip install google-adk</code></pre>
+                        <div class="tip">
+                            <p><strong>Tip:</strong> <span class="lang lang-ko">가상 환경 내에 ADK를 설치하는 것을 권장합니다. 이렇게 하면 프로젝트별로 의존성을 관리할 수 있습니다.</span><span class="lang lang-en" style="display:none;">It is recommended to install ADK within a virtual environment. This allows you to manage dependencies on a per-project basis.</span></p>
+                        </div>
+                        <h3 class="text-2xl font-bold mt-8 mb-4"><span class="lang lang-ko">ADK 실행</span><span class="lang lang-en" style="display:none;">Running ADK</span></h3>
+                        <p><span class="lang lang-ko">ADK로 개발한 에이전트는 다음 두 가지 방법으로 실행할 수 있습니다.</span><span class="lang lang-en" style="display:none;">Agents developed with ADK can be run in the following two ways.</span></p>
+                        <h4 class="text-xl font-semibold mt-6 mb-3"><span class="lang lang-ko">1. 대화형으로 실행 (CLI):</span><span class="lang lang-en" style="display:none;">1. Run Interactively (CLI):</span></h4>
+                        <p><span class="lang lang-ko">터미널에서 에이전트와 직접 대화하며 테스트하고 싶을 때 사용합니다.</span><span class="lang lang-en" style="display:none;">Use this when you want to test by interacting directly with the agent in the terminal.</span></p>
+                        <pre><code>adk run <agent_name></code></pre>
+                        <h4 class="text-xl font-semibold mt-6 mb-3"><span class="lang lang-ko">2. 웹 인터페이스로 실행:</span><span class="lang lang-en" style="display:none;">2. Run with Web Interface:</span></h4>
+                        <p><span class="lang lang-ko">웹 브라우저에서 사용할 수 있는 UI와 함께 에이전트를 실행합니다.</span><span class="lang lang-en" style="display:none;">Runs the agent with a UI that can be used in a web browser.</span></p>
+                        <pre><code>adk web</code></pre>
+                        
+                        <h2 class="text-3xl font-bold mt-10 mb-6 pb-2 border-b"><span class="lang lang-ko">실습 준비 (macOS)</span><span class="lang lang-en" style="display:none;">Getting Started (macOS)</span></h2>
+                        <p><span class="lang lang-ko">본격적인 에이전트 개발에 앞서, macOS 환경에서 실습을 진행하기 위한 준비 과정을 안내합니다. 모든 과정은 **가상 환경** 내에서 진행하여 프로젝트의 독립성을 보장합니다.</span><span class="lang lang-en" style="display:none;">Before starting agent development, this guide will walk you through the preparation process for a macOS environment. All steps are performed within a **virtual environment** to ensure project independence.</span></p>
+
+                        <h4 class="text-xl font-semibold mt-6 mb-3"><span class="lang lang-ko">사전 요구사항</span><span class="lang lang-en" style="display:none;">Prerequisites</span></h4>
+                        <p><span class="lang lang-ko">이 가이드를 따라하기 위해서는 Python 3.9 이상이 설치되어 있어야 합니다. 터미널을 열고 다음 명령어로 버전을 확인하세요.</span><span class="lang lang-en" style="display:none;">To follow this guide, you must have Python 3.9 or higher installed. Open a terminal and check the version with the following command.</span></p>
+                        <pre><code>python3 --version</code></pre>
+
+                        <h3 class="text-2xl font-bold mt-8 mb-4"><span class="lang lang-ko">1. 프로젝트 폴더 및 가상 환경 설정</span><span class="lang lang-en" style="display:none;">1. Project Folder and Virtual Environment Setup</span></h3>
+                        <p><span class="lang lang-ko">먼저 프로젝트를 위한 폴더를 만들고, 그 안에 파이썬 가상 환경을 설정합니다.</span><span class="lang lang-en" style="display:none;">First, create a folder for the project and set up a Python virtual environment inside it.</span></p>
+                        <pre><code># <span class="lang lang-ko">1. 'adk_project' 라는 프로젝트 폴더를 만들고 이동합니다.</span><span class="lang lang-en" style="display:none;">1. Create and navigate to a project folder named 'adk_project'.</span>
+mkdir adk_project
+cd adk_project
+
+# <span class="lang lang-ko">2. '.adk-venv' 라는 이름의 가상 환경을 생성합니다.</span><span class="lang lang-en" style="display:none;">2. Create a virtual environment named '.adk-venv'.</span>
+python3 -m venv .adk-venv
+
+# <span class="lang lang-ko">3. 생성한 가상 환경을 활성화합니다.</span><span class="lang lang-en" style="display:none;">3. Activate the created virtual environment.</span>
+source .adk-venv/bin/activate</code></pre>
+                        <div class="tip">
+                            <p><strong>Tip:</strong> <span class="lang lang-ko">터미널 프롬프트 앞에 `(.adk-venv)`가 표시되면 가상 환경이 성공적으로 활성화된 것입니다. 앞으로의 모든 명령어는 이 상태에서 실행해야 합니다.</span><span class="lang lang-en" style="display:none;">If `(.adk-venv)` appears before your terminal prompt, the virtual environment has been successfully activated. All subsequent commands should be run in this state.</span></p>
+                        </div>
+
+                        <h3 class="text-2xl font-bold mt-8 mb-4"><span class="lang lang-ko">2. `requirements.txt` 파일 생성 및 라이브러리 설치</span><span class="lang lang-en" style="display:none;">2. Create `requirements.txt` and Install Libraries</span></h3>
+                        <p><span class="lang lang-ko">실습에 필요한 모든 라이브러리를 `requirements.txt` 파일에 정의하고 한 번에 설치합니다. 아래 내용으로 프로젝트 루트에 파일을 생성하세요.</span><span class="lang lang-en" style="display:none;">Define all necessary libraries for the lab in a `requirements.txt` file and install them at once. Create the file in the project root with the content below.</span></p>
+                        <p><b><span class="lang lang-ko">경로:</span><span class="lang lang-en" style="display:none;">Path:</span></b> <code class="inline-code">adk_project/requirements.txt</code></p>
+                        <pre><code>google-adk
+python-dotenv
+google-cloud-logging
+langchain-community
+wikipedia</code></pre>
+                        <p><span class="lang lang-ko">이제 `pip`을 사용하여 이 파일에 명시된 모든 라이브러리를 설치합니다.</span><span class="lang lang-en" style="display:none;">Now, use `pip` to install all the libraries specified in this file.</span></p>
+                        <pre><code># <span class="lang lang-ko">'(.adk-venv)'가 보이는 상태에서 다음 명령어를 실행합니다.</span><span class="lang lang-en" style="display:none;">Run the following command while '(.adk-venv)' is visible.</span>
+pip install -r requirements.txt</code></pre>
+                        
+                        <h3 class="text-2xl font-bold mt-8 mb-4"><span class="lang lang-ko">3. 에이전트 프로젝트 구조 생성</span><span class="lang lang-en" style="display:none;">3. Create Agent Project Structure</span></h3>
+                        <p><span class="lang lang-ko">ADK는 정해진 디렉토리 구조를 따릅니다. 프로젝트 폴더 내에 에이전트 폴더들을 생성합니다.</span><span class="lang lang-en" style="display:none;">ADK follows a specific directory structure. Create the agent folders within the project folder.</span></p>
+                        <pre><code># <span class="lang lang-ko">'adk_project' 폴더 내에서 다음 폴더들을 생성합니다.</span><span class="lang lang-en" style="display:none;">Create the following folders inside the 'adk_project' folder.</span>
+mkdir app_agent
+mkdir my_google_search_agent
+mkdir llm_auditor
+mkdir custom_agent</code></pre>
+                        <p><span class="lang lang-ko">모든 폴더와 파일 생성이 완료되면, 프로젝트의 전체 구조는 다음과 같아집니다.</span><span class="lang lang-en" style="display:none;">Once all folders and files are created, the overall project structure will be as follows.</span></p>
+                        <pre><code>custom_agent/
+├── __init__.py
+├── agent.py
+└── .env</code></pre>
+                    </section>
+
+                    <section id="custom-agent" class="content-section">
+                        <h2 class="text-3xl font-bold mt-10 mb-6 pb-2 border-b"><span class="lang lang-ko">ADK + MCP Agent</span><span class="lang lang-en" style="display:none;">ADK + MCP Agent</span></h2>
+                        <p class="text-lg"><span class="lang lang-ko">기존의 독립적인 Python 스크립트(Streamlit 기반)를 ADK 프레임워크와 호환되는 에이전트로 변환하는 과정을 알아봅니다. 이 에이전트의 핵심은 ADK를 사용하여 외부 MCP(Model Context Protocol) 서버와 통신하는 것입니다. 이 MCP 서버는 <strong>Google BigQuery</strong>와 연동되어, 최종적으로 호텔 데이터를 조회하고 예약 관련 작업을 수행하는 백엔드 역할을 합니다.</span><span class="lang lang-en" style="display:none;">Learn how to convert an existing standalone Python script (based on Streamlit) into an agent compatible with the ADK framework. The core of this agent is communicating with an external MCP (Model Context Protocol) server using ADK. This MCP server integrates with <strong>Google BigQuery</strong> to ultimately serve as a backend for querying hotel data and performing reservation-related tasks.</span></p>
+
+                        <h3 class="text-2xl font-bold mt-8 mb-4"><span class="lang lang-ko">1. 프로젝트 구조</span><span class="lang lang-en" style="display:none;">1. Project Structure</span></h3>
+                        <p><span class="lang lang-ko">먼저, `custom_agent`라는 새 에이전트를 위한 디렉토리 구조를 생성합니다. ADK는 이 구조를 기반으로 에이전트를 인식합니다.</span><span class="lang lang-en" style="display:none;">First, create a directory structure for a new agent called `custom_agent`. ADK recognizes agents based on this structure.</span></p>
+                        <pre><code>custom_agent/
+├── __init__.py
+├── agent.py
+└── .env</code></pre>
+
+                        <h3 class="text-2xl font-bold mt-8 mb-4"><span class="lang lang-ko">2. 환경 변수 설정 (`custom_agent/.env`)</span><span class="lang lang-en" style="display:none;">2. Environment Variable Setup (`custom_agent/.env`)</span></h3>
+                        <p><span class="lang lang-ko">에이전트가 사용할 모델과 클라우드 설정을 `.env` 파일에 정의합니다. ADK는 에이전트 실행 시 해당 디렉토리의 `.env` 파일을 자동으로 로드합니다.</span><span class="lang lang-en" style="display:none;">Define the model and cloud settings for the agent in a `.env` file. ADK automatically loads the `.env` file from the corresponding directory when the agent runs.</span></p>
+                        <pre><code>GOOGLE_GENAI_USE_VERTEXAI=TRUE
+GOOGLE_CLOUD_PROJECT=your-google-cloud-project-id
+GOOGLE_CLOUD_LOCATION=us-central1
+MODEL=gemini-2.0-flash-001</code></pre>
+
+                        <h3 class="text-2xl font-bold mt-8 mb-4"><span class="lang lang-ko">3. 에이전트 로직 구현 (`custom_agent/agent.py`)</span><span class="lang lang-en" style="display:none;">3. Agent Logic Implementation (`custom_agent/agent.py`)</span></h3>
+                        <p><span class="lang lang-ko">에이전트의 핵심 로직입니다. MCP 서버와 통신하는 도구(Tool)들과, 이 도구들을 사용하는 메인 에이전트(Agent)를 정의합니다.</span><span class="lang lang-en" style="display:none;">This is the core logic of the agent. It defines the Tools that communicate with the MCP server and the main Agent that uses these tools.</span></p>
+                        <div class="tip">
+                            <p><strong><span class="lang lang-ko">핵심 개념:</span><span class="lang lang-en" style="display:none;">Core Concepts:</span></strong><br>
+                            - <strong>FunctionTool:</strong> <span class="lang lang-ko">일반 Python 함수를 ADK가 인식할 수 있는 도구로 변환하는 클래스입니다.</span><span class="lang lang-en" style="display:none;">A class that converts a regular Python function into a tool that ADK can recognize.</span><br>
+                            - <strong>Type Hinting:</strong> <span class="lang lang-ko">`Optional[str]` 와 같이 정확한 타입 힌트를 사용하여 ADK가 함수의 매개변수를 올바르게 파싱하도록 합니다. 이는 에러를 방지하는 데 매우 중요합니다.</span><span class="lang lang-en" style="display:none;">Use precise type hints like `Optional[str]` to ensure ADK parses function parameters correctly. This is crucial for preventing errors.</span><br>
+                            - <strong>Agent Instruction:</strong> <span class="lang lang-ko">에이전트에게 역할을 부여하고, 어떤 상황에서 어떤 도구를 사용해야 하는지 명확하게 지시하는 시스템 프롬프트입니다.</span><span class="lang lang-en" style="display:none;">A system prompt that assigns a role to the agent and clearly instructs which tool to use in what situation.</span></p>
+                        </div>
+                        <pre><code class="language-python">import os
+import requests
+import json
+import uuid
+import datetime
+from typing import Optional
+from google.adk.agents import Agent
+from google.adk.tools.function_tool import FunctionTool
+
+# --- 1. <span class="lang lang-ko">설정</span><span class="lang lang-en" style="display:none;">Settings</span> ---
+MODEL_NAME = os.environ.get("MODEL", "gemini-2.0-flash-001")
+TOOLBOX_MCP_ENDPOINT_BASE = "http://your-mcp-server-endpoint/mcp/my-toolset"
+
+# --- 2. <span class="lang lang-ko">Toolbox MCP 서버 호출 헬퍼 함수</span><span class="lang lang-en" style="display:none;">Toolbox MCP Server Call Helper Function</span> ---
+def call_mcp_tool(tool_name: str, tool_args: dict) -> dict:
+    """<span class="lang lang-ko">지정된 도구 이름과 인수로 Toolbox MCP 서버를 호출하는 중앙 함수.</span><span class="lang lang-en" style="display:none;">A central function to call the Toolbox MCP server with a specified tool name and arguments.</span>"""
+    mcp_session_id = str(uuid.uuid4())
+    endpoint_with_session = f"{TOOLBOX_MCP_ENDPOINT_BASE}?sessionId={mcp_session_id}"
+    payload = {
+        "jsonrpc": "2.0",
+        "method": "tools/call",
+        "params": {"name": tool_name, "arguments": tool_args},
+        "id": str(uuid.uuid4())
+    }
+    headers = {"Content-Type": "application/json"}
+    try:
+        response = requests.post(endpoint_with_session, headers=headers, json=payload, timeout=15)
+        response.raise_for_status()
+        if not response.text:
+            return {"status": "error", "message": f"MCP server returned an empty response for tool {tool_name}."}
+        return response.json()
+    except Exception as e:
+        return {"status": "error", "message": f"Exception during MCP server call: {str(e)}"}
+
+# --- 3. <span class="lang lang-ko">ADK 도구 정의</span><span class="lang lang-en" style="display:none;">ADK Tool Definitions</span> ---
+def search_hotels_by_name_func(name: str, location: Optional[str] = None) -> dict:
+    """<span class="lang lang-ko">호텔 이름을 기준으로 호텔을 검색합니다. 위치 정보를 함께 제공하여 검색 범위를 좁힐 수 있습니다.</span><span class="lang lang-en" style="display:none;">Searches for hotels by name. Location information can be provided to narrow down the search.</span>"""
+    return call_mcp_tool("search-hotels-by-name", {"name": name, "location": location})
+
+def search_hotels_by_location_func(location: str) -> dict:
+    """<span class="lang lang-ko">위치(도시)를 기준으로 호텔을 검색합니다.</span><span class="lang lang-en" style="display:none;">Searches for hotels by location (city).</span>"""
+    return call_mcp_tool("search-hotels-by-location", {"location": location})
+
+def book_hotel_func(hotel_id: int) -> dict:
+    """<span class="lang lang-ko">사용자가 특정 호텔 ID를 제공하고 예약을 명시적으로 요청할 때, 해당 호텔 ID를 사용하여 호텔을 예약합니다.</span><span class="lang lang-en" style="display:none;">Books a hotel using the hotel ID when the user provides a specific ID and explicitly requests a reservation.</span>"""
+    return call_mcp_tool("book-hotel", {"hotel_id": hotel_id})
+
+def update_hotel_func(hotel_id: int, checkin_date: str, checkout_date: str) -> dict:
+    """<span class="lang lang-ko">사용자가 특정 호텔 ID에 대해 체크인 또는 체크아웃 날짜 변경을 요청할 때 사용합니다.</span><span class="lang lang-en" style="display:none;">Used when a user requests to change the check-in or check-out date for a specific hotel ID.</span>"""
+    return call_mcp_tool("update-hotel", {"hotel_id": hotel_id, "checkin_date": checkin_date, "checkout_date": checkout_date})
+
+def cancel_hotel_func(hotel_id: int) -> dict:
+    """<span class="lang lang-ko">호텔 ID를 사용하여 호텔 예약을 취소합니다.</span><span class="lang lang-en" style="display:none;">Cancels a hotel reservation using the hotel ID.</span>"""
+    return call_mcp_tool("cancel-hotel", {"hotel_id": hotel_id})
+
+# <span class="lang lang-ko">FunctionTool로 각 함수를 래핑합니다.</span><span class="lang lang-en" style="display:none;">Wrap each function with FunctionTool.</span>
+search_hotels_by_name = FunctionTool(func=search_hotels_by_name_func)
+search_hotels_by_location = FunctionTool(func=search_hotels_by_location_func)
+book_hotel = FunctionTool(func=book_hotel_func)
+update_hotel = FunctionTool(func=update_hotel_func)
+cancel_hotel = FunctionTool(func=cancel_hotel_func)
+
+# --- 4. <span class="lang lang-ko">ADK 에이전트 정의</span><span class="lang lang-en" style="display:none;">ADK Agent Definition</span> ---
+system_instruction = """<span class="lang lang-ko">당신은 사용자의 호텔 검색, 예약, 예약 변경, 예약 취소를 돕는 AI 호텔 예약 에이전트입니다.
+대화의 맥락을 주의 깊게 파악하고, 사용자가 이미 제공한 정보(예: 호텔 ID, 날짜)를 다시 묻지 마세요.
+사용자의 요청을 이해하고 다음 지침에 따라 적절한 도구를 사용하세요:
+- 호텔 검색: 사용자가 호텔 이름이나 위치로 검색을 요청하면 'search_hotels_by_name_func' 또는 'search_hotels_by_location_func' 도구를 사용하세요.
+- 호텔 예약: 사용자가 특정 호텔 ID를 명시하고 '예약해줘' 또는 유사한 예약 의사를 밝히면, 해당 ID로 'book_hotel_func' 도구를 사용하세요.
+- 예약 변경 (날짜 업데이트): 사용자가 특정 호텔 ID에 대해 체크인 또는 체크아웃 날짜 변경을 요청하면, 호텔 ID, 새로운 체크인 날짜, 새로운 체크아웃 날짜를 모두 파악한 후 'update_hotel_func' 도구를 사용하세요. 모든 정보가 갖춰지지 않았다면 필요한 정보를 사용자에게 요청하세요.
+- 예약 취소: 사용자가 특정 호텔 ID로 예약 취소를 요청하면 'cancel_hotel_func' 도구를 사용하세요.
+항상 사용자의 요청을 명확히 이해한 후 도구를 사용하세요. 도구를 사용하기 전에는 사용자에게 어떤 작업을 수행할 것인지 간단히 언급해주세요 (예: '호텔을 검색해 보겠습니다.', '예약을 진행하겠습니다.'). 도구 사용 후에는 그 결과를 사용자에게 친절하게 안내하세요.</span><span class="lang lang-en" style="display:none;">You are an AI hotel reservation agent that helps users search, book, modify, and cancel hotel reservations.
+Pay close attention to the context of the conversation and do not ask for information the user has already provided (e.g., hotel ID, dates).
+Understand the user's request and use the appropriate tool according to the following guidelines:
+- Hotel Search: If the user requests a search by hotel name or location, use the 'search_hotels_by_name_func' or 'search_hotels_by_location_func' tool.
+- Hotel Booking: If the user specifies a hotel ID and expresses an intent to book (e.g., "book it"), use the 'book_hotel_func' tool with that ID.
+- Reservation Change (Date Update): If the user requests to change the check-in or check-out date for a specific hotel ID, use the 'update_hotel_func' tool after confirming the hotel ID, new check-in date, and new check-out date. If any information is missing, ask the user for it.
+- Reservation Cancellation: If the user requests to cancel a reservation with a specific hotel ID, use the 'cancel_hotel_func' tool.
+Always use a tool only after clearly understanding the user's request. Before using a tool, briefly mention what action you are about to perform (e.g., 'I will search for hotels.', 'I will proceed with the booking.'). After using the tool, kindly inform the user of the result.</span>"""
+
+root_agent = Agent(
+    name="custom_agent",
+    description="<span class="lang lang-ko">사용자 지정 호텔 예약 에이전트</span><span class="lang lang-en" style="display:none;">Custom Hotel Reservation Agent</span>",
+    model=MODEL_NAME,
+    instruction=system_instruction,
+    tools=[
+        search_hotels_by_name,
+        search_hotels_by_location,
+        book_hotel,
+        update_hotel,
+        cancel_hotel
+    ]
+)</code></pre>
+
+                        <h3 class="text-2xl font-bold mt-8 mb-4"><span class="lang lang-ko">4. 패키지 초기화 (`custom_agent/__init__.py`)</span><span class="lang lang-en" style="display:none;">4. Package Initialization (`custom_agent/__init__.py`)</span></h3>
+                        <p><span class="lang lang-ko">ADK가 `custom_agent` 디렉토리를 파이썬 패키지로 인식하고 `root_agent`를 찾을 수 있도록 `__init__.py` 파일을 생성합니다.</span><span class="lang lang-en" style="display:none;">Create an `__init__.py` file so that ADK recognizes the `custom_agent` directory as a Python package and can find the `root_agent`.</span></p>
+                        <pre><code class="language-python">from .agent import root_agent</code></pre>
+
+                        <h3 class="text-2xl font-bold mt-8 mb-4"><span class="lang lang-ko">5. 실행</span><span class="lang lang-en" style="display:none;">5. Execution</span></h3>
+                        <p><span class="lang lang-ko">이제 모든 준비가 완료되었습니다. 터미널에서 다음 명령어를 실행하면 `adk web` UI의 드롭다운 메뉴에 `custom_agent`가 나타나며, 선택하여 상호작용할 수 있습니다.</span><span class="lang lang-en" style="display:none;">Now everything is ready. Run the following command in the terminal. `custom_agent` will appear in the dropdown menu of the `adk web` UI, where you can select it and interact with it.</span></p>
+                        <pre><code># <span class="lang lang-ko">(.adk-venv)가 활성화된 상태에서 실행</span><span class="lang lang-en" style="display:none;">Run while (.adk-venv) is activated</span>
+adk web</code></pre>
+                        <div class="note">
+                            <p><strong><span class="lang lang-ko">참고 자료:</span><span class="lang lang-en" style="display:none;">Reference:</span></strong> <span class="lang lang-ko">이 예제는 다음 BigQuery Quickstart 문서를 기반으로 합니다.</span><span class="lang lang-en" style="display:none;">This example is based on the following BigQuery Quickstart document.</span><br>
+                            <a href="https://googleapis.github.io/genai-toolbox/samples/bigquery/local_quickstart/" class="text-blue-600 hover:underline" target="_blank" rel="noopener noreferrer">https://googleapis.github.io/genai-toolbox/samples/bigquery/local_quickstart/</a></p>
+                        </div>
+                    </section>
+
+                    <section id="agent-examples" class="content-section">
+                        <h2 class="text-3xl font-bold mt-10 mb-6 pb-2 border-b"><span class="lang lang-ko">Streamlit에서 ADK로 변환하기</span><span class="lang lang-en" style="display:none;">Converting from Streamlit to ADK</span></h2>
+                        <p class="text-lg"><span class="lang lang-ko">기존의 Streamlit으로 구현된 에이전트를 ADK 프레임워크로 전환하면서 어떤 부분이 변경되었는지 비교해봅니다. 이 과정은 독립 실행형 스크립트를 표준화되고 재사용 가능한 ADK 에이전트로 만드는 과정을 보여줍니다.</span><span class="lang lang-en" style="display:none;">Let's compare the changes when converting an existing Streamlit-based agent to the ADK framework. This process demonstrates how to turn a standalone script into a standardized, reusable ADK agent.</span></p>
+
+                        <div class="mt-8">
+                            <h3 class="text-2xl font-bold mb-4"><span class="lang lang-ko">1. 도구(Tool) 정의 방식의 변경</span><span class="lang lang-en" style="display:none;">1. Change in Tool Definition Method</span></h3>
+                            <p class="mb-4"><span class="lang lang-ko">가장 큰 변화는 도구를 정의하는 방식입니다. 기존에는 Google `genai` 라이브러리의 `FunctionDeclaration`을 직접 사용했지만, ADK에서는 `FunctionTool` 클래스로 Python 함수를 감싸는 방식을 사용합니다. 이를 통해 ADK는 함수의 시그니처와 독스트링(docstring)을 자동으로 분석하여 도구 스키마를 생성합니다.</span><span class="lang lang-en" style="display:none;">The biggest change is in how tools are defined. Previously, `FunctionDeclaration` from the Google `genai` library was used directly. In ADK, Python functions are wrapped with the `FunctionTool` class. This allows ADK to automatically analyze the function's signature and docstring to generate a tool schema.</span></p>
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                <div>
+                                    <h4 class="text-xl font-semibold mb-2 text-center"><span class="lang lang-ko">변경 전 (Streamlit + GenAI)</span><span class="lang lang-en" style="display:none;">Before (Streamlit + GenAI)</span></h4>
+                                    <pre><code class="language-python"># <span class="lang lang-ko">genai 라이브러리를 직접 사용</span><span class="lang lang-en" style="display:none;">Using the genai library directly</span>
+from google.generativeai.types import FunctionDeclaration
+
+Hotels_by_name_fd = FunctionDeclaration(
+    name="search-hotels-by-name",
+    description="<span class="lang lang-ko">호텔 이름을 기준으로 호텔을 검색...</span><span class="lang lang-en" style="display:none;">Search for hotels by name...</span>",
+    parameters={
+        "type": "object",
+        "properties": {
+            "name": {"type": "string", "description": "<span class="lang lang-ko">검색할 호텔 이름</span><span class="lang lang-en" style="display:none;">Hotel name to search for</span>"},
+            "location": {"type": "string", "description": "<span class="lang lang-ko">선택 사항. 호텔 위치</span><span class="lang lang-en" style="display:none;">Optional. Hotel location</span>"}
+        }, 
+        "required": ["name"]
+    }
+)
+# <span class="lang lang-ko">... 모든 도구를 이렇게 정의 ...</span><span class="lang lang-en" style="display:none;">... define all tools this way ...</span></code></pre>
+                                </div>
+                                <div>
+                                    <h4 class="text-xl font-semibold mb-2 text-center"><span class="lang lang-ko">변경 후 (ADK)</span><span class="lang lang-en" style="display:none;">After (ADK)</span></h4>
+                                    <pre><code class="language-python"># <span class="lang lang-ko">ADK의 FunctionTool 사용</span><span class="lang lang-en" style="display:none;">Using ADK's FunctionTool</span>
+from google.adk.tools.function_tool import FunctionTool
+from typing import Optional
+
+# <span class="lang lang-ko">일반 Python 함수로 정의</span><span class="lang lang-en" style="display:none;">Define as a regular Python function</span>
+def search_hotels_by_name_func(
+    name: str, 
+    location: Optional[str] = None
+) -> dict:
+    """<span class="lang lang-ko">호텔 이름을 기준으로 호텔을 검색합니다...</span><span class="lang lang-en" style="display:none;">Searches for hotels by name...</span>"""
+    return call_mcp_tool(...)
+
+# <span class="lang lang-ko">FunctionTool로 함수를 래핑</span><span class="lang lang-en" style="display:none;">Wrap the function with FunctionTool</span>
+search_hotels_by_name = FunctionTool(
+    func=search_hotels_by_name_func
+)</code></pre>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="mt-8">
+                            <h3 class="text-2xl font-bold mb-4"><span class="lang lang-ko">2. 에이전트 실행 로직의 변화</span><span class="lang lang-en" style="display:none;">2. Change in Agent Execution Logic</span></h3>
+                            <p class="mb-4"><span class="lang lang-ko">Streamlit 앱에서는 UI 코드와 대화 로직(턴 관리, 기록 관리)이 복잡하게 얽혀있습니다. ADK는 이러한 실행 흐름을 `Agent` 클래스와 내부 `Runner`가 모두 처리하므로, 개발자는 에이전트의 핵심 지시사항(instruction)과 사용할 도구 목록만 정의하면 됩니다.</span><span class="lang lang-en" style="display:none;">In a Streamlit app, UI code and conversation logic (turn management, history management) are intricately intertwined. ADK handles this execution flow with the `Agent` class and its internal `Runner`, so the developer only needs to define the agent's core instruction and the list of tools to use.</span></p>
+                             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                <div>
+                                    <h4 class="text-xl font-semibold mb-2 text-center"><span class="lang lang-ko">변경 전 (Streamlit)</span><span class="lang lang-en" style="display:none;">Before (Streamlit)</span></h4>
+                                    <pre><code class="language-python"># <span class="lang lang-ko">Streamlit UI 코드</span><span class="lang lang-en" style="display:none;">Streamlit UI Code</span>
+st.title("<span class="lang lang-ko">🏨 LLM 호텔 예약 에이전트</span><span class="lang lang-en" style="display:none;">🏨 LLM Hotel Reservation Agent</span>")
+user_input_prompt = st.chat_input(...)
+
+if user_input_prompt:
+    # <span class="lang lang-ko">세션 기록 직접 관리</span><span class="lang lang-en" style="display:none;">Manage session history directly</span>
+    st.session_state.messages.append(...)
+    
+    # <span class="lang lang-ko">대화 루프를 직접 구현</span><span class="lang lang-en" style="display:none;">Implement the conversation loop directly</span>
+    for i in range(MAX_TURNS):
+        # <span class="lang lang-ko">모델 호출, 함수 호출, 결과 처리 등</span><span class="lang lang-en" style="display:none;">Model calls, function calls, result processing, etc.</span>
+        # <span class="lang lang-ko">모든 로직을 수동으로 관리</span><span class="lang lang-en" style="display:none;">Manage all logic manually</span>
+        ...</code></pre>
+                                </div>
+                                <div>
+                                    <h4 class="text-xl font-semibold mb-2 text-center"><span class="lang lang-ko">변경 후 (ADK)</span><span class="lang lang-en" style="display:none;">After (ADK)</span></h4>
+                                    <pre><code class="language-python"># <span class="lang lang-ko">ADK Agent 정의</span><span class="lang lang-en" style="display:none;">ADK Agent Definition</span>
+from google.adk.agents import Agent
+
+system_instruction = """
+<span class="lang lang-ko">당신은 사용자의 호텔 예약을 돕는 AI입니다...</span><span class="lang lang-en" style="display:none;">You are an AI that helps users book hotels...</span>
+"""
+
+# <span class="lang lang-ko">에이전트의 역할과 도구만 정의</span><span class="lang lang-en" style="display:none;">Define only the agent's role and tools</span>
+root_agent = Agent(
+    name="custom_agent",
+    model="gemini-2.0-flash-001",
+    instruction=system_instruction,
+    tools=[
+        search_hotels_by_name,
+        book_hotel,
+        # <span class="lang lang-ko">... 다른 도구들</span><span class="lang lang-en" style="display:none;">... other tools</span>
+    ]
+)
+
+# <span class="lang lang-ko">실행은 `adk web` 명령어로 처리</span><span class="lang lang-en" style="display:none;">Execution is handled by the `adk web` command</span>
+# <span class="lang lang-ko">UI나 대화 루프 코드가 필요 없음</span><span class="lang lang-en" style="display:none;">No UI or conversation loop code needed</span></code></pre>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="mt-8">
+                            <h3 class="text-2xl font-bold mb-4"><span class="lang lang-ko">3. 설정 및 구성</span><span class="lang lang-en" style="display:none;">3. Settings and Configuration</span></h3>
+                            <p class="mb-4"><span class="lang lang-ko">기존 코드의 하드코딩된 API 키와 같은 설정 값들은 ADK의 표준 방식인 `.env` 파일로 이전되었습니다. 이를 통해 코드에서 민감한 정보를 분리하고 환경별로 다른 설정을 쉽게 관리할 수 있습니다.</span><span class="lang lang-en" style="display:none;">Settings like hardcoded API keys from the original code have been moved to a `.env` file, the standard ADK practice. This separates sensitive information from the code and makes it easy to manage different settings for each environment.</span></p>
+                        </div>
+
+                        <div class="tip">
+                            <p><strong><span class="lang lang-ko">결론: ADK로의 전환의 이점</span><span class="lang lang-en" style="display:none;">Conclusion: Benefits of Converting to ADK</span></strong><br>
+                            - <b><span class="lang lang-ko">코드 간소화:</span><span class="lang lang-en" style="display:none;">Code Simplification:</span></b> <span class="lang lang-ko">UI 및 대화 관리 로직이 프레임워크에 위임되어, 에이전트의 핵심 기능에만 집중할 수 있습니다.</span><span class="lang lang-en" style="display:none;">UI and conversation management logic are delegated to the framework, allowing focus on the agent's core functionality.</span><br>
+                            - <b><span class="lang lang-ko">표준화 및 재사용성:</span><span class="lang lang-en" style="display:none;">Standardization and Reusability:</span></b> <span class="lang lang-ko">모든 에이전트가 일관된 구조를 가지므로 재사용과 유지보수가 용이합니다.</span><span class="lang lang-en" style="display:none;">All agents have a consistent structure, making them easy to reuse and maintain.</span><br>
+                            - <b><span class="lang lang-ko">확장성:</span><span class="lang lang-en" style="display:none;">Scalability:</span></b> <span class="lang lang-ko">`adk web` UI, 평가 도구, Agent Engine으로의 배포 등 ADK 생태계의 모든 기능을 활용할 수 있습니다.</span><span class="lang lang-en" style="display:none;">Leverage all features of the ADK ecosystem, such as the `adk web` UI, evaluation tools, and deployment to Agent Engine.</span></p>
+                        </div>
+                    </section>
+
+                </div>
+            </main>
+        </div>
+    </div>
+
+    <script>
+        const titles = {
+            ko: 'ADK + MCP Agent',
+            en: 'ADK + MCP Agent'
+        };
+
+        function switchLang(lang) {
+            document.documentElement.lang = lang;
+            document.documentElement.className = lang;
+
+            document.title = titles[lang];
+
+            document.querySelectorAll('.lang').forEach(el => {
+                if (el.classList.contains(`lang-${lang}`)) {
+                    el.style.display = '';
+                } else {
+                    el.style.display = 'none';
+                }
+            });
+
+            document.querySelectorAll('.lang-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            document.getElementById(`btn-${lang}`).classList.add('active');
+        }
+
+        document.addEventListener('DOMContentLoaded', function() {
+            const links = document.querySelectorAll('.nav-link');
+            const sections = document.querySelectorAll('.content-section');
+            const navigationMenu = document.getElementById('navigation-menu');
+
+            function showSection(hash) {
+                if (!hash || !document.querySelector(hash)) {
+                    hash = '#introduction';
+                }
+                
+                let sectionFound = false;
+                sections.forEach(section => {
+                    if ('#' + section.id === hash) {
+                        section.classList.add('active');
+                        sectionFound = true;
+                    } else {
+                        section.classList.remove('active');
+                    }
+                });
+
+                if (!sectionFound && sections.length > 0) {
+                    sections[0].classList.add('active');
+                    hash = '#' + sections[0].id;
+                }
+
+                links.forEach(link => {
+                    if (link.getAttribute('href') === hash) {
+                        link.classList.add('active');
+                    } else {
+                        link.classList.remove('active');
+                    }
+                });
+            }
+
+            navigationMenu.addEventListener('click', function(e) {
+                const link = e.target.closest('a');
+                if (link) {
+                    e.preventDefault();
+                    const hash = link.getAttribute('href');
+                    const targetSection = document.querySelector(hash);
+                    if(targetSection) {
+                        history.pushState(null, null, hash);
+                        showSection(hash);
+                        window.scrollTo(0, 0);
+                    }
+                }
+            });
+
+            window.addEventListener('popstate', function() {
+                showSection(window.location.hash);
+            });
+
+            // Initialize language and section
+            switchLang('ko');
+            showSection(window.location.hash);
+        });
+    </script>
+
+</body>
+</html>
