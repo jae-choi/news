@@ -3,296 +3,228 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Peter Choi | AI & Data Specialist</title>
+    <title>Peter Choi | Technology & Philosophy</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700;900&family=Roboto:wght@300;400;500;700;900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Noto+Sans+KR:wght@300;400;500;700&family=Playfair+Display:wght@700;800&display=swap" rel="stylesheet">
     <style>
+        :root {
+            --bg-color: #FDFDFB;
+            --text-primary: #1a202c;
+            --text-secondary: #4a5568;
+            --accent-color: #3D5A80;
+            --border-color: #E2E8F0;
+            --hover-bg-color: #f8f9fa;
+        }
         body {
-            font-family: 'Noto Sans KR', sans-serif;
-            background-color: #FFFBF7;
-            color: #4A403A;
+            font-family: 'Inter', 'Noto Sans KR', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-primary);
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
         }
-        .en {
-             font-family: 'Roboto', sans-serif;
-        }
-        .project-card {
-            display: flex;
-            flex-direction: column;
-            transition: transform 0.3s ease, box-shadow 0.3s ease;
-        }
-        .project-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.07), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
-        }
-        .card-content {
-            flex-grow: 1;
-            display: flex;
-            flex-direction: column;
-        }
-        .card-text {
-            flex-grow: 1;
-        }
-        .project-card h3 {
-            font-size: 1.25rem; /* 20px */
-            line-height: 1.75rem; /* 28px */
-            font-weight: 700;
-        }
-        .en .project-card h3 {
-            font-size: 1.3rem;
-        }
-        .project-card .card-text p {
-            font-size: 1rem; /* 16px */
-            line-height: 1.625; /* Consistent line height */
-        }
-        .primary-heading {
-            color: #B94545;
-        }
-        .secondary-text {
-            color: #6B5F58;
-        }
-        .btn-primary, .btn-disabled {
-            display: inline-block;
-            padding: 0.625rem 1.25rem; /* 10px 20px */
-            font-size: 1rem; /* 16px */
-            font-weight: 600;
-            border-radius: 0.375rem; /* 6px */
-            transition: background-color 0.3s;
-            text-align: center;
-        }
-        .btn-primary {
-            background-color: #D75A4A;
-            color: white;
-        }
-        .btn-primary:hover {
-            background-color: #A23B3B;
-        }
-        .btn-disabled {
-             background-color: #D1D5DB;
-             color: #6B7280;
-             cursor: not-allowed;
+        .font-serif {
+            font-family: 'Playfair Display', serif;
         }
         .lang-btn.active {
-            font-weight: 700;
-            color: #B94545;
-            text-decoration: underline;
+            font-weight: 600;
+            color: var(--accent-color);
+            border-bottom: 2px solid var(--accent-color);
+        }
+        .project-item-link {
+            display: block;
+            border-bottom: 1px solid var(--border-color);
+            transition: background-color 0.3s ease, box-shadow 0.3s ease, transform 0.3s ease;
+            text-decoration: none;
+            border-radius: 0.5rem;
+        }
+        .project-item-link:hover {
+            background-color: var(--hover-bg-color);
+            transform: translateY(-4px);
+            box-shadow: 0 10px 25px -5px rgba(0,0,0,0.05), 0 8px 10px -6px rgba(0,0,0,0.05);
+        }
+        .tag {
+            display: inline-block;
+            background-color: #edf2f7;
+            color: #4a5568;
+            padding: 0.25rem 0.75rem;
+            border-radius: 9999px;
+            font-size: 0.875rem;
+            font-weight: 500;
+            transition: background-color 0.3s ease, color 0.3s ease;
+        }
+        .tag:hover {
+            background-color: var(--accent-color);
+            color: white;
         }
     </style>
 </head>
-<body class="antialiased">
+<body>
 
-    <!-- Language Switcher -->
-    <div class="container mx-auto px-6 pt-6 text-right">
-        <button id="btn-ko" class="lang-btn" onclick="switchLang('ko')">한국어</button>
-        <span class="text-gray-400">/</span>
-        <button id="btn-en" class="lang-btn" onclick="switchLang('en')">English</button>
+    <div class="container mx-auto max-w-5xl px-4 sm:px-6 lg:px-8">
+
+        <header class="flex justify-between items-center py-10">
+            <div>
+                <h1 class="text-2xl font-bold text-primary">Peter Choi</h1>
+                <p class="text-md text-secondary">
+                    <span class="lang lang-ko">기술과 철학의 교차점 탐구</span>
+                    <span class="lang lang-en" style="display:none;">Exploring the Intersection of Technology & Philosophy</span>
+                </p>
+            </div>
+            <div class="text-right">
+                <button id="btn-ko" class="lang-btn px-2 py-1 text-sm" onclick="switchLang('ko')">KOR</button>
+                <span class="text-gray-300">|</span>
+                <button id="btn-en" class="lang-btn px-2 py-1 text-sm" onclick="switchLang('en')">ENG</button>
+            </div>
+        </header>
+
+        <main>
+            <section id="intro" class="py-20 md:py-28 text-center">
+                <h2 class="font-serif text-4xl md:text-5xl font-bold text-primary mb-4">
+                    <span class="lang lang-ko">사유하는 아키텍트</span>
+                    <span class="lang lang-en" style="display:none;">A Contemplative Architect</span>
+                </h2>
+                <p class="text-lg md:text-xl text-secondary max-w-3xl mx-auto">
+                    <span class="lang lang-ko">저는 시스템의 구조를 설계하고, 그 과정에서 발견한 기술적 한계와 철학적 질문들을 기록합니다. 이 공간은 단순한 포트폴리오를 넘어, 제 사유의 여정을 담은 아카이브입니다.</span>
+                    <span class="lang lang-en" style="display:none;">I design system architectures and document the technical limitations and philosophical questions I discover along the way. This space is more than a portfolio; it's an archive of my intellectual journey.</span>
+                </p>
+            </section>
+
+            <section id="portfolio" class="mb-24">
+                <h3 class="font-serif text-3xl font-bold text-primary mb-10 pb-4 border-b border-border-color">
+                    <span class="lang lang-ko">Work & Prototypes</span>
+                    <span class="lang lang-en" style="display:none;">Work & Prototypes</span>
+                </h3>
+                
+                <div class="space-y-8">
+                    <a href="https://jae-choi.github.io/news/agentspace.html" target="_blank" class="project-item-link">
+                        <div class="py-8 px-6 grid md:grid-cols-12 gap-6 items-center">
+                            <div class="md:col-span-8">
+                                <h4 class="font-serif text-2xl font-bold mb-2 text-primary">
+                                    <span class="lang lang-ko">B2B AI 플랫폼은 왜 늘 어렵게 보이는가?</span>
+                                    <span class="lang lang-en" style="display:none;">Why do B2B AI platforms always seem so complex?</span>
+                                </h4>
+                                <p class="text-secondary mb-4">
+                                    <span class="lang lang-ko">Agentspace : Search, Generate, Actions</span>
+                                    <span class="lang lang-en" style="display:none;">Agentspace : Search, Generate, Actions</span>
+                                </p>
+                                <div class="flex flex-wrap gap-2">
+                                    <span class="tag"><span class="lang lang-ko">🔍 기술: Agentspace 핵심은 Search, Generate, Actions.</span><span class="lang lang-en" style="display:none;">🔍 Tech: The core of Agentspace is Search, Generate, Actions.</span></span>
+                                    <span class="tag"><span class="lang lang-ko">💭 사유: 정보 파편화 문제를 해결하여 사용자는 본질에 집중.</span><span class="lang lang-en" style="display:none;">💭 Philosophy: Solving information fragmentation to help users focus on the essence.</span></span>
+                                </div>
+                            </div>
+                            <div class="md:col-span-4 flex items-center justify-center">
+                                <svg class="w-full h-full rounded-lg" viewBox="0 0 200 120" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Agentspace Infographic"><rect width="200" height="120" fill="#f7fafc"/><text x="45" y="20" font-family="Inter" font-size="9" text-anchor="middle" fill="#4a5568">Search</text><path d="M 45 25 v 50" stroke="#A1887F" stroke-width="1.5" fill="none" marker-end="url(#arrowhead)"/><text x="100" y="20" font-family="Inter" font-size="9" text-anchor="middle" fill="#4a5568">Generate</text><path d="M 100 25 v 50" stroke="#A1887F" stroke-width="1.5" fill="none" marker-end="url(#arrowhead)"/><text x="155" y="20" font-family="Inter" font-size="9" text-anchor="middle" fill="#4a5568">Actions</text><path d="M 155 25 v 50" stroke="#A1887F" stroke-width="1.5" fill="none" marker-end="url(#arrowhead)"/><rect x="20" y="80" width="160" height="25" rx="2" fill="#3D5A80"/><text x="100" y="96" font-family="Inter" font-size="10" fill="white" text-anchor="middle">Unified & Simplified Experience</text><defs><marker id="arrowhead" markerWidth="5" markerHeight="3.5" refX="0" refY="1.75" orient="auto"><polygon points="0 0, 5 1.75, 0 3.5" fill="#A1887F"/></marker></defs></svg>
+                            </div>
+                        </div>
+                    </a>
+                    <a href="https://jae-choi.github.io/news/agent_engine.html" target="_blank" class="project-item-link">
+                        <div class="py-8 px-6 grid md:grid-cols-12 gap-6 items-center">
+                            <div class="md:col-span-8">
+                                <h4 class="font-serif text-2xl font-bold mb-2 text-primary">
+                                    <span class="lang lang-ko">에이전트는 인간 사고의 대체인가, 확장인가?</span>
+                                    <span class="lang lang-en" style="display:none;">Are agents a replacement or an extension of human thought?</span>
+                                </h4>
+                                <p class="text-secondary mb-4">
+                                    <span class="lang lang-ko">여러 AI 에이전트가 협력하는 시스템의 아키텍처를 설계하고, 핵심 비즈니스 로직에만 집중</span>
+                                    <span class="lang lang-en" style="display:none;">Designing the architecture for a collaborative multi-agent system, focusing solely on core business logic.</span>
+                                </p>
+                                 <div class="flex flex-wrap gap-2">
+                                    <span class="tag"><span class="lang lang-ko">🔍 기술: ADK와 Agent Engine을 활용한 멀티 에이전트 시스템 설계.</span><span class="lang lang-en" style="display:none;">🔍 Tech: Designing a multi-agent system using ADK and Agent Engine.</span></span>
+                                    <span class="tag"><span class="lang lang-ko">💭 사유: 개별적으로 개발된 다양한 AI 에이전트들을 하나의 통합된 시스템으로 연결하고 조율하여, 더 복잡한 문제를 해결하는 '에이전트의 사회'를 구축.</span><span class="lang lang-en" style="display:none;">💭 Philosophy: The idea of building a 'society of agents' that solves more complex problems by connecting and orchestrating various individually developed AI agents into a single, integrated system.</span></span>
+                                </div>
+                            </div>
+                             <div class="md:col-span-4 flex items-center justify-center">
+                                <svg class="w-full h-full rounded-lg" viewBox="0 0 200 120" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Agent Engine Infographic"><rect width="200" height="120" fill="#f7fafc"/><rect x="70" y="40" width="60" height="40" rx="4" fill="#3D5A80" stroke="#1a202c" stroke-width="1"/><text x="100" y="65" font-family="Inter" font-size="9" fill="white" text-anchor="middle">Orchestrator</text><g><rect x="10" y="10" width="40" height="20" rx="2" fill="#A1887F"/><text x="30" y="23" font-family="Inter" font-size="8" fill="white" text-anchor="middle">Agent A</text><path d="M 50 20 L 70 45" stroke="#4a5568" stroke-width="1" fill="none"/></g><g><rect x="150" y="10" width="40" height="20" rx="2" fill="#A1887F"/><text x="170" y="23" font-family="Inter" font-size="8" fill="white" text-anchor="middle">Agent B</text><path d="M 150 20 L 130 45" stroke="#4a5568" stroke-width="1" fill="none"/></g><g><rect x="10" y="90" width="40" height="20" rx="2" fill="#A1887F"/><text x="30" y="103" font-family="Inter" font-size="8" fill="white" text-anchor="middle">Agent C</text><path d="M 50 100 L 70 75" stroke="#4a5568" stroke-width="1" fill="none"/></g><g><rect x="150" y="90" width="40" height="20" rx="2" fill="#A1887F"/><text x="170" y="103" font-family="Inter" font-size="8" fill="white" text-anchor="middle">Agent D</text><path d="M 150 100 L 130 75" stroke="#4a5568" stroke-width="1" fill="none"/></g></svg>
+                            </div>
+                        </div>
+                    </a>
+                    <a href="https://jae-choi.github.io/news/machine.html" target="_blank" class="project-item-link">
+                        <div class="py-8 px-6 grid md:grid-cols-12 gap-6 items-center">
+                            <div class="md:col-span-8">
+                                <h4 class="font-serif text-2xl font-bold mb-2 text-primary">
+                                    <span class="lang lang-ko">정확하다는 말, 과연 무엇이 정확한가?</span>
+                                    <span class="lang lang-en" style="display:none;">When we say 'accurate,' what is actually accurate?</span>
+                                </h4>
+                                <p class="text-secondary mb-4">
+                                    <span class="lang lang-ko">머신러닝 모델의 '정확도'라는 지표가 어떻게 진실을 왜곡할 수 있는지 분석하고, 더 나은 평가 방식에 대해 고찰합니다.</span>
+                                    <span class="lang lang-en" style="display:none;">An analysis of how the 'accuracy' metric in machine learning can distort truth, and a consideration of better evaluation methods.</span>
+                                </p>
+                                 <div class="flex flex-wrap gap-2">
+                                    <span class="tag"><span class="lang lang-ko">🔍 기술: 모델 평가 지표(정확도, 정밀도, 재현율)의 한계 분석.</span><span class="lang lang-en" style="display:none;">🔍 Tech: Analysis of the limitations of model evaluation metrics (accuracy, precision, recall).</span></span>
+                                    <span class="tag"><span class="lang lang-ko">💭 사유: 통계적 정확도와 실질적 진실 사이의 관계에 대한 고찰.</span><span class="lang lang-en" style="display:none;">💭 Philosophy: A reflection on the relationship between statistical accuracy and actual truth.</span></span>
+                                </div>
+                            </div>
+                             <div class="md:col-span-4 flex items-center justify-center">
+                                <svg class="w-full h-full rounded-lg" viewBox="0 0 200 120" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="ML Accuracy Infographic"><rect width="200" height="120" fill="#f7fafc"/><text x="100" y="20" font-family="Playfair Display" font-size="12" text-anchor="middle" fill="#3D5A80">Truth vs. Metric</text><g><path d="M 20 60 C 60 20, 140 100, 180 60" stroke="#A1887F" stroke-width="2" fill="none" stroke-dasharray="4,4"/><text x="50" y="80" font-family="Inter" font-size="9" fill="#A1887F">Real World</text></g><g><rect x="20" y="60" width="160" height="20" rx="2" fill="#3D5A80" fill-opacity="0.7"/><text x="100" y="74" font-family="Inter" font-size="9" fill="white" text-anchor="middle">"99% Accuracy"</text></g></svg>
+                            </div>
+                        </div>
+                    </a>
+                    <a href="https://jae-choi.github.io/news/adk.html" target="_blank" class="project-item-link">
+                        <div class="py-8 px-6 grid md:grid-cols-12 gap-6 items-center">
+                            <div class="md:col-span-8">
+                                <h4 class="font-serif text-2xl font-bold mb-2 text-primary">
+                                    <span class="lang lang-ko">개발자에게 '에이전트'를 만든다는 것은 어떤 의미인가?</span>
+                                    <span class="lang lang-en" style="display:none;">What does it mean for a developer to 'build an agent'?</span>
+                                </h4>
+                                <p class="text-secondary mb-4">
+                                    <span class="lang lang-ko">Google의 Agent Development Kit(ADK)를 사용하여 로컬 환경에서 AI 에이전트를 구축하고 실행하는 과정을 안내하는 실습 가이드입니다.</span>
+                                    <span class="lang lang-en" style="display:none;">A hands-on guide that walks through the process of building and running an AI agent in a local environment using Google's Agent Development Kit (ADK).</span>
+                                </p>
+                                 <div class="flex flex-wrap gap-2">
+                                    <span class="tag"><span class="lang lang-ko">🔍 기술: Google ADK를 활용한 로컬 AI 에이전트 구축 실습 가이드.</span><span class="lang lang-en" style="display:none;">🔍 Tech: A hands-on guide to building a local AI agent using Google ADK.</span></span>
+                                    <span class="tag"><span class="lang lang-ko">💭 사유: 복잡한 개발 과정을 표준화된 프레임워크를 통해 어떻게 단순화하고 접근성을 높이는지에 대한 탐구.</span><span class="lang lang-en" style="display:none;">💭 Philosophy: An exploration of how to simplify and increase accessibility in the complex agent development process through a standardized framework.</span></span>
+                                </div>
+                            </div>
+                             <div class="md:col-span-4 flex items-center justify-center">
+                                <svg class="w-full h-full rounded-lg" viewBox="0 0 200 120" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="ADK Guide Infographic"><rect width="200" height="120" fill="#f7fafc"/><g><rect x="10" y="40" width="60" height="40" rx="2" fill="#A1887F"/><text x="40" y="58" font-family="monospace" font-size="8" fill="white" text-anchor="middle">def agent():</text><text x="40" y="70" font-family="monospace" font-size="8" fill="white" text-anchor="middle">  ...</text></g><path d="M 75 60 L 125 60" stroke="#3D5A80" stroke-width="1.5" fill="none" marker-end="url(#arrowhead2)"/><text x="100" y="55" font-family="Inter" font-size="9" text-anchor="middle" fill="#3D5A80">ADK</text><g><rect x="130" y="30" width="60" height="60" rx="4" fill="#3D5A80" stroke="#1a202c" stroke-width="1"/><text x="160" y="65" font-family="Inter" font-size="10" fill="white" text-anchor="middle">Agent</text></g><defs><marker id="arrowhead2" markerWidth="5" markerHeight="3.5" refX="0" refY="1.75" orient="auto"><polygon points="0 0, 5 1.75, 0 3.5" fill="#3D5A80"/></marker></defs></svg>
+                            </div>
+                        </div>
+                    </a>
+                </div>
+            </section>
+
+            <section id="about" class="py-20 md:py-28">
+                 <div class="max-w-3xl mx-auto text-center">
+                    <h3 class="font-serif text-3xl font-bold text-primary mb-4">About Me</h3>
+                    <div class="prose prose-lg text-secondary mx-auto">
+                        <p>
+                            <span class="lang lang-ko">저는 기술과 인문학의 경계에서 일하는 AI 아키텍트이자 프로토타이퍼입니다. 코드를 작성하는 행위가 단지 기술적 문제 해결을 넘어, 세상을 이해하고 질문을 던지는 과정이라고 믿습니다. 생성형 AI와 멀티 에이전트 시스템이 우리의 사고와 상호작용을 어떻게 재구성하는지 탐구하며, 그 과정에서 얻은 기술적, 철학적 통찰을 공유합니다.</span>
+                            <span class="lang lang-en" style="display:none;">I am an AI architect and prototyper working at the intersection of technology and the humanities. I believe that the act of writing code is not just about technical problem-solving, but a process of understanding the world and asking questions. I explore how generative AI and multi-agent systems are reshaping our thoughts and interactions, and I share the technical and philosophical insights gained in the process.</span>
+                        </p>
+                    </div>
+                </div>
+            </section>
+        </main>
+
+        <footer class="text-center py-12 border-t border-border-color">
+            <div class="flex justify-center space-x-6 mb-4">
+                <a href="https://www.linkedin.com/in/jaeeun-choi-a660b718b/" target="_blank" class="text-secondary hover:text-accent-color transition-colors">LinkedIn</a>
+                <a href="https://github.com/jae-choi" target="_blank" class="text-secondary hover:text-accent-color transition-colors">GitHub</a>
+            </div>
+            <p class="text-sm text-gray-400">&copy; <span id="year"></span> Peter Choi. All Rights Reserved.</p>
+        </footer>
     </div>
 
-    <!-- Header & Hero Section -->
-    <header class="bg-white">
-        <div class="container mx-auto px-6 py-10 md:py-12 text-center">
-            <h1 class="text-3xl md:text-5xl font-black primary-heading">Peter Choi</h1>
-            <p class="lang lang-ko mt-3 text-base md:text-lg secondary-text max-w-5xl mx-auto mb-6 md:mb-8">
-                AI와 데이터의 최신 트렌드를 공유합니다. 새로운 소식을 넘어, 그것이 왜 중요한지에 대한 통찰을 나눕니다.
-            </p>
-             <p class="lang lang-en mt-3 text-base md:text-lg secondary-text max-w-5xl mx-auto mb-6 md:mb-8" style="display:none;">
-                I share the latest trends in AI and data. Beyond just the news, I offer insights into why it matters.
-            </p>
-        </div>
-    </header>
-
-    <main class="container mx-auto px-6 py-12">
-
-        <!-- Portfolio Section -->
-        <section id="portfolio" class="mb-10 md:mb-16">
-            <h2 class="lang lang-ko text-3xl font-bold text-center primary-heading mb-12">Selected Work & Analysis</h2>
-            <h2 class="lang lang-en text-3xl font-bold text-center primary-heading mb-12" style="display:none;">Selected Work & Analysis</h2>
-
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-                
-                <!-- Project Card 1: Google Agentspace -->
-                <div class="project-card bg-white rounded-lg shadow-md overflow-hidden">
-                    <svg class="w-full h-48" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Placeholder: Agentspace Report">
-                        <title>Agentspace Report</title>
-                        <rect width="100%" height="100%" fill="#D75A4A"></rect>
-                        <text x="50%" y="50%" fill="#FFFBF7" dy=".3em" text-anchor="middle" font-size="20" font-weight="bold" font-family="Roboto, sans-serif">Agentspace Report</text>
-                    </svg>
-                    <div class="p-6 md:p-8 card-content">
-                        <div class="card-text">
-                            <h3 class="lang lang-ko mb-3 primary-heading">Google Agentspace 인터랙티브 리포트</h3>
-                            <h3 class="lang lang-en mb-3 primary-heading" style="display:none;">Google Agentspace Interactive Report</h3>
-
-                            <p class="lang lang-ko secondary-text mb-6">복잡한 기업용 AI 플랫폼 제안서를 사용자가 쉽게 탐색할 수 있는 인터랙티브 웹 앱으로 시각화했습니다.</p>
-                            <p class="lang lang-en secondary-text mb-6" style="display:none;">Visualized a complex enterprise AI platform proposal into an interactive web app for easy user exploration.</p>
-                        </div>
-                        <a href="https://jae-choi.github.io/news/agentspace.html" target="_blank" class="lang lang-ko btn-primary">프로젝트 보기 &rarr;</a>
-                        <a href="https://jae-choi.github.io/news/agentspace.html" target="_blank" class="lang lang-en btn-primary" style="display:none;">View Project &rarr;</a>
-                    </div>
-                </div>
-
-                <!-- Project Card 2: 99% Accuracy Article -->
-                <div class="project-card bg-white rounded-lg shadow-md overflow-hidden">
-                    <svg class="w-full h-48" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Placeholder: Analysis Image">
-                        <title>Analysis Image</title>
-                        <rect width="100%" height="100%" fill="#D75A4A"></rect>
-                        <text x="50%" y="50%" fill="#FFFBF7" dy=".3em" text-anchor="middle" font-size="20" font-weight="bold" font-family="Roboto, sans-serif">Analysis(ML)</text>
-                    </svg>
-                    <div class="p-6 md:p-8 card-content">
-                        <div class="card-text">
-                            <h3 class="lang lang-ko mb-3 primary-heading">'정확도 99%'에 속지 않는 이유</h3>
-                            <h3 class="lang lang-en mb-3 primary-heading" style="display:none;">Why You Shouldn't Be Fooled by '99% Accuracy'</h3>
-                            
-                            <p class="lang lang-ko secondary-text mb-6">머신러닝 모델의 정확도가 비즈니스 가치를 왜곡하는 방식을 분석하고, 정밀도와 재현율의 중요성을 탐구하는 기술 분석 글입니다.</p>
-                            <p class="lang lang-en secondary-text mb-6" style="display:none;">A technical analysis exploring how machine learning model accuracy can distort business value and the importance of precision and recall.</p>
-                        </div>
-                        <a href="https://jae-choi.github.io/news/machine.html" target="_blank" class="lang lang-ko btn-primary">분석 보기 &rarr;</a>
-                        <a href="https://jae-choi.github.io/news/machine.html" target="_blank" class="lang lang-en btn-primary" style="display:none;">View Analysis &rarr;</a>
-                    </div>
-                </div>
-
-                <!-- Project Card 3: Agent Engine -->
-                <div class="project-card bg-white rounded-lg shadow-md overflow-hidden">
-                    <svg class="w-full h-48" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Placeholder: Agent Engine Guide">
-                        <title>Agent Engine Guide</title>
-                        <rect width="100%" height="100%" fill="#D75A4A"></rect>
-                        <text x="50%" y="50%" fill="#FFFBF7" dy=".3em" text-anchor="middle" font-size="20" font-weight="bold" font-family="Roboto, sans-serif">Agent Engine Guide</text>
-                    </svg>
-                    <div class="p-6 md:p-8 card-content">
-                        <div class="card-text">
-                            <h3 class="lang lang-ko mb-3 primary-heading">ADK & Agent Engine 기술 소개</h3>
-                            <h3 class="lang lang-en mb-3 primary-heading" style="display:none;">ADK & Agent Engine Tech</h3>
-
-                            <p class="lang lang-ko secondary-text mb-6">ADK와 Vertex AI Agent Engine의 개념, 배포, 관리 방법을 다루는 기술 분석 글입니다. 에이전트 개발부터 운영까지의 전체 생명주기를 설명합니다.</p>
-                            <p class="lang lang-en secondary-text mb-6" style="display:none;">A technical analysis on the concepts, deployment, and management of ADK & Vertex AI Agent Engine, explaining the entire lifecycle from development to operation.</p>
-                        </div>
-                        <a href="https://jae-choi.github.io/news/agent_engine.html" target="_blank" class="lang lang-ko btn-primary">가이드 보기 &rarr;</a>
-                        <a href="https://jae-choi.github.io/news/agent_engine.html" target="_blank" class="lang lang-en btn-primary" style="display:none;">View Guide &rarr;</a>
-                    </div>
-                </div>
-
-                <!-- Project Card 4: ADK Guide -->
-                <div class="project-card bg-white rounded-lg shadow-md overflow-hidden">
-                    <svg class="w-full h-48" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Placeholder: ADK Guide">
-                        <title>ADK Guide</title>
-                        <rect width="100%" height="100%" fill="#B5655D"></rect>
-                        <text x="50%" y="50%" fill="#FFFBF7" dy=".3em" text-anchor="middle" font-size="20" font-weight="bold" font-family="Roboto, sans-serif">ADK Guide</text>
-                    </svg>
-                    <div class="p-6 md:p-8 card-content">
-                        <div class="card-text">
-                            <h3 class="lang lang-ko mb-3 primary-heading">ADK 실습 가이드</h3>
-                            <h3 class="lang lang-en mb-3 primary-heading" style="display:none;">ADK Hands-on Guide</h3>
-
-                            <p class="lang lang-ko secondary-text mb-6">Google의 Agent Development Kit(ADK)를 사용하여 로컬 환경에서 AI 에이전트를 구축하고 실행하는 과정을 안내하는 실습 가이드입니다.</p>
-                            <p class="lang lang-en secondary-text mb-6" style="display:none;">A hands-on guide that walks through the process of building and running an AI agent in a local environment using Google's Agent Development Kit (ADK).</p>
-                        </div>
-                        <a href="https://jae-choi.github.io/news/adk.html" target="_blank" class="lang lang-ko btn-primary">가이드 보기 &rarr;</a>
-                        <a href="https://jae-choi.github.io/news/adk.html" target="_blank" class="lang lang-en btn-primary" style="display:none;">View Guide &rarr;</a>
-                    </div>
-                </div>
-                
-                <!-- Project Card 5: Placeholder -->
-                <div class="project-card bg-white rounded-lg shadow-md overflow-hidden">
-                    <svg class="w-full h-48" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Placeholder: Project Five">
-                        <title>Project Five</title>
-                        <rect width="100%" height="100%" fill="#A23B3B"></rect>
-                        <text x="50%" y="50%" fill="#FFFBF7" dy=".3em" text-anchor="middle" font-size="20" font-weight="bold" font-family="Roboto, sans-serif">Project Five</text>
-                    </svg>
-                    <div class="p-6 md:p-8 card-content">
-                        <div class="card-text">
-                            <h3 class="lang lang-ko mb-3 primary-heading">다섯 번째 프로젝트</h3>
-                            <h3 class="lang lang-en mb-3 primary-heading" style="display:none;">Project Five</h3>
-
-                            <p class="lang lang-ko secondary-text mb-6">다섯 번째 프로젝트에 대한 설명입니다. 이미지와 링크를 수정하여 사용하세요.</p>
-                            <p class="lang lang-en secondary-text mb-6" style="display:none;">Description for the fifth project. Modify the image and link as needed.</p>
-                        </div>
-                        <span class="lang lang-ko btn-disabled">준비 중</span>
-                        <span class="lang lang-en btn-disabled" style="display:none;">Coming Soon</span>
-                    </div>
-                </div>
-
-                <!-- Project Card 6: Placeholder -->
-                 <div class="project-card bg-white rounded-lg shadow-md overflow-hidden">
-                    <svg class="w-full h-48" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Placeholder: Project Six">
-                        <title>Project Six</title>
-                        <rect width="100%" height="100%" fill="#6B5F58"></rect>
-                        <text x="50%" y="50%" fill="#FFFBF7" dy=".3em" text-anchor="middle" font-size="20" font-weight="bold" font-family="Roboto, sans-serif">Project Six</text>
-                    </svg>
-                    <div class="p-6 md:p-8 card-content">
-                        <div class="card-text">
-                            <h3 class="lang lang-ko mb-3 primary-heading">여섯 번째 프로젝트</h3>
-                            <h3 class="lang lang-en mb-3 primary-heading" style="display:none;">Project Six</h3>
-
-                            <p class="lang lang-ko secondary-text mb-6">여섯 번째 프로젝트에 대한 설명입니다. 이미지와 링크를 수정하여 사용하세요.</p>
-                            <p class="lang lang-en secondary-text mb-6" style="display:none;">Description for the sixth project. Modify the image and link as needed.</p>
-                        </div>
-                        <span class="lang lang-ko btn-disabled">준비 중</span>
-                        <span class="lang lang-en btn-disabled" style="display:none;">Coming Soon</span>
-                    </div>
-                </div>
-
-            </div>
-        </section>
-
-        <!-- About Section -->
-        <section id="about" class="mt-16 md:mt-24">
-            <div class="max-w-5xl mx-auto bg-white p-4 md:p-6 rounded-lg shadow-sm">
-                <h2 class="lang lang-ko text-xl md:text-2xl font-bold text-center primary-heading mb-4">Tech and Philosophy</h2>
-                <h2 class="lang lang-en text-xl md:text-2xl font-bold text-center primary-heading mb-4" style="display:none;">Tech and Philosophy</h2>
-                <p class="lang lang-ko text-center text-sm md:text-base secondary-text leading-relaxed md:leading-loose">
-                    저는 기술과 철학의 교차점에서 생성형 AI, 멀티 에이전트 시스템, 그리고 응용 머신러닝이 우리의 사고방식과 의사결정 과정을 어떻게 바꾸고 있는지 탐구합니다. 이곳에서 정제된 인사이트와 실용적인 아이디어, 그리고 생각해 볼 만한 최신 업데이트를 만나보실 수 있습니다.
-                </p>
-                <p class="lang lang-en text-center text-sm md:text-base secondary-text leading-relaxed md:leading-loose" style="display:none;">
-                    At the intersection of technology and philosophy, I explore how generative AI, multi-agent systems, and applied machine learning are transforming our ways of thinking and decision-making processes. Here, you will find refined insights, practical ideas, and the latest updates worth considering.
-                </p>
-            </div>
-        </section>
-
-    </main>
-
-    <!-- Footer -->
-    <footer class="bg-white mt-16 md:mt-24">
-        <div class="container mx-auto px-6 py-8">
-            <h2 class="lang lang-ko text-2xl font-bold text-center primary-heading mb-6">Connect & Follow</h2>
-            <h2 class="lang lang-en text-2xl font-bold text-center primary-heading mb-6" style="display:none;">Connect & Follow</h2>
-            <div class="flex justify-center space-x-6">
-                <a href="https://www.linkedin.com/in/jaeeun-choi-a660b718b/" target="_blank" class="secondary-text hover:text-[#B94545] font-semibold transition-colors">LinkedIn</a>
-                <a href="#" target="_blank" class="secondary-text hover:text-[#B94545] font-semibold transition-colors">Website</a>
-                <a href="https://github.com/jae-choi" target="_blank" class="secondary-text hover:text-[#B94545] font-semibold transition-colors">GitHub</a>
-            </div>
-            <div class="text-center text-gray-400 mt-8 text-sm">
-                &copy; <span id="year"></span> Peter Choi. All Rights Reserved.
-            </div>
-        </div>
-    </footer>
-
     <script>
-        const titles = {
-            ko: 'Peter Choi | AI & Data Specialist',
-            en: 'Peter Choi | AI & Data Specialist'
-        };
-
         function switchLang(lang) {
             document.documentElement.lang = lang;
-            document.documentElement.className = lang === 'en' ? 'en' : '';
-            document.title = titles[lang];
-
             document.querySelectorAll('.lang').forEach(el => {
-                const displayValue = el.classList.contains(`lang-${lang}`) ? '' : 'none';
-                if (el.tagName === 'A' || el.tagName === 'SPAN') {
-                     el.style.display = el.classList.contains(`lang-${lang}`) ? 'inline-block' : 'none';
-                } else {
-                     el.style.display = el.classList.contains(`lang-${lang}`) ? '' : 'none';
-                }
+                el.style.display = el.classList.contains(`lang-${lang}`) ? '' : 'none';
             });
-
             document.querySelectorAll('.lang-btn').forEach(btn => {
                 btn.classList.toggle('active', btn.id === `btn-${lang}`);
             });
         }
 
         document.addEventListener('DOMContentLoaded', () => {
-            switchLang('ko');
+            const userLang = navigator.language || navigator.userLanguage;
+            if (userLang.startsWith('en')) {
+                switchLang('en');
+            } else {
+                switchLang('ko');
+            }
             document.getElementById('year').textContent = new Date().getFullYear();
         });
     </script>
