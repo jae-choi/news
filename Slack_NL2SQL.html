@@ -1,0 +1,404 @@
+<!DOCTYPE html>
+<html lang="ko" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NL2SQL Slack Bot 통합 매뉴얼</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Noto+Sans+KR:wght@400;500;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Noto Sans KR', 'Inter', sans-serif;
+            background-color: #f8fafc;
+        }
+        .en body {
+            font-family: 'Inter', sans-serif;
+        }
+        .command-block {
+            background-color: #1e293b;
+            color: #e2e8f0;
+            padding: 1rem;
+            border-radius: 0.5rem;
+            position: relative;
+            font-family: 'Menlo', 'Monaco', 'Consolas', "Liberation Mono", "Courier New", monospace;
+            white-space: pre-wrap;
+            overflow-x: auto;
+            cursor: pointer;
+        }
+        .command-block:hover {
+            background-color: #334155;
+        }
+        .note {
+            border-left: 4px solid;
+            padding: 1rem;
+            margin-top: 1rem;
+            border-radius: 0.25rem;
+        }
+        .note-info { border-color: #3b82f6; background-color: #eff6ff; }
+        .note-warning { border-color: #f97316; background-color: #fff7ed; }
+        .note-danger { border-color: #ef4444; background-color: #fef2f2; }
+        .sidebar-nav a.active {
+            background-color: #e0f2fe;
+            color: #0284c7;
+            font-weight: 600;
+        }
+        .component {
+            background-color: white;
+            border: 1px solid #e5e7eb;
+            border-radius: 0.75rem;
+            padding: 1rem 1.5rem;
+            text-align: center;
+            box-shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1);
+            width: 240px;
+            z-index: 10;
+            position: relative;
+        }
+        .component-title {
+            font-weight: 700;
+            font-size: 1.125rem;
+            margin-bottom: 0.5rem;
+        }
+        .component-desc {
+            font-size: 0.875rem;
+            color: #6b7280;
+        }
+        .arrow-label {
+            position: absolute;
+            background-color: #f9fafb;
+            padding: 0.125rem 0.5rem;
+            font-size: 0.8rem;
+            font-weight: 500;
+            color: #4b5563;
+            z-index: 20;
+            white-space: nowrap;
+            transform: translate(-50%, -50%);
+        }
+        .dashed-box {
+            border: 2px dashed #9ca3af;
+            border-radius: 1rem;
+            padding: 3rem 1.5rem 1.5rem;
+            position: relative;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        .dashed-box-label {
+            position: absolute;
+            top: -0.8rem;
+            left: 1.5rem;
+            background-color: #f9fafb;
+            padding: 0 0.5rem;
+            font-weight: 600;
+            color: #4b5563;
+        }
+        .lang-btn.active {
+            font-weight: 700;
+            color: #0284c7;
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body class="bg-slate-50 text-slate-800">
+
+    <div class="flex flex-col lg:flex-row max-w-screen-xl mx-auto">
+        <!-- Sidebar Navigation -->
+        <aside class="w-full lg:w-80 lg:h-screen lg:sticky lg:top-0 p-4 lg:p-8 border-b lg:border-b-0 lg:border-r bg-white">
+            <div class="flex justify-between items-center mb-6">
+                <h2 class="text-xl font-bold text-slate-900">NL2SQL</h2>
+                <div class="text-sm">
+                    <button id="btn-ko" class="lang-btn" onclick="switchLang('ko')">KOR</button>
+                    <span class="text-gray-300">/</span>
+                    <button id="btn-en" class="lang-btn" onclick="switchLang('en')">ENG</button>
+                </div>
+            </div>
+            <nav class="sidebar-nav">
+                <ul class="space-y-1">
+                    <li><a href="#part1" data-page="part1" class="nav-link block px-3 py-2 rounded-md text-slate-600 hover:bg-slate-100 font-semibold"><span class="lang lang-ko">Part 1: 시스템 구성도</span><span class="lang lang-en" style="display:none;">Part 1: System Architecture</span></a></li>
+                    <li><a href="#part2" data-page="part2" class="nav-link block px-3 py-2 rounded-md text-slate-600 hover:bg-slate-100 font-semibold"><span class="lang lang-ko">Part 2: 터널링 설정</span><span class="lang lang-en" style="display:none;">Part 2: Tunneling Setup</span></a></li>
+                    <ul class="pl-4 mt-1 space-y-1">
+                        <li><a href="#part2-requirements" data-page="part2" class="nav-link sub-link block px-3 py-1.5 rounded-md text-sm text-slate-500 hover:bg-slate-100"><span class="lang lang-ko">2.1 사전 준비</span><span class="lang lang-en" style="display:none;">2.1 Prerequisites</span></a></li>
+                        <li><a href="#part2-cloudflare" data-page="part2" class="nav-link sub-link block px-3 py-1.5 rounded-md text-sm text-slate-500 hover:bg-slate-100"><span class="lang lang-ko">2.2 Cloudflare Tunnel</span><span class="lang lang-en" style="display:none;">2.2 Cloudflare Tunnel</span></a></li>
+                        <li><a href="#part2-ngrok" data-page="part2" class="nav-link sub-link block px-3 py-1.5 rounded-md text-sm text-slate-500 hover:bg-slate-100"><span class="lang lang-ko">2.3 ngrok</span><span class="lang lang-en" style="display:none;">2.3 ngrok</span></a></li>
+                        <li><a href="#part2-slack" data-page="part2" class="nav-link sub-link block px-3 py-1.5 rounded-md text-sm text-slate-500 hover:bg-slate-100"><span class="lang lang-ko">2.4 Slack 앱 설정</span><span class="lang lang-en" style="display:none;">2.4 Slack App Setup</span></a></li>
+                    </ul>
+                    <li><a href="#part3" data-page="part3" class="nav-link block px-3 py-2 rounded-md text-slate-600 hover:bg-slate-100 font-semibold mt-2"><span class="lang lang-ko">Part 3: 배포 매뉴얼</span><span class="lang lang-en" style="display:none;">Part 3: Deployment Manual</span></a></li>
+                     <ul class="pl-4 mt-1 space-y-1">
+                        <li><a href="#part3-result" data-page="part3" class="nav-link sub-link block px-3 py-1.5 rounded-md text-sm text-slate-500 hover:bg-slate-100"><span class="lang lang-ko">3.1 최종 결과물</span><span class="lang lang-en" style="display:none;">3.1 Final Result</span></a></li>
+                        <li><a href="#part3-structure" data-page="part3" class="nav-link sub-link block px-3 py-1.5 rounded-md text-sm text-slate-500 hover:bg-slate-100"><span class="lang lang-ko">3.2 프로젝트 구조</span><span class="lang lang-en" style="display:none;">3.2 Project Structure</span></a></li>
+                        <li><a href="#part3-local" data-page="part3" class="nav-link sub-link block px-3 py-1.5 rounded-md text-sm text-slate-500 hover:bg-slate-100"><span class="lang lang-ko">3.3 로컬 설치</span><span class="lang lang-en" style="display:none;">3.3 Local Installation</span></a></li>
+                        <li><a href="#part3-deploy" data-page="part3" class="nav-link sub-link block px-3 py-1.5 rounded-md text-sm text-slate-500 hover:bg-slate-100"><span class="lang lang-ko">3.4 Cloud Run 배포</span><span class="lang lang-en" style="display:none;">3.4 Cloud Run Deployment</span></a></li>
+                    </ul>
+                </ul>
+            </nav>
+        </aside>
+
+        <!-- Main Content -->
+        <main id="main-content" class="flex-1 p-4 md:p-10 h-screen overflow-y-auto">
+            
+            <!-- Part 1: Slack Bot System Architecture -->
+            <section id="part1" class="page-content mb-16 scroll-mt-20">
+                 <div class="max-w-6xl w-full">
+                    <header class="text-center mb-12">
+                        <h1 class="text-4xl md:text-5xl font-bold text-gray-800"><span class="lang lang-ko">NL2SQL 슬랙봇 시스템 구성도</span><span class="lang lang-en" style="display:none;">NL2SQL Slack Bot System Architecture</span></h1>
+                        <p class="mt-4 text-lg text-gray-600"><span class="lang lang-ko">Slack에서 BigQuery까지, 데이터 요청 및 응답의 전체 흐름</span><span class="lang lang-en" style="display:none;">The complete flow of data requests and responses, from Slack to BigQuery</span></p>
+                    </header>
+                    <div class="relative w-full" id="diagram-container">
+                        <div class="space-y-24 flex flex-col items-center">
+                            <div class="w-full flex justify-center items-center space-x-32">
+                                <div id="user-slack" class="component"><p class="component-title"><span class="lang lang-ko">사용자 & Slack</span><span class="lang lang-en" style="display:none;">User & Slack</span></p><p class="component-desc"><span class="lang lang-ko">Slack 채널에서<br><code class="font-mono bg-gray-200 px-1 rounded">/ask</code> 명령어로 질문</span><span class="lang lang-en" style="display:none;">Asks with <code class="font-mono bg-gray-200 px-1 rounded">/ask</code> command<br>in a Slack channel</span></p></div>
+                                <div id="tunnel" class="component bg-blue-50 border-blue-200"><p class="component-title text-blue-800"><span class="lang lang-ko">터널링 서비스</span><span class="lang lang-en" style="display:none;">Tunneling Service</span></p><p class="component-desc text-blue-700"><span class="lang lang-ko">Cloudflare Tunnel 또는 ngrok<br>공개 URL을 로컬 서버로 연결</span><span class="lang lang-en" style="display:none;">Cloudflare Tunnel or ngrok<br>Connects public URL to local server</span></p></div>
+                            </div>
+                            <div class="w-full flex justify-center">
+                                <div id="local-env" class="dashed-box"><span class="dashed-box-label"><span class="lang lang-ko">로컬 개발 환경</span><span class="lang lang-en" style="display:none;">Local Dev Environment</span></span><div id="fastapi" class="component bg-green-50 border-green-200"><p class="component-title text-green-800">FastAPI 서버</p><p class="component-desc text-green-700"><span class="lang lang-ko">localhost:8000에서 실행,<br>핵심 비즈니스 로직 처리</span><span class="lang lang-en" style="display:none;">Runs on localhost:8000,<br>handles core business logic</span></p></div></div>
+                            </div>
+                            <div class="w-full flex justify-center items-center space-x-32">
+                                <div id="gemini" class="component"><p class="component-title">Gemini API</p><p class="component-desc"><span class="lang lang-ko">자연어 질문을<br>SQL로 변환</span><span class="lang lang-en" style="display:none;">Converts natural language<br>question to SQL</span></p></div>
+                                <div id="bigquery" class="component"><p class="component-title">Google BigQuery</p><p class="component-desc"><span class="lang lang-ko">변환된 SQL을 실행하고<br>데이터 반환</span><span class="lang lang-en" style="display:none;">Executes the converted SQL<br>and returns data</span></p></div>
+                            </div>
+                        </div>
+                        <svg class="absolute top-0 left-0 w-full h-full" style="pointer-events:none; z-index: 5;">
+                            <defs><marker id="arrowhead" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M 0 0 L 10 5 L 0 10 z" fill="#4b5563"></path></marker><marker id="arrowhead-dashed" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M 0 0 L 10 5 L 0 10 z" fill="#9ca3af"></path></marker><marker id="arrowhead-success" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M 0 0 L 10 5 L 0 10 z" fill="#10b981"></path></marker></defs>
+                            <path id="arrow1" stroke-width="2" stroke="#4b5563" fill="none" marker-end="url(#arrowhead)"></path><path id="arrow2" stroke-width="2" stroke="#4b5563" fill="none" marker-end="url(#arrowhead)"></path><path id="arrow3" stroke-width="2" stroke="#4b5563" fill="none" marker-end="url(#arrowhead)"></path><path id="arrow4" stroke-width="2" stroke="#9ca3af" stroke-dasharray="5,5" fill="none" marker-end="url(#arrowhead-dashed)"></path><path id="arrow5" stroke-width="2" stroke="#4b5563" fill="none" marker-end="url(#arrowhead)"></path><path id="arrow6" stroke-width="2" stroke="#9ca3af" stroke-dasharray="5,5" fill="none" marker-end="url(#arrowhead-dashed)"></path><path id="arrow7" stroke-width="2" stroke="#10b981" stroke-dasharray="5,5" fill="none" marker-end="url(#arrowhead-success)"></path>
+                        </svg>
+                        <div class="arrow-label" id="label1"><span class="lang lang-ko">1. /ask 요청 (Webhook)</span><span class="lang lang-en" style="display:none;">1. /ask Request (Webhook)</span></div><div class="arrow-label" id="label2"><span class="lang lang-ko">2. 요청 전달</span><span class="lang lang-en" style="display:none;">2. Forward Request</span></div><div class="arrow-label" id="label3"><span class="lang lang-ko">3. NL to SQL 변환 요청</span><span class="lang lang-en" style="display:none;">3. NL to SQL Conversion Request</span></div><div class="arrow-label" id="label4"><span class="lang lang-ko">4. 변환된 SQL 반환</span><span class="lang lang-en" style="display:none;">4. Return Converted SQL</span></div><div class="arrow-label" id="label5"><span class="lang lang-ko">5. SQL 실행 요청</span><span class="lang lang-en" style="display:none;">5. Execute SQL Request</span></div><div class="arrow-label" id="label6"><span class="lang lang-ko">6. 데이터 결과 반환</span><span class="lang lang-en" style="display:none;">6. Return Data Result</span></div><div class="arrow-label" id="label7" style="color: #059669;"><span class="lang lang-ko">7. 최종 결과 전송 (response_url)</span><span class="lang lang-en" style="display:none;">7. Send Final Result (response_url)</span></div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Part 2: Tunneling Manual -->
+            <section id="part2" class="page-content mb-16 scroll-mt-20 hidden">
+                <header class="text-center mb-16">
+                    <h1 class="text-4xl md:text-5xl font-bold text-slate-900"><span class="lang lang-ko">터미널 설정 매뉴얼</span><span class="lang lang-en" style="display:none;">Tunneling Setup Manual</span></h1>
+                    <p class="mt-4 text-lg text-slate-600"><span class="lang lang-ko">로컬 서버를 외부 인터넷에 연결하는 두 가지 방법: Cloudflare Tunnel 과 ngrok</span><span class="lang lang-en" style="display:none;">Two ways to connect a local server to the internet: Cloudflare Tunnel and ngrok</span></p>
+                </header>
+                <section id="part2-requirements" class="mb-16 scroll-mt-20"><h2 class="text-3xl font-bold mb-8 text-slate-900 border-b pb-4"><span class="lang lang-ko">2.1 사전 준비 사항</span><span class="lang lang-en" style="display:none;">2.1 Prerequisites</span></h2><div class="space-y-8"><div class="bg-white p-6 rounded-lg shadow-sm"><h3 class="text-xl font-semibold text-slate-800 mb-4"><span class="lang lang-ko">개발 도구 설치</span><span class="lang lang-en" style="display:none;">Development Tools Installation</span></h3><div class="space-y-4"><div><p class="font-semibold text-slate-700">① Python 3.7+</p><p class="text-sm text-slate-500"><span class="lang lang-ko">Python 설치 여부를 확인하고, 없다면 <a href="https://www.python.org/downloads/" target="_blank" class="text-blue-600 hover:underline">공식 웹사이트</a>에서 다운로드합니다.</span><span class="lang lang-en" style="display:none;">Check if Python is installed. If not, download it from the <a href="https://www.python.org/downloads/" target="_blank" class="text-blue-600 hover:underline">official website</a>.</span></p><div class="command-block mt-2 text-sm"><pre><code>python3 --version</code></pre></div></div></div></div><div class="bg-white p-6 rounded-lg shadow-sm"><h3 class="text-xl font-semibold text-slate-800 mb-4"><span class="lang lang-ko">프로젝트 및 가상환경 설정</span><span class="lang lang-en" style="display:none;">Project and Virtual Environment Setup</span></h3><p class="text-slate-600 mb-4"><span class="lang lang-ko">패키지 충돌을 방지하기 위해 격리된 개발 환경을 설정합니다.</span><span class="lang lang-en" style="display:none;">Set up an isolated development environment to prevent package conflicts.</span></p><ol class="list-decimal list-inside space-y-4 text-slate-600"><li><span class="lang lang-ko">프로젝트 폴더 생성 및 이동:</span><span class="lang lang-en" style="display:none;">Create and move to the project folder:</span> <div class="command-block mt-2 text-sm"><pre><code>mkdir nl2sql-project && cd nl2sql-project</code></pre></div></li><li><span class="lang lang-ko">Python 가상환경 생성:</span><span class="lang lang-en" style="display:none;">Create a Python virtual environment:</span> <div class="command-block mt-2 text-sm"><pre><code>python3 -m venv venv</code></pre></div></li><li><span class="lang lang-ko">가상환경 활성화:</span><span class="lang lang-en" style="display:none;">Activate the virtual environment:</span> <div class="command-block mt-2 text-sm"><pre><code>source venv/bin/activate</code></pre></div><p class="text-sm text-slate-500 mt-2"><span class="lang lang-ko">성공하면 터미널 프롬프트 앞에 <code class="font-mono bg-slate-200 px-1 rounded">(venv)</code>가 표시됩니다.</span><span class="lang lang-en" style="display:none;">If successful, <code class="font-mono bg-slate-200 px-1 rounded">(venv)</code> will appear before the terminal prompt.</span></p></li></ol></div><div class="bg-white p-6 rounded-lg shadow-sm"><h3 class="text-xl font-semibold text-slate-800 mb-4"><span class="lang lang-ko">필수 Python 패키지 설치</span><span class="lang lang-en" style="display:none;">Install Required Python Packages</span></h3><ol class="list-decimal list-inside space-y-4 text-slate-600"><li><span class="lang lang-ko"><code class="font-mono bg-slate-200 px-1 rounded">requirements.txt</code> 파일 생성 후 아래 내용 붙여넣기:</span><span class="lang lang-en" style="display:none;">Create a <code class="font-mono bg-slate-200 px-1 rounded">requirements.txt</code> file and paste the content below:</span><div class="command-block text-sm"><pre><code>fastapi
+uvicorn
+google-cloud-bigquery
+google-auth
+langchain-google-genai
+langchain
+pandas
+pydantic
+altair
+db-dtypes
+google-cloud-bigquery-storage
+httpx
+tabulate</code></pre></div></li><li><span class="lang lang-ko">가상환경에서 모든 패키지 설치:</span><span class="lang lang-en" style="display:none;">Install all packages from the virtual environment:</span><div class="command-block text-sm"><pre><code>pip install -r requirements.txt</code></pre></div></li></ol></div><div class="bg-white p-6 rounded-lg shadow-sm"><h3 class="text-xl font-semibold text-slate-800 mb-4"><span class="lang lang-ko">클라우드 서비스 및 계정 설정</span><span class="lang lang-en" style="display:none;">Cloud Service and Account Setup</span></h3><div class="space-y-4"><div><p class="font-semibold text-slate-700">① Google Cloud Platform (GCP) <span class="lang lang-ko">설정</span><span class="lang lang-en" style="display:none;">Setup</span></p><ol class="list-decimal list-inside space-y-2 text-slate-500 mt-2 text-sm"><li><span class="lang lang-ko">GCP 프로젝트 생성 후 <strong>BigQuery API</strong>와 <strong>Vertex AI API</strong>를 '사용 설정'합니다.</span><span class="lang lang-en" style="display:none;">After creating a GCP project, enable the <strong>BigQuery API</strong> and <strong>Vertex AI API</strong>.</span></li><li><span class="lang lang-ko">로컬 환경 인증:</span><span class="lang lang-en" style="display:none;">Authenticate local environment:</span> <div class="command-block mt-2 text-sm"><pre><code>gcloud auth application-default login</code></pre></div></li><li><span class="lang lang-ko">Gemini API 키 발급 및 환경 변수 설정:</span><span class="lang lang-en" style="display:none;">Issue Gemini API Key and set environment variable:</span> <div class="command-block mt-2 text-sm"><pre><code>export GOOGLE_API_KEY="your-google-api-key"</code></pre></div></li></ol></div><div><p class="font-semibold text-slate-700">② <span class="lang lang-ko">외부 서비스 계정</span><span class="lang lang-en" style="display:none;">External Service Accounts</span></p><ul class="list-disc list-inside space-y-2 text-slate-500 mt-2 text-sm"><li><strong>Slack</strong>: <span class="lang lang-ko">앱 설치 권한이 있는 워크스페이스 필요.</span><span class="lang lang-en" style="display:none;">A workspace with app installation permissions is required.</span></li><li><strong>Cloudflare or ngrok</strong>: <span class="lang lang-ko">사용할 터널링 서비스의 계정 필요.</span><span class="lang lang-en" style="display:none;">An account for the tunneling service you will use is required.</span></li></ul></div></div></div></div></section>
+                <section id="part2-cloudflare" class="mb-16 scroll-mt-20"><h2 class="text-3xl font-bold mb-8 text-slate-900 border-b pb-4">2.2 Cloudflare Tunnel <span class="lang lang-ko">설정</span><span class="lang lang-en" style="display:none;">Setup</span></h2><p class="text-slate-600 mb-6"><span class="lang lang-ko">Cloudflare Tunnel을 사용하여 로컬 서버를 외부에 노출하는 방법입니다. CLI 도구 설치가 필요합니다.</span><span class="lang lang-en" style="display:none;">This is how to expose your local server to the outside using Cloudflare Tunnel. CLI tool installation is required.</span></p><div class="command-block mt-2 text-sm mb-6"><pre><code># macOS (Homebrew 사용 시)
+brew install cloudflared</code></pre></div><div class="space-y-8"><div class="bg-white p-6 rounded-lg shadow-sm"><h3 class="text-2xl font-semibold text-slate-800 mb-4"><span class="lang lang-ko">방법 A: Quick Tunnel (임시 URL)</span><span class="lang lang-en" style="display:none;">Method A: Quick Tunnel (Temporary URL)</span></h3><p class="text-slate-600 mb-4"><span class="lang lang-ko">가장 빠르고 간단한 방법으로, 테스트나 일회성 공유에 적합합니다.</span><span class="lang lang-en" style="display:none;">The quickest and simplest method, suitable for testing or one-time sharing.</span></p><div class="command-block h-full"><pre><code>cloudflared tunnel --url http://localhost:8000</code></pre></div><div class="note note-warning mt-4"><p><span class="lang lang-ko">터널을 재시작하면 URL이 변경됩니다.</span><span class="lang lang-en" style="display:none;">The URL will change if you restart the tunnel.</span></p></div></div><div class="bg-white p-6 rounded-lg shadow-sm"><h3 class="text-2xl font-semibold text-slate-800 mb-4"><span class="lang lang-ko">방법 B: Named Tunnel (고정 URL)</span><span class="lang lang-en" style="display:none;">Method B: Named Tunnel (Fixed URL)</span></h3><p class="text-slate-600 mb-4"><span class="lang lang-ko">개인 도메인이 필요하며, 여러 단계의 초기 설정이 필요합니다.</span><span class="lang lang-en" style="display:none;">Requires a personal domain and several initial setup steps.</span></p><ol class="list-decimal list-inside space-y-4 text-slate-600"><li><strong>Cloudflare <span class="lang lang-ko">계정 로그인</span><span class="lang lang-en" style="display:none;">Account Login</span></strong><p class="text-sm text-slate-500"><span class="lang lang-ko">터미널에서 아래 명령어를 실행하고 웹 브라우저에서 Cloudflare 계정으로 로그인하여 인증합니다.</span><span class="lang lang-en" style="display:none;">Run the command below in the terminal and authenticate by logging into your Cloudflare account in a web browser.</span></p><div class="command-block mt-2 text-sm"><pre><code>cloudflared tunnel login</code></pre></div></li><li><strong><span class="lang lang-ko">터널 생성</span><span class="lang lang-en" style="display:none;">Create Tunnel</span></strong><p class="text-sm text-slate-500"><span class="lang lang-ko">터널에 고유한 이름을 부여하여 생성합니다. 이 이름은 나중에 터널을 관리할 때 사용됩니다.</span><span class="lang lang-en" style="display:none;">Create a tunnel with a unique name. This name will be used to manage the tunnel later.</span></p><div class="command-block mt-2 text-sm"><pre><code># cloudflared tunnel create <터널이름>
+# 예시:
+cloudflared tunnel create nl2sql-test</code></pre></div></li><li><strong>DNS <span class="lang lang-ko">라우팅 설정</span><span class="lang lang-en" style="display:none;">Routing Setup</span></strong><p class="text-sm text-slate-500"><span class="lang lang-ko">생성한 터널과 사용할 고정 주소(서브도메인)를 연결합니다.</span><span class="lang lang-en" style="display:none;">Connect the created tunnel to the fixed address (subdomain) you will use.</span></p><div class="command-block mt-2 text-sm"><pre><code># cloudflared tunnel route dns <터널이름> <사용할 주소>
+# 예시:
+cloudflared tunnel route dns nl2sql-test your-subdomain.your-domain.com</code></pre></div><p class="text-sm text-slate-500 mt-2"><span class="lang lang-ko"><code class="font-mono bg-slate-200 px-1 rounded">your-subdomain.your-domain.com</code>는 실제 소유한 도메인 주소로 변경해야 합니다.</span><span class="lang lang-en" style="display:none;">You must change <code class="font-mono bg-slate-200 px-1 rounded">your-subdomain.your-domain.com</code> to your actual domain address.</span></p></li><li><strong><span class="lang lang-ko">설정 파일(config.yml) 작성 및 실행</span><span class="lang lang-en" style="display:none;">Create and Run Config File (config.yml)</span></strong><p class="text-sm text-slate-500"><span class="lang lang-ko">터널의 상세 설정을 위해 <code class="font-mono bg-slate-200 px-1 rounded">~/.cloudflared/</code> 폴더에 <code class="font-mono bg-slate-200 px-1 rounded">config.yml</code> 파일을 생성하고 아래 내용을 붙여넣습니다.</span><span class="lang lang-en" style="display:none;">For detailed tunnel settings, create a <code class="font-mono bg-slate-200 px-1 rounded">config.yml</code> file in the <code class="font-mono bg-slate-200 px-1 rounded">~/.cloudflared/</code> folder and paste the content below.</span></p><div class="command-block mt-2 text-sm"><pre><code># /path/to/your/.cloudflared/config.yml
+
+tunnel: nl2sql-test
+credentials-file: /path/to/your/.cloudflared/your-credentials-file.json
+
+ingress:
+  # 'your-subdomain.your-domain.com' 주소로 들어오는 요청은
+  - hostname: your-subdomain.your-domain.com
+    # 로컬의 8000번 포트(FastAPI 서버)로 전달합니다.
+    service: http://localhost:8000
+  # 위 규칙에 맞지 않는 모든 요청은 404 에러를 반환합니다.
+  - service: http_status:404</code></pre></div><p class="text-sm text-slate-500 mt-4"><span class="lang lang-ko">파일 작성이 완료되면, 아래 명령어로 터널을 실행합니다.</span><span class="lang lang-en" style="display:none;">Once the file is created, run the tunnel with the command below.</span></p><div class="command-block mt-2 text-sm"><pre><code>cloudflared tunnel run nl2sql-test</code></pre></div></li></ol></div></div></section>
+                <section id="part2-ngrok" class="mb-16 scroll-mt-20"><h2 class="text-3xl font-bold mb-8 text-slate-900 border-b pb-4">2.3 ngrok <span class="lang lang-ko">설정</span><span class="lang lang-en" style="display:none;">Setup</span></h2><p class="text-slate-600 mb-6"><span class="lang lang-ko">ngrok을 사용하여 로컬 서버를 외부 인터넷에 연결하는 방법입니다. CLI 도구 설치 및 계정 설정이 필요합니다.</span><span class="lang lang-en" style="display:none;">This is how to connect your local server to the internet using ngrok. CLI tool installation and account setup are required.</span></p><div class="space-y-6"><div class="bg-white p-6 rounded-lg shadow-sm"><h3 class="text-xl font-semibold text-slate-800 mb-4">1단계: ngrok <span class="lang lang-ko">설치</span><span class="lang lang-en" style="display:none;">Installation</span></h3><div class="command-block"><pre><code># macOS (Homebrew 사용 시)
+brew install ngrok</code></pre></div></div><div class="bg-white p-6 rounded-lg shadow-sm"><h3 class="text-xl font-semibold text-slate-800 mb-4">2단계: ngrok <span class="lang lang-ko">회원가입 및 Authtoken 등록</span><span class="lang lang-en" style="display:none;">Sign Up and Register Authtoken</span></h3><p class="text-slate-600 mb-4"><span class="lang lang-ko">최신 ngrok 정책에 따라, 터널을 사용하려면 반드시 <a href="https://dashboard.ngrok.com/signup" target="_blank" class="text-blue-600 hover:underline">ngrok 계정</a>에 가입하고, 개인 인증 토큰(Authtoken)을 컴퓨터에 등록해야 합니다. 이 과정은 최초 한 번만 수행하면 됩니다.</span><span class="lang lang-en" style="display:none;">According to the latest ngrok policy, you must sign up for an <a href="https://dashboard.ngrok.com/signup" target="_blank" class="text-blue-600 hover:underline">ngrok account</a> and register your personal authentication token (Authtoken) on your computer to use tunnels. This process only needs to be done once.</span></p><div class="command-block mt-2"><pre><code># ngrok 대시보드에서 복사한 Authtoken 등록 명령어
+ngrok config add-authtoken your-ngrok-authtoken</code></pre></div></div><div class="bg-white p-6 rounded-lg shadow-sm"><h3 class="text-xl font-semibold text-slate-800 mb-4">3단계: ngrok <span class="lang lang-ko">실행</span><span class="lang lang-en" style="display:none;">Execution</span></h3><div class="command-block mt-2"><pre><code>ngrok http 8000</code></pre></div><div class="note note-warning mt-4"><p><span class="lang lang-ko">무료 플랜은 터널을 재시작하면 URL이 변경됩니다.</span><span class="lang lang-en" style="display:none;">On the free plan, the URL will change if you restart the tunnel.</span></p></div></div></div></section>
+                <section id="part2-slack" class="scroll-mt-20"><h2 class="text-3xl font-bold mb-8 text-slate-900 border-b pb-4">2.4 Slack <span class="lang lang-ko">앱 설정</span><span class="lang lang-en" style="display:none;">App Setup</span></h2><p class="text-slate-600 mb-6"><span class="lang lang-ko">위에서 얻은 공개 URL을 사용하여 Slack 슬래시 커맨드와 로컬 서버를 연결합니다.</span><span class="lang lang-en" style="display:none;">Use the public URL obtained above to connect the Slack slash command to your local server.</span></p><div class="space-y-6"><div class="bg-white p-6 rounded-lg shadow-sm"><h3 class="text-xl font-semibold text-slate-800 mb-4">1단계: Slack <span class="lang lang-ko">앱 생성 및 슬래시 커맨드 추가</span><span class="lang lang-en" style="display:none;">Create Slack App and Add Slash Command</span></h3><ol class="list-decimal list-inside space-y-2 text-slate-600 mb-4"><li><span class="lang lang-ko"><a href="https://api.slack.com/apps" target="_blank" class="text-blue-600 hover:underline">Slack API</a> 페이지에서 <code class="font-mono bg-slate-200 px-1 rounded">Create New App</code> > <code class="font-mono bg-slate-200 px-1 rounded">From scratch</code> 옵션으로 앱을 생성합니다.</span><span class="lang lang-en" style="display:none;">On the <a href="https://api.slack.com/apps" target="_blank" class="text-blue-600 hover:underline">Slack API</a> page, create an app with the <code class="font-mono bg-slate-200 px-1 rounded">Create New App</code> > <code class="font-mono bg-slate-200 px-1 rounded">From scratch</code> option.</span></li><li><span class="lang lang-ko">앱 설정 페이지 왼쪽 메뉴에서 <code class="font-mono bg-slate-200 px-1 rounded">Features > Slash Commands</code>를 클릭하고 <code class="font-mono bg-slate-200 px-1 rounded">Create New Command</code> 버튼을 누릅니다.</span><span class="lang lang-en" style="display:none;">In the left menu of the app settings page, click <code class="font-mono bg-slate-200 px-1 rounded">Features > Slash Commands</code> and press the <code class="font-mono bg-slate-200 px-1 rounded">Create New Command</code> button.</span></li></ol></div><div class="bg-white p-6 rounded-lg shadow-sm"><h3 class="text-xl font-semibold text-slate-800 mb-4">2단계: Request URL <span class="lang lang-ko">설정</span><span class="lang lang-en" style="display:none;">Setup</span></h3><p class="text-slate-600 mb-4"><span class="lang lang-ko">아래 내용을 참고하여 슬래시 커맨드 설정 창을 채웁니다.</span><span class="lang lang-en" style="display:none;">Fill in the slash command settings window with the content below.</span></p><div class="space-y-3 text-sm border p-4 rounded-md bg-slate-50"><p><strong class="w-32 inline-block">Command:</strong> <code class="font-mono bg-slate-200 px-1 rounded">/ask</code></p><p><strong class="w-32 inline-block">Request URL:</strong> <span class="font-bold text-red-600"><span class="lang lang-ko">가장 중요!</span><span class="lang lang-en" style="display:none;">Most Important!</span></span> <span class="lang lang-ko">아래 형식에 맞게 입력합니다.</span><span class="lang lang-en" style="display:none;">Enter it in the format below.</span></p><div class="command-block text-sm"><pre><code>[Cloudflare 또는 ngrok 공개 URL]/slack/ask
+
+# 예시 (Cloudflare): https://random.trycloudflare.com/slack/ask
+# 예시 (ngrok): https://random.ngrok-free.app/slack/ask</code></pre></div><p><strong class="w-32 inline-block">Short Description:</strong> <span class="lang lang-ko">'BigQuery에 자연어로 질문합니다'와 같이 간단한 설명을 입력합니다.</span><span class="lang lang-en" style="display:none;">Enter a brief description, such as 'Ask BigQuery a question in natural language'.</span></p><p><strong class="w-32 inline-block">Usage Hint:</strong> <span class="lang lang-ko">'[질문 내용]'과 같이 사용자에게 입력 형식을 안내합니다.</span><span class="lang lang-en" style="display:none;">Guide the user on the input format, such as '[your question]'.</span></p></div></div><div class="bg-white p-6 rounded-lg shadow-sm"><h3 class="text-xl font-semibold text-slate-800 mb-4">3단계: <span class="lang lang-ko">앱 설치 및 재설치</span><span class="lang lang-en" style="display:none;">App Installation & Reinstallation</span></h3><ol class="list-decimal list-inside space-y-2 text-slate-600"><li><span class="lang lang-ko">왼쪽 메뉴의 <code class="font-mono bg-slate-200 px-1 rounded">Settings > Install App</code>으로 이동하여 <code class="font-mono bg-slate-200 px-1 rounded">Install to Workspace</code> 버튼을 클릭하고 권한을 허용합니다.</span><span class="lang lang-en" style="display:none;">Go to <code class="font-mono bg-slate-200 px-1 rounded">Settings > Install App</code> in the left menu, click the <code class="font-mono bg-slate-200 px-1 rounded">Install to Workspace</code> button, and grant permissions.</span></li><li class="font-semibold text-red-600"><span class="lang lang-ko">Request URL을 변경하는 등, 앱 설정을 수정한 후에는 반드시 이 페이지에서 <code class="font-mono bg-slate-200 px-1 rounded">Reinstall to Workspace</code> 버튼을 눌러 변경사항을 워크스페이스에 적용해야 합니다.</span><span class="lang lang-en" style="display:none;">After modifying app settings, such as changing the Request URL, you must press the <code class="font-mono bg-slate-200 px-1 rounded">Reinstall to Workspace</code> button on this page to apply the changes to the workspace.</span></li></ol></div></div></section>
+            </section>
+
+            <!-- Part 3: Deployment Manual -->
+            <section id="part3" class="page-content mb-16 scroll-mt-20 hidden">
+                <header class="text-center mb-16">
+                    <h1 class="text-4xl md:text-5xl font-bold text-slate-900"><span class="lang lang-ko">NL2SQL 배포 매뉴얼</span><span class="lang lang-en" style="display:none;">NL2SQL Deployment Manual</span></h1>
+                    <p class="mt-4 text-lg text-slate-600"><span class="lang lang-ko">로컬 개발부터 클라우드 배포까지 전 과정 안내</span><span class="lang lang-en" style="display:none;">A guide to the entire process from local development to cloud deployment</span></p>
+                </header>
+                <section id="part3-result" class="mb-16 scroll-mt-20"><h2 class="text-3xl font-bold mb-8 text-slate-900 border-b pb-4"><span class="lang lang-ko">3.1 최종 결과물</span><span class="lang lang-en" style="display:none;">3.1 Final Result</span></h2><div class="bg-white p-6 rounded-lg shadow-sm"><p class="text-slate-600"><span class="lang lang-ko">이 매뉴얼을 따라 성공적으로 배포하면 아래 링크의 웹 애플리케이션이 완성됩니다.</span><span class="lang lang-en" style="display:none;">By successfully following this manual, you will complete the web application at the link below.</span></p><a href="https://jae-choi.github.io/nl-to-sql-app/" target="_blank" class="text-blue-600 hover:underline font-semibold"><span class="lang lang-ko">라이브 데모 바로가기</span><span class="lang lang-en" style="display:none;">Go to Live Demo</span></a></div></section>
+                <section id="part3-structure" class="mb-16 scroll-mt-20"><h2 class="text-3xl font-bold mb-8 text-slate-900 border-b pb-4"><span class="lang lang-ko">3.2 프로젝트 폴더 구조</span><span class="lang lang-en" style="display:none;">3.2 Project Folder Structure</span></h2><div class="bg-white p-6 rounded-lg shadow-sm"><p class="text-slate-600 mb-4"><span class="lang lang-ko">이 프로젝트는 백엔드와 프론트엔드가 명확히 분리된 구조를 가집니다. 각 파일의 역할은 다음과 같습니다.</span><span class="lang lang-en" style="display:none;">This project has a structure where the backend and frontend are clearly separated. The role of each file is as follows.</span></p><div class="command-block text-sm"><pre><code>nl-to-sql-project/
+├── backend/
+│   ├── main.py              # FastAPI 서버 로직 (API 엔드포인트)
+│   ├── requirements.txt     # 백엔드 Python 라이브러리 목록
+│   └── Dockerfile           # Cloud Run 배포를 위한 컨테이너 설계도
+└── frontend/
+    ├── index.html           # 웹페이지의 구조 (HTML)
+    ├── style.css            # 웹페이지의 디자인 (CSS)
+    └── script.js            # 웹페이지의 동작 (JavaScript)</code></pre></div></div></section>
+                <section id="part3-local" class="mb-16 scroll-mt-20"><h2 class="text-3xl font-bold mb-8 text-slate-900 border-b pb-4">3.3 <span class="lang lang-ko">로컬 설치 및 실행 (macOS)</span><span class="lang lang-en" style="display:none;">Local Installation & Execution (macOS)</span></h2><p class="text-slate-600 mb-6"><span class="lang lang-ko">Cloud에 배포하기 전, 로컬 PC에서 앱을 테스트하고 실행하는 방법입니다.</span><span class="lang lang-en" style="display:none;">How to test and run the app on your local PC before deploying to the Cloud.</span></p><div class="space-y-8"><div class="bg-white p-6 rounded-lg shadow-sm"><h3 class="text-xl font-semibold text-slate-800 mb-4"><span class="lang lang-ko">사전 준비</span><span class="lang lang-en" style="display:none;">Prerequisites</span></h3><p class="text-slate-600 mb-4"><span class="lang lang-ko">로컬 개발을 위해 다음 도구들이 설치되어 있어야 합니다.</span><span class="lang lang-en" style="display:none;">The following tools must be installed for local development.</span></p><ul class="list-disc list-inside space-y-2 text-slate-600"><li><strong>Homebrew:</strong> <span class="lang lang-ko">macOS용 패키지 관리자. <a href="https://brew.sh/index_ko" target="_blank" class="text-blue-600 hover:underline">brew.sh</a>에서 설치.</span><span class="lang lang-en" style="display:none;">Package manager for macOS. Install from <a href="https://brew.sh/" target="_blank" class="text-blue-600 hover:underline">brew.sh</a>.</span></li><li><strong>Python 3.10+:</strong> <div class="command-block mt-2 text-sm"><pre><code>brew install python</code></pre></div></li><li><strong>Google Cloud SDK:</strong> <div class="command-block mt-2 text-sm"><pre><code>brew install --cask google-cloud-sdk</code></pre></div></li></ul></div><div class="bg-white p-6 rounded-lg shadow-sm"><h3 class="text-xl font-semibold text-slate-800 mb-4"><span class="lang lang-ko">인증 및 API 키 설정</span><span class="lang lang-en" style="display:none;">Authentication and API Key Setup</span></h3><p class="text-slate-600 mb-4"><span class="lang lang-ko">로컬 PC가 Google Cloud 서비스 및 AI 모델에 접근할 수 있도록 인증을 설정합니다.</span><span class="lang lang-en" style="display:none;">Set up authentication so your local PC can access Google Cloud services and AI models.</span></p><ol class="list-decimal list-inside space-y-4 text-slate-600"><li><strong><span class="lang lang-ko">Google 계정 로그인:</span><span class="lang lang-en" style="display:none;">Google Account Login:</span></strong> <span class="lang lang-ko">터미널에서 아래 명령어를 실행하고, `your-gcp-project-id` 프로젝트에 접근 권한이 있는 Google 계정으로 로그인합니다.</span><span class="lang lang-en" style="display:none;">Run the command below in the terminal and log in with a Google account that has access to the `your-gcp-project-id` project.</span><div class="command-block mt-2 text-sm"><pre><code>gcloud auth login</code></pre></div></li><li><strong><span class="lang lang-ko">프로젝트 설정:</span><span class="lang lang-en" style="display:none;">Project Setup:</span></strong> <span class="lang lang-ko">사용할 Google Cloud 프로젝트를 지정합니다.</span><span class="lang lang-en" style="display:none;">Specify the Google Cloud project to use.</span><div class="command-block mt-2 text-sm"><pre><code>gcloud config set project your-gcp-project-id</code></pre></div></li><li><strong><span class="lang lang-ko">로컬 환경 인증:</span><span class="lang lang-en" style="display:none;">Local Environment Authentication:</span></strong> <span class="lang lang-ko">로컬 애플리케이션이 Google Cloud API를 사용할 수 있도록 인증합니다.</span><span class="lang lang-en" style="display:none;">Authenticate your local application to use Google Cloud APIs.</span><div class="command-block mt-2 text-sm"><pre><code>gcloud auth application-default login</code></pre></div></li><li><strong><span class="lang lang-ko">Gemini API 키 설정:</span><span class="lang lang-en" style="display:none;">Gemini API Key Setup:</span></strong> <span class="lang lang-ko">터미널에서 환경 변수로 API 키를 설정합니다. (터미널을 닫으면 초기화됩니다)</span><span class="lang lang-en" style="display:none;">Set the API key as an environment variable in the terminal. (It will be reset when the terminal is closed)</span><div class="command-block mt-2 text-sm"><pre><code>export GOOGLE_API_KEY="your-google-api-key"</code></pre></div></li></ol></div><div class="bg-white p-6 rounded-lg shadow-sm"><h3 class="text-xl font-semibold text-slate-800 mb-4"><span class="lang lang-ko">서버 실행</span><span class="lang lang-en" style="display:none;">Run Server</span></h3><p class="text-slate-600 mb-4"><span class="lang lang-ko">백엔드와 프론트엔드 서버를 각각 실행합니다.</span><span class="lang lang-en" style="display:none;">Run the backend and frontend servers separately.</span></p><h4 class="text-lg font-semibold text-slate-700 mb-2"><span class="lang lang-ko">백엔드 서버 (터미널 1)</span><span class="lang lang-en" style="display:none;">Backend Server (Terminal 1)</span></h4><p class="text-slate-600 mb-4"><span class="lang lang-ko">다른 파이썬 프로젝트와의 충돌을 방지하기 위해, 이 프로젝트만을 위한 격리된 '가상환경'을 사용합니다.</span><span class="lang lang-en" style="display:none;">To avoid conflicts with other Python projects, use an isolated 'virtual environment' for this project only.</span></p><ol class="list-decimal list-inside space-y-4 text-slate-600"><li><strong><span class="lang lang-ko">`backend` 폴더로 이동:</span><span class="lang lang-en" style="display:none;">Navigate to `backend` folder:</span></strong> <div class="command-block mt-2 text-sm"><pre><code>cd path/to/your/nl-to-sql-project/backend</code></pre></div></li><li><strong><span class="lang lang-ko">가상환경 생성 (최초 한 번만 실행):</span><span class="lang lang-en" style="display:none;">Create virtual environment (run only once):</span></strong> <div class="command-block mt-2 text-sm"><pre><code>python3 -m venv venv</code></pre></div></li><li><strong><span class="lang lang-ko">가상환경 활성화 (서버 실행 전 항상 실행):</span><span class="lang lang-en" style="display:none;">Activate virtual environment (run before starting server):</span></strong> <div class="command-block mt-2 text-sm"><pre><code>source venv/bin/activate</code></pre></div><p class="text-sm text-slate-500 mt-2"><span class="lang lang-ko">성공하면 터미널 프롬프트 앞에 <code class="font-mono bg-slate-200 px-1 rounded">(venv)</code>가 표시됩니다.</span><span class="lang lang-en" style="display:none;">If successful, <code class="font-mono bg-slate-200 px-1 rounded">(venv)</code> will appear before the terminal prompt.</span></p></li><li><strong><span class="lang lang-ko">라이브러리 설치:</span><span class="lang lang-en" style="display:none;">Install libraries:</span></strong> <div class="command-block mt-2 text-sm"><pre><code>pip install -r requirements.txt</code></pre></div></li><li><strong><span class="lang lang-ko">서버 실행:</span><span class="lang lang-en" style="display:none;">Run server:</span></strong> <div class="command-block mt-2 text-sm"><pre><code>uvicorn main:app --reload --port 8000</code></pre></div></li></ol><h4 class="text-lg font-semibold text-slate-700 mt-6 mb-2"><span class="lang lang-ko">프론트엔드 서버 (터미널 2)</span><span class="lang lang-en" style="display:none;">Frontend Server (Terminal 2)</span></h4><p class="text-slate-600 mb-4"><span class="lang lang-ko">백엔드 서버는 켜둔 채로, 새로운 터미널 창을 열어 진행합니다.</span><span class="lang lang-en" style="display:none;">Keep the backend server running and open a new terminal window to proceed.</span></p><ol class="list-decimal list-inside space-y-4 text-slate-600"><li><strong><span class="lang lang-ko">`frontend` 폴더로 이동:</span><span class="lang lang-en" style="display:none;">Navigate to `frontend` folder:</span></strong> <div class="command-block mt-2 text-sm"><pre><code>cd path/to/your/nl-to-sql-project/frontend</code></pre></div></li><li><strong><span class="lang lang-ko">웹 서버 실행:</span><span class="lang lang-en" style="display:none;">Run web server:</span></strong> <div class="command-block mt-2 text-sm"><pre><code>python3 -m http.server 5500</code></pre></div></li></ol></div><div class="bg-white p-6 rounded-lg shadow-sm"><h3 class="text-xl font-semibold text-slate-800 mb-4"><span class="lang lang-ko">브라우저에서 테스트</span><span class="lang lang-en" style="display:none;">Test in Browser</span></h3><p class="text-slate-600"><span class="lang lang-ko">웹 브라우저를 열고 주소창에 <code class="font-mono bg-slate-200 px-1 rounded">http://localhost:5500</code>를 입력하여 앱을 테스트합니다. <code class="font-mono bg-slate-200 px-1 rounded">frontend/script.js</code> 파일의 <code class="font-mono bg-slate-200 px-1 rounded">BACKEND_BASE_URL</code> 변수가 <code class="font-mono bg-slate-200 px-1 rounded">http://127.0.0.1:8000</code>로 설정되어 있는지 확인하세요.</span><span class="lang lang-en" style="display:none;">Open a web browser and enter <code class="font-mono bg-slate-200 px-1 rounded">http://localhost:5500</code> in the address bar to test the app. Make sure the <code class="font-mono bg-slate-200 px-1 rounded">BACKEND_BASE_URL</code> variable in the <code class="font-mono bg-slate-200 px-1 rounded">frontend/script.js</code> file is set to <code class="font-mono bg-slate-200 px-1 rounded">http://127.0.0.1:8000</code>.</span></p></div></div></section>
+                <section id="part3-deploy" class="scroll-mt-20"><h2 class="text-3xl font-bold mb-8 text-slate-900 border-b pb-4">3.4 Google Cloud Run <span class="lang lang-ko">배포</span><span class="lang lang-en" style="display:none;">Deployment</span></h2><p class="text-slate-600 mb-6"><span class="lang lang-ko">로컬 테스트가 완료된 앱을 실제 사용자들이 접근할 수 있도록 Google Cloud Run에 배포하는 방법입니다.</span><span class="lang lang-en" style="display:none;">How to deploy the app to Google Cloud Run so that real users can access it after local testing is complete.</span></p><div class="note note-info"><p><strong><span class="lang lang-ko">주의:</span><span class="lang lang-en" style="display:none;">Note:</span></strong> <span class="lang lang-ko">배포를 진행하기 전, `backend/main.py` 파일의 CORS 설정 (`origins` 리스트)에 GitHub Pages 등 실제 프론트엔드가 배포될 주소를 추가해야 합니다.</span><span class="lang lang-en" style="display:none;">Before proceeding with deployment, you must add the address where the actual frontend will be deployed, such as GitHub Pages, to the CORS settings (`origins` list) in the `backend/main.py` file.</span></p></div><div class="space-y-8 mt-8"><div class="bg-white p-6 rounded-lg shadow-sm"><ol class="list-decimal list-inside space-y-4 text-slate-600"><li><strong><span class="lang lang-ko">컨테이너 이미지 빌드 및 업로드:</span><span class="lang lang-en" style="display:none;">Build and Upload Container Image:</span></strong> <span class="lang lang-ko">터미널에서 `nl-to-sql-project` 폴더로 이동한 후, 다음 명령어로 백엔드 코드를 컨테이너 이미지로 만들어 Google Container Registry에 업로드합니다.</span><span class="lang lang-en" style="display:none;">Navigate to the `nl-to-sql-project` folder in the terminal, then use the following command to build the backend code into a container image and upload it to the Google Container Registry.</span><div class="command-block mt-2 text-sm"><pre><code>gcloud builds submit ./backend --tag gcr.io/your-gcp-project-id/nl-to-sql-api</code></pre></div></li><li><strong><span class="lang lang-ko">Cloud Run에 배포:</span><span class="lang lang-en" style="display:none;">Deploy to Cloud Run:</span></strong> <span class="lang lang-ko">업로드된 이미지를 사용하여 Cloud Run 서비스를 생성하고 배포합니다. API 키는 `--set-env-vars` 플래그를 통해 안전하게 주입합니다.</span><span class="lang lang-en" style="display:none;">Create and deploy a Cloud Run service using the uploaded image. The API key is securely injected via the `--set-env-vars` flag.</span><div class="command-block mt-2 text-sm"><pre><code>gcloud run deploy nl-to-sql-api \
+  --image gcr.io/your-gcp-project-id/nl-to-sql-api \
+  --platform managed \
+  --region asia-northeast3 \
+  --allow-unauthenticated \
+  --set-env-vars="GOOGLE_API_KEY=your-google-api-key"</code></pre></div></li><li><strong><span class="lang lang-ko">배포 완료 및 URL 확인:</span><span class="lang lang-en" style="display:none;">Deployment Completion and URL Verification:</span></strong> <span class="lang lang-ko">배포가 성공하면 `Service URL: https://...` 형태의 주소가 출력됩니다. 이 주소가 실제 운영되는 백엔드 API 주소입니다.</span><span class="lang lang-en" style="display:none;">When deployment is successful, a URL in the format `Service URL: https://...` will be displayed. This is the address of the backend API that is actually in operation.</span></li><li><strong><span class="lang lang-ko">프론트엔드 업데이트:</span><span class="lang lang-en" style="display:none;">Frontend Update:</span></strong> <span class="lang lang-ko">`frontend/script.js` 파일의 `BACKEND_BASE_URL` 변수 값을 새로 얻은 Cloud Run 서비스 URL로 변경한 후, 프론트엔드 코드를 GitHub Pages 등 원하는 곳에 배포합니다.</span><span class="lang lang-en" style="display:none;">After changing the value of the `BACKEND_BASE_URL` variable in the `frontend/script.js` file to the newly obtained Cloud Run service URL, deploy the frontend code to your desired location, such as GitHub Pages.</span></li></ol></div></div></section>
+            </section>
+        </main>
+    </div>
+
+    <script>
+        const titles = {
+            ko: 'NL2SQL Slack Bot 통합 매뉴얼',
+            en: 'NL2SQL Slack Bot Integration Manual'
+        };
+
+        function switchLang(lang) {
+            document.documentElement.lang = lang;
+            document.documentElement.className = lang === 'en' ? 'en' : '';
+            document.title = titles[lang];
+
+            document.querySelectorAll('.lang').forEach(el => {
+                el.style.display = el.classList.contains(`lang-${lang}`) ? '' : 'none';
+            });
+
+            document.querySelectorAll('.lang-btn').forEach(btn => {
+                btn.classList.toggle('active', btn.id === `btn-${lang}`);
+            });
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const userLang = navigator.language || navigator.userLanguage;
+            if (userLang.startsWith('en')) {
+                switchLang('en');
+            } else {
+                switchLang('ko');
+            }
+
+            const navLinks = document.querySelectorAll('.sidebar-nav a');
+            const pageContents = document.querySelectorAll('.page-content');
+            const mainContent = document.getElementById('main-content');
+
+            function showPage(pageId, anchor) {
+                pageContents.forEach(page => {
+                    page.classList.toggle('hidden', page.id !== pageId);
+                });
+
+                if (pageId === 'part1') {
+                    setTimeout(drawArrows, 50);
+                }
+                
+                if (anchor && anchor !== '#') {
+                    const element = document.querySelector(anchor);
+                    if (element) {
+                        element.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                    }
+                } else {
+                    mainContent.scrollTo(0, 0);
+                }
+            }
+
+            navLinks.forEach(link => {
+                link.addEventListener('click', e => {
+                    e.preventDefault();
+                    const pageId = link.getAttribute('data-page');
+                    const anchor = link.getAttribute('href');
+
+                    showPage(pageId, anchor);
+
+                    navLinks.forEach(nav => nav.classList.remove('active'));
+                    
+                    link.classList.add('active');
+                    const parentUl = link.closest('ul.pl-4');
+                    if (parentUl) {
+                       const parentLink = parentUl.previousElementSibling.querySelector('a');
+                       if(parentLink) parentLink.classList.add('active');
+                    }
+                });
+            });
+
+            const firstLink = document.querySelector('.sidebar-nav a');
+            if (firstLink) {
+                firstLink.classList.add('active');
+                showPage(firstLink.getAttribute('data-page'), firstLink.getAttribute('href'));
+            }
+            
+            document.querySelectorAll('.command-block').forEach(block => {
+                block.addEventListener('click', () => {
+                    const codeNode = block.querySelector('pre') || block.querySelector('code');
+                    if (codeNode) {
+                        selectText(codeNode);
+                    }
+                });
+            });
+
+            window.addEventListener('resize', drawArrows);
+        });
+
+        function selectText(node) {
+            if (document.body.createTextRange) {
+                const range = document.body.createTextRange();
+                range.moveToElementText(node);
+                range.select();
+            } else if (window.getSelection) {
+                const selection = window.getSelection();
+                const range = document.createRange();
+                range.selectNodeContents(node);
+                selection.removeAllRanges();
+                selection.addRange(range);
+            }
+        }
+
+        function drawArrows() {
+            const container = document.getElementById('diagram-container');
+            if (!container || container.offsetParent === null) return;
+            const containerRect = container.getBoundingClientRect();
+            
+            function getCoords(elementId) {
+                const el = document.getElementById(elementId);
+                if (!el) return null;
+                const rect = el.getBoundingClientRect();
+                return {
+                    x: rect.x - containerRect.x,
+                    y: rect.y - containerRect.y,
+                    width: rect.width,
+                    height: rect.height,
+                    top: rect.top - containerRect.top,
+                    left: rect.left - containerRect.left,
+                    right: rect.right - containerRect.left,
+                    bottom: rect.bottom - containerRect.top,
+                    cx: rect.left - containerRect.left + rect.width / 2,
+                    cy: rect.top - containerRect.top + rect.height / 2
+                };
+            }
+
+            const slack = getCoords('user-slack');
+            const tunnel = getCoords('tunnel');
+            const fastapi = getCoords('fastapi');
+            const gemini = getCoords('gemini');
+            const bigquery = getCoords('bigquery');
+
+            if (!slack || !tunnel || !fastapi || !gemini || !bigquery) return;
+
+            document.getElementById('arrow1').setAttribute('d', `M ${slack.right}, ${slack.cy} L ${tunnel.left}, ${tunnel.cy}`);
+            document.getElementById('label1').style.left = `${(slack.right + tunnel.left) / 2}px`;
+            document.getElementById('label1').style.top = `${slack.cy - 20}px`;
+
+            document.getElementById('arrow2').setAttribute('d', `M ${tunnel.cx}, ${tunnel.bottom} L ${fastapi.cx}, ${fastapi.top}`);
+            document.getElementById('label2').style.left = `${(tunnel.cx + fastapi.cx) / 2 + 40}px`;
+            document.getElementById('label2').style.top = `${(tunnel.bottom + fastapi.top) / 2}px`;
+
+            document.getElementById('arrow3').setAttribute('d', `M ${fastapi.cx - fastapi.width / 4}, ${fastapi.bottom} L ${gemini.cx + gemini.width / 4}, ${gemini.top}`);
+            document.getElementById('label3').style.left = `${(fastapi.cx + gemini.cx) / 2 - 80}px`;
+            document.getElementById('label3').style.top = `${(fastapi.bottom + gemini.top) / 2}px`;
+
+            document.getElementById('arrow4').setAttribute('d', `M ${gemini.cx}, ${gemini.top} L ${fastapi.cx - fastapi.width / 4}, ${fastapi.bottom}`);
+            document.getElementById('label4').style.left = `${(gemini.cx + fastapi.cx) / 2 - 80}px`;
+            document.getElementById('label4').style.top = `${(gemini.top + fastapi.bottom) / 2 + 20}px`;
+
+            document.getElementById('arrow5').setAttribute('d', `M ${fastapi.cx + fastapi.width / 4}, ${fastapi.bottom} L ${bigquery.cx - bigquery.width / 4}, ${bigquery.top}`);
+            document.getElementById('label5').style.left = `${(fastapi.cx + bigquery.cx) / 2 + 60}px`;
+            document.getElementById('label5').style.top = `${(fastapi.bottom + bigquery.top) / 2}px`;
+
+            document.getElementById('arrow6').setAttribute('d', `M ${bigquery.cx}, ${bigquery.top} L ${fastapi.cx + fastapi.width / 4}, ${fastapi.bottom}`);
+            document.getElementById('label6').style.left = `${(bigquery.cx + fastapi.cx) / 2 + 60}px`;
+            document.getElementById('label6').style.top = `${(bigquery.top + fastapi.bottom) / 2 + 20}px`;
+
+            const path7 = `M ${fastapi.cx}, ${fastapi.top} C ${fastapi.cx - 350}, ${fastapi.cy} ${slack.cx - 150}, ${slack.cy} ${slack.left}, ${slack.cy}`;
+            document.getElementById('arrow7').setAttribute('d', path7);
+            document.getElementById('label7').style.left = `${slack.left - 40}px`;
+            document.getElementById('label7').style.top = `${slack.cy}px`;
+        }
+    </script>
+</body>
+</html>
