@@ -64,15 +64,16 @@
 
     <div class="container mx-auto max-w-5xl px-4 sm:px-6 lg:px-8">
 
-        <header class="flex justify-between items-center py-10">
+        <header class="flex justify-between items-center py-10 border-b border-border-color">
             <div>
-                <h1 class="text-2xl font-bold text-primary">Peter Choi</h1>
-                <p class="text-md text-secondary">
-                    <span class="lang lang-ko">기술과 철학의 교차점 탐구</span>
-                    <span class="lang lang-en" style="display:none;">Exploring the Intersection of Technology & Philosophy</span>
-                </p>
+                <a href="index.html" class="text-2xl font-bold text-primary no-underline">Peter Choi</a>
             </div>
-            <div class="text-right">
+            <nav class="hidden md:flex items-center space-x-8">
+                <a href="#about" class="text-secondary hover:text-accent-color transition-colors"><span class="lang lang-ko">소개</span><span class="lang lang-en" style="display:none;">About</span></a>
+                <a href="#articles" class="text-secondary hover:text-accent-color transition-colors"><span class="lang lang-ko">사유의 기록</span><span class="lang lang-en" style="display:none;">Articles</span></a>
+                <a href="#works" class="text-secondary hover:text-accent-color transition-colors"><span class="lang lang-ko">기술의 증명</span><span class="lang lang-en" style="display:none;">Works</span></a>
+            </nav>
+            <div class="flex items-center">
                 <button id="btn-ko" class="lang-btn px-2 py-1 text-sm" onclick="switchLang('ko')">KOR</button>
                 <span class="text-gray-300">|</span>
                 <button id="btn-en" class="lang-btn px-2 py-1 text-sm" onclick="switchLang('en')">ENG</button>
@@ -91,10 +92,10 @@
                 </p>
             </section>
 
-            <section id="portfolio" class="mb-24">
+            <section id="articles" class="mb-24">
                 <h3 class="font-serif text-3xl font-bold text-primary mb-10 pb-4 border-b border-border-color">
-                    <span class="lang lang-ko">Work & Prototypes</span>
-                    <span class="lang lang-en" style="display:none;">Work & Prototypes</span>
+                    <span class="lang lang-ko">사유의 기록 (Articles)</span>
+                    <span class="lang lang-en" style="display:none;">Articles</span>
                 </h3>
                 
                 <div class="space-y-8">
@@ -127,7 +128,7 @@
                                     <span class="lang lang-en" style="display:none;">Are agents a replacement or an extension of human thought?</span>
                                 </h4>
                                 <p class="text-secondary mb-4">
-                                    <span class="lang lang-ko">여러 AI 에이전트가 협력하는 시스템의 아키텍처를 설계하고, 핵심 비즈니스 로직에만 집중</span>
+                                    <span class="lang lang-ko">여러 AI 에이전트가 협력하는 시스템의 아키텍처을 설계하고, 핵심 비즈니스 로직에만 집중</span>
                                     <span class="lang lang-en" style="display:none;">Designing the architecture for a collaborative multi-agent system, focusing solely on core business logic.</span>
                                 </p>
                                  <div class="flex flex-wrap gap-2">
@@ -161,6 +162,16 @@
                             </div>
                         </div>
                     </a>
+                </div>
+            </section>
+
+            <section id="works" class="mb-24">
+                <h3 class="font-serif text-3xl font-bold text-primary mb-10 pb-4 border-b border-border-color">
+                    <span class="lang lang-ko">기술의 증명 (Works)</span>
+                    <span class="lang lang-en" style="display:none;">Works</span>
+                </h3>
+                
+                <div class="space-y-8">
                     <a href="https://jae-choi.github.io/news/adk.html" target="_blank" class="project-item-link">
                         <div class="py-8 px-6 grid md:grid-cols-12 gap-6 items-center">
                             <div class="md:col-span-8">
@@ -206,9 +217,12 @@
                 </div>
             </section>
 
-            <section id="about" class="py-20 md:py-28">
+            <section id="about" class="py-20 md:py-28 border-t border-border-color">
                  <div class="max-w-3xl mx-auto text-center">
-                    <h3 class="font-serif text-3xl font-bold text-primary mb-4">About Me</h3>
+                    <h3 class="font-serif text-3xl font-bold text-primary mb-4">
+                        <span class="lang lang-ko">소개 (About Me)</span>
+                        <span class="lang lang-en" style="display:none;">About Me</span>
+                    </h3>
                     <div class="prose prose-lg text-secondary mx-auto">
                         <p>
                             <span class="lang lang-ko">저는 기술과 인문학의 경계에서 일하는 AI 아키텍트이자 프로토타이퍼입니다. 코드를 작성하는 행위가 단지 기술적 문제 해결을 넘어, 세상을 이해하고 질문을 던지는 과정이라고 믿습니다. 생성형 AI와 멀티 에이전트 시스템이 우리의 사고와 상호작용을 어떻게 재구성하는지 탐구하며, 그 과정에서 얻은 기술적, 철학적 통찰을 공유합니다.</span>
@@ -217,9 +231,10 @@
                     </div>
                 </div>
             </section>
+
         </main>
 
-        <footer class="text-center py-12 border-t border-border-color">
+        <footer class="text-center py-10 mt-16 border-t border-border-color">
             <div class="flex justify-center space-x-6 mb-4">
                 <a href="https://www.linkedin.com/in/jaeeun-choi-a660b718b/" target="_blank" class="text-secondary hover:text-accent-color transition-colors">LinkedIn</a>
                 <a href="https://github.com/jae-choi" target="_blank" class="text-secondary hover:text-accent-color transition-colors">GitHub</a>
