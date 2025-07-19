@@ -30,10 +30,24 @@
             font-style: italic;
             color: #374151;
         }
+        .lang-ko .lang-en,
+        .lang-en .lang-ko {
+            display: none;
+        }
+        .lang-btn {
+            transition: all 0.2s ease-in-out;
+            border-radius: 9999px;
+            padding: 0.25rem 0.75rem;
+            font-size: 0.875rem;
+        }
         .lang-btn.active {
-            font-weight: 700;
-            color: #2563eb;
-            text-decoration: underline;
+            font-weight: 600;
+            background-color: #2dd4bf;
+            color: #0f172a;
+        }
+        .lang-btn:not(.active) {
+            color: #94a3b8;
+            background-color: transparent;
         }
         .prose code {
             background-color: #e9ecef;
@@ -48,10 +62,11 @@
 <body class="bg-slate-50">
     <div class="container mx-auto max-w-4xl px-4 py-12 sm:py-20">
         
-        <div class="text-right mb-4">
-            <button id="btn-ko" class="lang-btn active" onclick="switchLang('ko')">한국어</button>
-            <span class="text-gray-400">/</span>
-            <button id="btn-en" class="lang-btn" onclick="switchLang('en')">English</button>
+        <div class="flex justify-end mb-4">
+            <div class="flex items-center bg-gray-800 rounded-full p-1">
+                <button id="btn-ko" class="lang-btn" onclick="switchLang('ko')">KOR</button>
+                <button id="btn-en" class="lang-btn" onclick="switchLang('en')">ENG</button>
+            </div>
         </div>
 
         <article class="bg-white rounded-lg shadow-lg p-8 sm:p-12 prose lg:prose-lg">
@@ -143,10 +158,27 @@
             en: 'The Gap Between Natural Language and Data | Peter Choi'
         };
 
+        function updateLinksWithLang(lang) {
+            document.querySelectorAll('a[href*=".html"]').forEach(link => {
+                let href = link.getAttribute('href');
+                if (!href || !href.endsWith('.html')) {
+                    return;
+                }
+                
+                try {
+                    const url = new URL(href, window.location.href);
+                    url.searchParams.set('lang', lang);
+                    link.href = url.href;
+                } catch (e) {
+                    console.error(`Could not update link href: ${href}`, e);
+                }
+            });
+        }
+
         function switchLang(lang) {
             document.documentElement.lang = lang;
             document.documentElement.className = lang;
-
+            localStorage.setItem('language', lang);
             document.title = titles[lang];
 
             document.querySelectorAll('.lang').forEach(el => {
@@ -161,15 +193,17 @@
                 btn.classList.remove('active');
             });
             document.getElementById(`btn-${lang}`).classList.add('active');
+            updateLinksWithLang(lang);
         }
         
         document.addEventListener('DOMContentLoaded', () => {
-            const userLang = navigator.language || navigator.userLanguage;
-            if (userLang.startsWith('en')) {
-                switchLang('en');
-            } else {
-                switchLang('ko');
-            }
+            const urlParams = new URLSearchParams(window.location.search);
+            const langFromUrl = urlParams.get('lang');
+            const langFromStorage = localStorage.getItem('language');
+            const browserLang = (navigator.language || navigator.userLanguage).startsWith('en') ? 'en' : 'ko';
+            
+            const initialLang = langFromUrl || langFromStorage || browserLang;
+            switchLang(initialLang);
         });
     </script>
 </body>
