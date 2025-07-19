@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Vertex AI Interactive Infographic</title>
-  <link rel="icon" href="favicon.png" type="image/png" />
+  <link rel="icon" href="https://avatars.githubusercontent.com/u/35217573?v=4" type="image/png" />
 
   <!-- Tailwind & Fonts -->
   <script src="https://cdn.tailwindcss.com"></script>
@@ -72,6 +72,15 @@
         color: #94a3b8; /* text-slate-400 from index.html */
         background-color: transparent;
     }
+    .back-link {
+        display: inline-block;
+        margin-bottom: 2rem;
+        color: #9ca3af;
+        transition: color 0.2s;
+    }
+    .back-link:hover {
+        color: #60a5fa;
+    }
   </style>
 </head>
 
@@ -132,12 +141,13 @@
     <!-- Main Content -->
     <!-- scroll-smooth + scroll-pt-20 : 헤더 높이 80px 만큼 여백 확보 -->
     <main class="flex-1 p-6 md:p-10 overflow-y-auto scroll-smooth">
-      <div class="flex justify-end mb-8">
-        <div class="flex items-center bg-gray-800 rounded-full p-1">
-            <button id="btn-ko" class="lang-btn" onclick="switchLang('ko')">KOR</button>
-            <button id="btn-en" class="lang-btn" onclick="switchLang('en')">ENG</button>
+        <div class="flex justify-between items-center mb-8">
+            <a href="index.html" class="back-link">&larr; <span class="lang lang-ko">메인으로 돌아가기</span><span class="lang lang-en">Back to Main</span></a>
+            <div class="flex items-center bg-gray-800 rounded-full p-1">
+                <button id="btn-ko" class="lang-btn" onclick="switchLang('ko')">KOR</button>
+                <button id="btn-en" class="lang-btn" onclick="switchLang('en')">ENG</button>
+            </div>
         </div>
-      </div>
       <div class="prose prose-lg max-w-none">
 
         <!-- ============== SECTION 1 ============== -->
