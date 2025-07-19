@@ -545,7 +545,8 @@ graph TD
 
     function switchLang(lang) {
         document.documentElement.lang = lang;
-        document.documentElement.className = `lang-${lang}`;
+        document.documentElement.classList.remove('lang-ko', 'lang-en');
+        document.documentElement.classList.add(`lang-${lang}`);
         localStorage.setItem('language', lang);
 
         const btnKo = document.getElementById('btn-ko');
