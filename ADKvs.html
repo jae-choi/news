@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html lang="ko" class="lang-ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Google ADK vs. LangGraph Comparison</title>
+    <link rel="icon" href="https://google.github.io/adk-docs/assets/agent-development-kit.png" type="image/png">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&family=Noto+Sans+KR:wght@400;500;700&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        body {
+            font-family: 'Inter', 'Noto Sans KR', sans-serif;
+            background-color: #111827;
+            color: #d1d5db;
+        }
+        .prose { color: #d1d5db; }
+        .prose h1, .prose h2, .prose h3, .prose h4 { color: #f9fafb; border-color: #374151; }
+        .prose a { color: #60a5fa; }
+        .prose code {
+            background-color: #374151; color: #e5e7eb;
+            padding: 0.2em 0.4em; margin: 0; font-size: 85%; border-radius: 6px;
+        }
+        .prose pre {
+            background-color: #1f2937; color: #d1d5db;
+            padding: 1em; border-radius: 8px; overflow-x: auto;
+        }
+        .prose pre code { background-color: transparent; padding: 0; }
+        .prose blockquote { border-left-color: #4b5563; color: #9ca3af; }
+        .sidebar-link { transition: all 0.2s ease-in-out; }
+        .sidebar-link:hover, .sidebar-link.active {
+            background-color: #374151;
+            color: #f9fafb;
+            transform: translateX(4px);
+        }
+        .gradient-text {
+            background: -webkit-linear-gradient(45deg, #4285F4, #34A853, #FBBC05, #EA4335);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        .table-wrapper {
+            background-color: #1f2937;
+            border-radius: 12px;
+            border: 1px solid #374151;
+            overflow: hidden;
+        }
+        .table-wrapper th { color: #d1d5db; }
+        .table-wrapper td { color: #9ca3af; }
+        .table-wrapper .font-bold { color: #f9fafb; }
+        .table-wrapper .text-blue-400 { color: #60a5fa; }
+        .table-wrapper .text-gray-300 { color: #d1d5db; }
+        .table-wrapper tbody tr { border-color: #374151; }
+        .table-wrapper tbody tr:hover { background-color: #374151; }
+        /* Language switcher styles */
+        .lang-ko .lang-en,
+        .lang-en .lang-ko {
+            display: none;
+        }
+        .lang-btn {
+            transition: all 0.2s ease-in-out;
+            border-radius: 9999px;
+            padding: 0.25rem 0.75rem;
+            font-size: 0.875rem;
+        }
+        .lang-btn.active {
+            font-weight: 600;
+            background-color: #2dd4bf; /* accent-color from index.html */
+            color: #0f172a; /* text-slate-900 from index.html */
+        }
+        .lang-btn:not(.active) {
+            color: #94a3b8; /* text-slate-400 from index.html */
+            background-color: transparent;
+        }
+    </style>
+</head>
+<body class="antialiased">
+    <div class="flex min-h-screen">
+        <!-- Sidebar -->
+        <aside class="w-64 bg-gray-900/80 p-6 hidden lg:block sticky top-0 h-screen overflow-y-auto">
+            <h1 class="text-xl font-bold text-white mb-8 flex items-center">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-git-compare-arrows mr-2 text-blue-400"><circle cx="5" cy="6" r="3"/><path d="M12 6h5a2 2 0 0 1 2 2v7"/><path d="m15 18-3-3 3-3"/><circle cx="19" cy="18" r="3"/><path d="M12 18H7a2 2 0 0 1-2-2V9"/><path d="m9 6 3 3-3 3"/></svg>
+                <span>ADK vs LangGraph</span>
+            </h1>
+            <nav class="space-y-2">
+                <a href="#intro" class="sidebar-link flex items-center px-4 py-2 rounded-lg text-gray-400"><span class="lang lang-ko">소개</span><span class="lang lang-en">Introduction</span></a>
+                <a href="#comparison" class="sidebar-link flex items-center px-4 py-2 rounded-lg text-gray-400"><span class="lang lang-ko">상세 비교</span><span class="lang lang-en">Detailed Comparison</span></a>
+                <a href="#conclusion" class="sidebar-link flex items-center px-4 py-2 rounded-lg text-gray-400"><span class="lang lang-ko">결론</span><span class="lang lang-en">Conclusion</span></a>
+            </nav>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="flex-1 p-6 md:p-10 overflow-y-auto" id="main-content">
+            <div class="flex justify-end mb-8">
+                <div class="flex items-center bg-gray-800 rounded-full p-1">
+                    <button id="btn-ko" class="lang-btn" onclick="switchLang('ko')">KOR</button>
+                    <button id="btn-en" class="lang-btn" onclick="switchLang('en')">ENG</button>
+                </div>
+            </div>
+            <div class="prose prose-lg max-w-none">
+                
+                <section id="intro">
+                    <header class="text-center mb-16 not-prose">
+                        <h1 class="text-4xl md:text-5xl font-bold mb-2 text-white">
+                            <span class="gradient-text">Google ADK</span> vs <span class="text-gray-300">LangGraph</span>
+                        </h1>
+                        <p class="text-lg text-gray-400"><span class="lang lang-ko">AI 에이전트 개발, 어떤 프레임워크를 선택해야 할까?</span><span class="lang lang-en">Developing AI Agents: Which Framework Should You Choose?</span></p>
+                    </header>
+                    <p class="mt-8"><span class="lang lang-ko">Google의 <a href="https://google.github.io/adk-docs/" target="_blank" class="text-blue-400 hover:underline">Agent Development Kit (ADK)</a>와 LangChain의 LangGraph는 지능형 AI 에이전트를 구축하기 위한 강력한 도구이지만, 서로 다른 설계 철학을 가지고 있습니다. ADK는 Google Cloud 생태계에 최적화된 '프레임워크'로, 정해진 구조 안에서 빠르고 안정적으로 프로덕션용 에이전트를 개발하는 데 중점을 둡니다. 반면, LangGraph는 '라이브러리'에 가까워, 개발자가 상태와 흐름을 완전히 제어하며 복잡하고 순환적인 워크플로우를 유연하게 설계할 수 있도록 돕습니다. 이 비교표는 두 도구의 핵심적인 차이점을 분석하여 프로젝트의 목적과 요구사항에 가장 적합한 선택을 할 수 있도록 안내합니다.</span><span class="lang lang-en">Google's <a href="https://google.github.io/adk-docs/" target="_blank" class="text-blue-400 hover:underline">Agent Development Kit (ADK)</a> and LangChain's LangGraph are powerful tools for building intelligent AI agents, but they have different design philosophies. ADK is a 'framework' optimized for the Google Cloud ecosystem, focusing on developing production-ready agents quickly and reliably within a set structure. In contrast, LangGraph is more like a 'library,' helping developers to flexibly design complex and cyclical workflows with full control over state and flow. This comparison table analyzes the key differences between the two tools to help you make the best choice for your project's goals and requirements.</span></p>
+                </section>
+
+                <section id="comparison" class="mt-12">
+                    <h2 class="text-3xl font-bold border-b border-gray-700 pb-2"><span class="lang lang-ko">상세 비교</span><span class="lang lang-en">Detailed Comparison</span></h2>
+                    <div class="table-wrapper mt-8 not-prose">
+                        <div class="overflow-x-auto">
+                            <table class="w-full text-left">
+                                <thead class="bg-gray-800/50 border-b border-gray-700">
+                                    <tr>
+                                        <th class="p-4 md:p-6 text-sm font-bold uppercase"><span class="lang lang-ko">기능</span><span class="lang lang-en">Feature</span></th>
+                                        <th class="p-4 md:p-6 text-sm font-bold uppercase text-blue-400">Google ADK</th>
+                                        <th class="p-4 md:p-6 text-sm font-bold uppercase text-gray-300">LangGraph</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr class="border-b border-gray-700">
+                                        <td class="p-4 md:p-6 font-bold"><span class="lang lang-ko">기본 설계 사상</span><span class="lang lang-en">Core Design Philosophy</span></td>
+                                        <td class="p-4 md:p-6">
+                                            <span class="font-semibold text-blue-400">Framework</span>
+                                            <p class="text-sm text-gray-400 mt-1"><span class="lang lang-ko">정해진 구조 위에서 빠르게 프로덕션용 에이전트를 개발</span><span class="lang lang-en">Quickly develop production agents on a predefined structure</span></p>
+                                        </td>
+                                        <td class="p-4 md:p-6">
+                                            <span class="font-semibold text-gray-300">Library</span>
+                                            <p class="text-sm text-gray-400 mt-1"><span class="lang lang-ko">유연한 부품을 조립하여 처음부터 흐름을 직접 설계</span><span class="lang lang-en">Assemble flexible components to design the flow from scratch</span></p>
+                                        </td>
+                                    </tr>
+                                    <tr class="border-b border-gray-700">
+                                        <td class="p-4 md:p-6 font-bold"><span class="lang lang-ko">상태 관리 방식</span><span class="lang lang-en">State Management</span></td>
+                                        <td class="p-4 md:p-6">
+                                            <span class="font-semibold text-blue-400"><span class="lang lang-ko">외부 DB 연동 (Firestore)</span><span class="lang lang-en">External DB Integration (Firestore)</span></span>
+                                            <p class="text-sm text-gray-400 mt-1"><span class="lang lang-ko">대화 ID 기반으로 외부 DB에 상태를 저장하여 영속성 확보</span><span class="lang lang-en">Ensures persistence by saving state to an external DB based on conversation ID</span></p>
+                                        </td>
+                                        <td class="p-4 md:p-6">
+                                            <span class="font-semibold text-gray-300"><span class="lang lang-ko">내부 상태 객체 (State Object)</span><span class="lang lang-en">Internal State Object</span></span>
+                                            <p class="text-sm text-gray-400 mt-1"><span class="lang lang-ko">그래프 내에서 상태 객체를 명시적으로 정의하고 노드 간 전달</span><span class="lang lang-en">Explicitly define and pass a state object between nodes within the graph</span></p>
+                                        </td>
+                                    </tr>
+                                    <tr class="border-b border-gray-700">
+                                        <td class="p-4 md:p-6 font-bold"><span class="lang lang-ko">흐름 제어 (조건 분기)</span><span class="lang lang-en">Flow Control (Conditional Branching)</span></td>
+                                        <td class="p-4 md:p-6">
+                                            <span class="font-semibold text-blue-400"><span class="lang lang-ko">LLM의 추론 + 코드 로직</span><span class="lang lang-en">LLM Inference + Code Logic</span></span>
+                                            <p class="text-sm text-gray-400 mt-1"><span class="lang lang-ko">LLM의 판단 또는 코드 레벨의 if문으로 분기 처리</span><span class="lang lang-en">Branching handled by LLM decisions or code-level if-statements</span></p>
+                                        </td>
+                                        <td class="p-4 md:p-6">
+                                            <span class="font-semibold text-gray-300"><span class="lang lang-ko">명시적 그래프 엣지 (Edge)</span><span class="lang lang-en">Explicit Graph Edges</span></span>
+                                            <p class="text-sm text-gray-400 mt-1"><span class="lang lang-ko">노드 연결선(엣지)에 조건부 함수를 정의하여 흐름을 명시적으로 제어</span><span class="lang lang-en">Define conditional functions on edges to explicitly control the flow</span></p>
+                                        </td>
+                                    </tr>
+                                    <tr class="border-b border-gray-700">
+                                        <td class="p-4 md:p-6 font-bold"><span class="lang lang-ko">시각적 디버깅</span><span class="lang lang-en">Visual Debugging</span></td>
+                                        <td class="p-4 md:p-6">
+                                            <span class="font-semibold text-blue-400">Cloud Logging/Tracing</span>
+                                            <p class="text-sm text-gray-400 mt-1"><span class="lang lang-ko">Google Cloud의 로그/추적 도구를 통해 호출 순서 및 데이터 확인</span><span class="lang lang-en">Check call order and data via Google Cloud's logging/tracing tools</span></p>
+                                        </td>
+                                        <td class="p-4 md:p-6">
+                                            <span class="font-semibold text-gray-300"><span class="lang lang-ko">그래프 시각화 (Mermaid)</span><span class="lang lang-en">Graph Visualization (Mermaid)</span></span>
+                                            <p class="text-sm text-gray-400 mt-1"><span class="lang lang-ko">코드를 기반으로 상태 흐름도를 다이어그램으로 직접 생성</span><span class="lang lang-en">Generate state flow diagrams directly from code</span></p>
+                                        </td>
+                                    </tr>
+                                    <tr class="border-b border-gray-700">
+                                        <td class="p-4 md:p-6 font-bold"><span class="lang lang-ko">주요 장점</span><span class="lang lang-en">Key Advantages</span></td>
+                                        <td class="p-4 md:p-6">
+                                            <ul class="list-disc list-inside text-sm space-y-1 text-gray-400">
+                                                <li><span class="lang lang-ko">Google Cloud 생태계 완벽 통합</span><span class="lang lang-en">Full integration with Google Cloud ecosystem</span></li>
+                                                <li><span class="lang lang-ko">프로덕션 배포 및 확장 용이</span><span class="lang lang-en">Easy production deployment and scaling</span></li>
+                                                <li><span class="lang lang-ko">비교적 낮은 학습 곡선</span><span class="lang lang-en">Relatively low learning curve</span></li>
+                                            </ul>
+                                        </td>
+                                        <td class="p-4 md:p-6">
+                                            <ul class="list-disc list-inside text-sm space-y-1 text-gray-400">
+                                                <li><span class="lang lang-ko">워크플로우의 완벽한 제어 가능</span><span class="lang lang-en">Complete control over the workflow</span></li>
+                                                <li><span class="lang lang-ko">상태 변화의 명시적 추적 용이</span><span class="lang lang-en">Easy to explicitly track state changes</span></li>
+                                                <li><span class="lang lang-ko">순환/반복 등 복잡한 로직 구현</span><span class="lang lang-en">Implementation of complex logic like cycles/loops</span></li>
+                                            </ul>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td class="p-4 md:p-6 font-bold"><span class="lang lang-ko">적합한 사용 사례</span><span class="lang lang-en">Suitable Use Cases</span></td>
+                                        <td class="p-4 md:p-6">
+                                            <p class="text-sm text-gray-400"><span class="lang lang-ko">빠르게 프로토타입을 만들고 확장해야 하는 <strong>프로덕션용 에이전트</strong></span><span class="lang lang-en"><strong>Production-ready agents</strong> that need to be prototyped and scaled quickly</span></p>
+                                        </td>
+                                        <td class="p-4 md:p-6">
+                                            <p class="text-sm text-gray-400"><span class="lang lang-ko">사람의 개입이 필요하거나 매우 특수한 로직을 가진 <strong>복잡한 워크플로우</strong></span><span class="lang lang-en"><strong>Complex workflows</strong> that require human intervention or highly specific logic</span></p>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </section>
+
+                <section id="conclusion" class="mt-12">
+                    <h2 class="text-3xl font-bold border-b border-gray-700 pb-2"><span class="lang lang-ko">결론</span><span class="lang lang-en">Conclusion</span></h2>
+                    <div class="mt-8 grid grid-cols-1 md:grid-cols-2 gap-8 not-prose">
+                        <div class="bg-gray-800 p-6 rounded-xl border border-gray-700">
+                            <h3 class="font-bold text-xl mb-3 text-blue-400"><span class="lang lang-ko">언제 Google ADK를 선택할까?</span><span class="lang lang-en">When to Choose Google ADK?</span></h3>
+                            <p class="text-gray-400">
+                                <span class="lang lang-ko">"빠르고 안정적인 구축"이 중요하다면 ADK가 정답입니다. Google Cloud의 강력한 인프라 위에서 잘 정의된 패턴을 따라 안정적인 AI 에이전트를 신속하게 개발하고 배포하고 싶을 때 최고의 선택입니다.</span><span class="lang lang-en">If "fast and reliable deployment" is important, ADK is the answer. It's the best choice when you want to quickly develop and deploy stable AI agents following well-defined patterns on Google Cloud's powerful infrastructure.</span>
+                            </p>
+                        </div>
+                        <div class="bg-gray-800 p-6 rounded-xl border border-gray-700">
+                            <h3 class="font-bold text-xl mb-3 text-gray-300"><span class="lang lang-ko">언제 LangGraph를 선택할까?</span><span class="lang lang-en">When to Choose LangGraph?</span></h3>
+                            <p class="text-gray-400">
+                                <span class="lang lang-ko">"정교하고 유연한 설계"가 필요하다면 LangGraph가 적합합니다. 에이전트의 모든 결정 단계를 직접 제어하고, 상태 변화를 명시적으로 추적하며, 복잡하고 순환적인 로직을 자유롭게 구현하고 싶을 때 강력한 성능을 발휘합니다.</span><span class="lang lang-en">If "sophisticated and flexible design" is needed, LangGraph is suitable. It performs powerfully when you want to control every decision step of the agent, explicitly track state changes, and freely implement complex, cyclical logic.</span>
+                            </p>
+                        </div>
+                    </div>
+                </section>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        lucide.createIcons();
+
+        function switchLang(lang) {
+            document.documentElement.lang = lang;
+            document.documentElement.className = `lang-${lang}`;
+            localStorage.setItem('language', lang);
+
+            const btnKo = document.getElementById('btn-ko');
+            const btnEn = document.getElementById('btn-en');
+
+            if (btnKo && btnEn) {
+                if (lang === 'ko') {
+                    btnKo.classList.add('active');
+                    btnEn.classList.remove('active');
+                } else {
+                    btnEn.classList.add('active');
+                    btnKo.classList.remove('active');
+                }
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const langFromStorage = localStorage.getItem('language');
+            const browserLang = (navigator.language || navigator.userLanguage).startsWith('en') ? 'en' : 'ko';
+            const initialLang = langFromStorage || browserLang;
+            switchLang(initialLang);
+            const mainContent = document.querySelector('#main-content');
+            // Simple smooth scroll
+            document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+                anchor.addEventListener('click', function (e) {
+                    e.preventDefault();
+                    const targetElement = document.querySelector(this.getAttribute('href'));
+                    if(targetElement) {
+                        targetElement.scrollIntoView({ behavior: 'smooth' });
+                    }
+                });
+            });
+
+            // Active sidebar link on scroll
+            const sections = document.querySelectorAll('main section');
+            const navLi = document.querySelectorAll('aside nav a');
+
+            mainContent.addEventListener('scroll', () => {
+                let current = '';
+                sections.forEach(section => {
+                    const sectionTop = section.offsetTop;
+                    if (mainContent.scrollTop >= sectionTop - 100) {
+                        current = section.getAttribute('id');
+                    }
+                });
+
+                navLi.forEach(a => {
+                    a.classList.remove('active');
+                    if (a.getAttribute('href') === `#${current}`) {
+                        a.classList.add('active');
+                    }
+                });
+            });
+        });
+    </script>
+</body>
+</html>

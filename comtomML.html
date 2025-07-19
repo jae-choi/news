@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="ko" class="lang-ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Custom ML Platform Example</title>
+  <link rel="icon" href="favicon.png" type="image/png" />
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&family=Noto+Sans+KR:wght@400;500;700&display=swap" rel="stylesheet" />
+  <style>
+    body {
+      font-family: "Inter", "Noto Sans KR", sans-serif;
+      background-color: #111827;
+      color: #d1d5db;
+    }
+    .prose { color: #d1d5db; }
+    .prose h1, .prose h2, .prose h3, .prose h4 { color: #f9fafb; border-color: #374151; }
+    .prose a { color: #60a5fa; }
+    .prose code {
+      background-color: #374151; color: #e5e7eb;
+      padding: 0.2em 0.4em; margin: 0; font-size: 85%; border-radius: 6px;
+    }
+    .prose pre {
+      background-color: #1f2937; color: #d1d5db;
+      padding: 1em; border-radius: 8px; overflow-x: auto;
+    }
+    .prose pre code { background-color: transparent; padding: 0; }
+    .prose blockquote { border-left-color: #4b5563; color: #9ca3af; }
+    .back-link {
+        display: inline-block;
+        margin-bottom: 2rem;
+        color: #9ca3af;
+        transition: color 0.2s;
+    }
+    .back-link:hover {
+        color: #60a5fa;
+    }
+    /* Language switcher styles */
+    .lang-ko .lang-en,
+    .lang-en .lang-ko {
+        display: none;
+    }
+    .lang-btn {
+        transition: all 0.2s ease-in-out;
+        border-radius: 9999px;
+        padding: 0.25rem 0.75rem;
+        font-size: 0.875rem;
+    }
+    .lang-btn.active {
+        font-weight: 600;
+        background-color: #2dd4bf; /* accent-color from index.html */
+        color: #0f172a; /* text-slate-900 from index.html */
+    }
+    .lang-btn:not(.active) {
+        color: #94a3b8; /* text-slate-400 from index.html */
+        background-color: transparent;
+    }
+  </style>
+</head>
+<body class="antialiased">
+  <main class="flex-1 p-6 md:p-10">
+    <div class="flex justify-between items-center mb-8">
+        <a href="vertexAI.html" class="back-link">&larr; <span class="lang lang-ko">메인으로 돌아가기</span><span class="lang lang-en">Back to Main</span></a>
+        <div class="flex items-center bg-gray-800 rounded-full p-1">
+            <button id="btn-ko" class="lang-btn" onclick="switchLang('ko')">KOR</button>
+            <button id="btn-en" class="lang-btn" onclick="switchLang('en')">ENG</button>
+        </div>
+    </div>
+    <div class="prose prose-lg max-w-none">
+      <h1 class="text-4xl font-bold border-b pb-4"><span class="lang lang-ko">Vertex AI Workbench를 이용한 Custom ML 예제</span><span class="lang lang-en">Custom ML Example using Vertex AI Workbench</span></h1>
+      
+      <section class="mt-12">
+        <h2 class="text-3xl font-bold"><span class="lang lang-ko">개요</span><span class="lang lang-en">Overview</span></h2>
+        <p><span class="lang lang-ko">이 예제에서는 <strong>Vertex AI Workbench</strong>의 관리형 노트북 환경에서 Python과 <strong>Scikit-learn</strong> 라이브러리를 사용하여 간단한 머신러닝 모델을 학습시키는 과정을 안내합니다.</span><span class="lang lang-en">This example guides you through the process of training a simple machine learning model using Python and the <strong>Scikit-learn</strong> library in a managed notebook environment on <strong>Vertex AI Workbench</strong>.</span></p>
+        <p><span class="lang lang-ko">대표적인 붓꽃(Iris) 데이터셋을 사용하여 품종을 분류하는 모델을 만들어 보겠습니다.</span><span class="lang lang-en">We will create a model to classify iris species using the classic Iris dataset.</span></p>
+      </section>
+
+      <section class="mt-12">
+        <h2 class="text-3xl font-bold"><span class="lang lang-ko">1단계: Vertex AI Workbench 노트북 생성</span><span class="lang lang-en">Step 1: Create a Vertex AI Workbench Notebook</span></h2>
+        <p><span class="lang lang-ko">먼저, Google Cloud 콘솔에서 Vertex AI Workbench 인스턴스를 생성해야 합니다.</span><span class="lang lang-en">First, you need to create a Vertex AI Workbench instance from the Google Cloud Console.</span></p>
+        <ol class="list-decimal list-inside space-y-2">
+          <li><span class="lang lang-ko"><strong>Vertex AI Workbench</strong> 페이지로 이동합니다.</span><span class="lang lang-en">Navigate to the <a href="https://console.cloud.google.com/vertex-ai/workbench" target="_blank">Vertex AI Workbench</a> page.</span></li>
+          <li><span class="lang lang-ko"><strong>[새 노트북]</strong>을 클릭합니다.</span><span class="lang lang-en">Click <strong>[New Notebook]</strong>.</span></li>
+          <li><span class="lang lang-ko">"Python 3" 환경을 선택하고, 머신 유형 등 필요한 사양을 설정합니다.</span><span class="lang lang-en">Select the "Python 3" environment and configure the necessary specifications, such as machine type.</span></li>
+          <li><span class="lang lang-ko"><strong>[만들기]</strong>를 클릭하여 노트북 인스턴스를 생성합니다. 생성이 완료되면 <strong>[JupyterLab 열기]</strong>를 클릭합니다.</span><span class="lang lang-en">Click <strong>[Create]</strong> to create the notebook instance. Once it's created, click <strong>[Open JupyterLab]</strong>.</span></li>
+        </ol>
+      </section>
+
+      <section class="mt-12">
+        <h2 class="text-3xl font-bold"><span class="lang lang-ko">2단계: Python 코드로 모델 학습시키기</span><span class="lang lang-en">Step 2: Train the Model with Python Code</span></h2>
+        <p><span class="lang lang-ko">JupyterLab 환경이 열리면, 새 노트북(.ipynb) 파일을 만들고 아래 코드를 셀에 입력하여 실행합니다.</span><span class="lang lang-en">Once the JupyterLab environment opens, create a new notebook (.ipynb) file and enter the following code into a cell to run it.</span></p>
+
+        <h3 class="text-2xl font-semibold mt-8"><span class="lang lang-ko">코드: 붓꽃 데이터셋 로드 및 모델 학습</span><span class="lang lang-en">Code: Load Iris Dataset and Train Model</span></h3>
+        <pre><code class="language-python">
+# 필요한 라이브러리 가져오기
+from sklearn.datasets import load_iris
+from sklearn.model_selection import train_test_split
+from sklearn.tree import DecisionTreeClassifier
+from sklearn.metrics import accuracy_score
+
+# 1. 데이터 로드
+# Scikit-learn에 내장된 예제용 붓꽃(Iris) 데이터셋을 로드합니다.
+# 별도의 파일 없이 라이브러리에서 바로 데이터를 가져올 수 있습니다.
+iris = load_iris()
+X, y = iris.data, iris.target
+
+print(f"데이터셋 크기: {X.shape}")
+print(f"클래스 종류: {iris.target_names}")
+
+# 2. 데이터 분할 (학습용 / 테스트용)
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.3, random_state=42)
+
+print(f"학습 데이터 크기: {X_train.shape}")
+print(f"테스트 데이터 크기: {X_test.shape}")
+
+# 3. 모델 생성 및 학습 (결정 트리 모델)
+model = DecisionTreeClassifier()
+model.fit(X_train, y_train)
+
+print("\n모델 학습이 완료되었습니다.")
+
+# 4. 모델 예측 및 평가
+y_pred = model.predict(X_test)
+accuracy = accuracy_score(y_test, y_pred)
+
+print(f"\n모델 정확도: {accuracy:.4f}")
+
+# 5. 새로운 데이터로 예측해보기
+# 예시: 꽃받침 길이=5.1, 너비=3.5, 꽃잎 길이=1.4, 너비=0.2
+new_sample = [[5.1, 3.5, 1.4, 0.2]]
+prediction = model.predict(new_sample)
+predicted_class = iris.target_names[prediction[0]]
+
+print(f"\n새로운 샘플 예측 결과: '{predicted_class}' 품종입니다.")
+        </code></pre>
+      </section>
+      
+      <section class="mt-12">
+        <h2 class="text-3xl font-bold"><span class="lang lang-ko">결과 설명</span><span class="lang lang-en">Result Explanation</span></h2>
+        <p><span class="lang lang-ko">위 코드를 실행하면 다음과 같은 결과가 출력됩니다. 각 항목의 의미는 아래와 같습니다.</span><span class="lang lang-en">Running the code above will produce the following output. The meaning of each item is as follows.</span></p>
+        <div class="not-prose bg-gray-800 rounded-xl p-6 border border-gray-700 mt-6">
+          <code class="block whitespace-pre-wrap">
+            <span class="lang lang-ko">데이터셋 크기: (150, 4)</span><span class="lang lang-en">Dataset size: (150, 4)</span>
+            <br>
+            <span class="text-gray-400 text-sm lang lang-ko">// 총 150개의 붓꽃 샘플 데이터가 있으며, 각 샘플은 4개의 특성(꽃받침 길이/너비, 꽃잎 길이/너비)을 가집니다.</span><span class="text-gray-400 text-sm lang lang-en">// There are 150 iris sample data in total, and each sample has 4 features (sepal length/width, petal length/width).</span>
+          </code>
+          <code class="block whitespace-pre-wrap mt-4">
+            <span class="lang lang-ko">클래스 종류: ['setosa' 'versicolor' 'virginica']</span><span class="lang lang-en">Class types: ['setosa' 'versicolor' 'virginica']</span>
+            <br>
+            <span class="text-gray-400 text-sm lang lang-ko">// 모델이 분류해야 할 붓꽃의 품종이 3가지(setosa, versicolor, virginica)임을 의미합니다.</span><span class="text-gray-400 text-sm lang lang-en">// This means the model needs to classify 3 species of iris (setosa, versicolor, virginica).</span>
+          </code>
+          <code class="block whitespace-pre-wrap mt-4">
+            <span class="lang lang-ko">학습 데이터 크기: (105, 4)</span><span class="lang lang-en">Training data size: (105, 4)</span>
+            <br>
+            <span class="text-gray-400 text-sm lang lang-ko">// 전체 데이터 150개 중 70%인 105개를 모델 학습에 사용합니다.</span><span class="text-gray-400 text-sm lang lang-en">// 70% of the total data (105 out of 150) is used for model training.</span>
+          </code>
+          <code class="block whitespace-pre-wrap mt-4">
+            <span class="lang lang-ko">테스트 데이터 크기: (45, 4)</span><span class="lang lang-en">Test data size: (45, 4)</span>
+            <br>
+            <span class="text-gray-400 text-sm lang lang-ko">// 나머지 30%인 45개를 학습된 모델의 성능을 평가하는 데 사용합니다.</span><span class="text-gray-400 text-sm lang lang-en">// The remaining 30% (45) is used to evaluate the trained model's performance.</span>
+          </code>
+          <code class="block whitespace-pre-wrap mt-4">
+            <span class="lang lang-ko">모델 정확도: 1.0000</span><span class="lang lang-en">Model accuracy: 1.0000</span>
+            <br>
+            <span class="text-gray-400 text-sm lang lang-ko">// 학습된 모델이 테스트 데이터 45개의 품종을 100% 정확하게 예측했음을 의미합니다.</span><span class="text-gray-400 text-sm lang lang-en">// This means the trained model predicted the species of the 45 test data samples with 100% accuracy.</span>
+          </code>
+          <code class="block whitespace-pre-wrap mt-4">
+            <span class="lang lang-ko">새로운 샘플 예측 결과: 'setosa' 품종입니다.</span><span class="lang lang-en">New sample prediction result: It is a 'setosa' species.</span>
+            <br>
+            <span class="text-gray-400 text-sm lang lang-ko">// 코드에 입력된 새로운 샘플 정보를 바탕으로, 모델이 'setosa' 품종일 것이라고 예측한 결과입니다.</span><span class="text-gray-400 text-sm lang lang-en">// Based on the new sample information provided in the code, the model predicted it to be the 'setosa' species.</span>
+          </code>
+        </div>
+        <p class="mt-8"><span class="lang lang-ko">이처럼 Vertex AI Workbench를 활용하면 복잡한 인프라 설정 없이도 신속하게 커스텀 머신러닝 모델을 개발하고 테스트할 수 있습니다.</span><span class="lang lang-en">As you can see, Vertex AI Workbench allows you to quickly develop and test custom machine learning models without complex infrastructure setup.</span></p>
+      </section>
+    </div>
+    <footer class="mt-24 py-8 border-t border-gray-700">
+      <div class="text-center">
+        <p class="text-gray-500">&copy; 2025 Vertex AI Architect. Megazone.</p>
+      </div>
+    </footer>
+  </main>
+  <script>
+    function switchLang(lang) {
+        document.documentElement.lang = lang;
+        document.documentElement.className = `lang-${lang}`;
+        localStorage.setItem('language', lang);
+
+        const btnKo = document.getElementById('btn-ko');
+        const btnEn = document.getElementById('btn-en');
+
+        if (btnKo && btnEn) {
+            if (lang === 'ko') {
+                btnKo.classList.add('active');
+                btnEn.classList.remove('active');
+            } else {
+                btnEn.classList.add('active');
+                btnKo.classList.remove('active');
+            }
+        }
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+        const langFromStorage = localStorage.getItem('language');
+        const browserLang = (navigator.language || navigator.userLanguage).startsWith('en') ? 'en' : 'ko';
+        const initialLang = langFromStorage || browserLang;
+        switchLang(initialLang);
+
+        const preBlock = document.querySelector('pre');
+        if (preBlock) {
+            const codeBlock = preBlock.querySelector('code');
+            preBlock.style.cursor = 'pointer';
+            preBlock.setAttribute('title', 'Click to select all code');
+            preBlock.addEventListener('click', () => {
+                if (codeBlock) {
+                    const selection = window.getSelection();
+                    const range = document.createRange();
+                    range.selectNodeContents(codeBlock);
+                    selection.removeAllRanges();
+                    selection.addRange(range);
+                }
+            });
+        }
+    });
+  </script>
+</body>
+</html>
