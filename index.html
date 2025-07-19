@@ -50,9 +50,17 @@
         }
 
         /* Active language button style */
+        .lang-btn {
+            transition: all 0.2s ease-in-out;
+        }
         .lang-btn.active {
             font-weight: 600;
-            color: var(--accent-color);
+            background-color: var(--accent-color);
+            color: #0f172a;
+        }
+        .lang-btn:not(.active) {
+            color: #94a3b8;
+            background-color: transparent;
         }
 
         /* Project card styles */
@@ -143,6 +151,7 @@
             </div>
             <nav class="space-y-2">
                 <a href="#intro" class="sidebar-link flex items-center px-4 py-2 rounded-lg text-secondary font-medium"><i data-lucide="home" class="w-4 h-4 mr-3"></i><span class="lang lang-ko">소개</span><span class="lang lang-en">Intro</span></a>
+                <a href="https://jae-choi.github.io/news/vertexAI.html" class="sidebar-link flex items-center px-4 py-2 rounded-lg text-secondary font-medium"><i data-lucide="brain-circuit" class="w-4 h-4 mr-3"></i><span class="lang lang-ko">VertexAI 소개</span><span class="lang lang-en">VertexAI Intro</span></a>
                 <a href="#articles" class="sidebar-link flex items-center px-4 py-2 rounded-lg text-secondary font-medium"><i data-lucide="pen-square" class="w-4 h-4 mr-3"></i><span class="lang lang-ko">사유의 기록</span><span class="lang lang-en">Articles</span></a>
                 <a href="#works" class="sidebar-link flex items-center px-4 py-2 rounded-lg text-secondary font-medium"><i data-lucide="code" class="w-4 h-4 mr-3"></i><span class="lang lang-ko">기술의 증명</span><span class="lang lang-en">Works</span></a>
                 <a href="#about" class="sidebar-link flex items-center px-4 py-2 rounded-lg text-secondary font-medium"><i data-lucide="user" class="w-4 h-4 mr-3"></i><span class="lang lang-ko">About Me</span><span class="lang lang-en">About Me</span></a>
@@ -155,7 +164,7 @@
         <!-- Main Content -->
         <main class="flex-1 p-6 md:p-10 lg:pt-6 pt-24">
             <div class="flex justify-end mb-8">
-                 <div class="flex items-center bg-slate-800 rounded-full p-1">
+                 <div class="flex items-center bg-gray-800 rounded-full p-1">
                     <button id="btn-ko" class="lang-btn px-3 py-1 text-sm rounded-full" onclick="switchLang('ko')">KOR</button>
                     <button id="btn-en" class="lang-btn px-3 py-1 text-sm rounded-full" onclick="switchLang('en')">ENG</button>
                 </div>
@@ -531,6 +540,8 @@
             document.documentElement.lang = lang;
             document.documentElement.className = `scroll-smooth lang-${lang}`;
             
+            localStorage.setItem('language', lang);
+
             document.querySelectorAll('.lang-btn').forEach(btn => {
                 btn.classList.toggle('active', btn.id.includes(lang));
                 if (btn.id.includes(lang)) {
@@ -571,8 +582,11 @@
             });
 
             // --- Initial Language Setup ---
-            const userLang = navigator.language || navigator.userLanguage;
-            switchLang(userLang.startsWith('en') ? 'en' : 'ko');
+            const langFromStorage = localStorage.getItem('language');
+            const browserLang = (navigator.language || navigator.userLanguage).startsWith('en') ? 'en' : 'ko';
+            
+            const initialLang = langFromStorage || browserLang;
+            switchLang(initialLang);
 
             // --- Copyright Year ---
             document.getElementById('year').textContent = new Date().getFullYear();
