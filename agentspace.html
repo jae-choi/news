@@ -37,10 +37,24 @@
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
         }
+        .lang-ko .lang-en,
+        .lang-en .lang-ko {
+            display: none;
+        }
+        .lang-btn {
+            transition: all 0.2s ease-in-out;
+            border-radius: 9999px;
+            padding: 0.25rem 0.75rem;
+            font-size: 0.875rem;
+        }
         .lang-btn.active {
-            font-weight: 700;
-            color: #013088;
-            text-decoration: underline;
+            font-weight: 600;
+            background-color: #2dd4bf;
+            color: #0f172a;
+        }
+        .lang-btn:not(.active) {
+            color: #94a3b8;
+            background-color: transparent;
         }
     </style>
 </head>
@@ -49,10 +63,11 @@
     <div class="container mx-auto max-w-5xl p-4 md:p-8">
         
         <!-- Language Switcher -->
-        <div class="text-right mb-4">
-            <button id="btn-ko" class="lang-btn" onclick="switchLang('ko')">한국어</button>
-            <span class="text-gray-400">/</span>
-            <button id="btn-en" class="lang-btn" onclick="switchLang('en')">English</button>
+        <div class="flex justify-end mb-4">
+            <div class="flex items-center bg-gray-800 rounded-full p-1">
+                <button id="btn-ko" class="lang-btn" onclick="switchLang('ko')">KOR</button>
+                <button id="btn-en" class="lang-btn" onclick="switchLang('en')">ENG</button>
+            </div>
         </div>
 
         <header class="text-center mb-12 md:mb-16">
@@ -324,9 +339,24 @@
 
         let productivityChart, featureUsageChart;
 
+        function updateLinksWithLang(lang) {
+            document.querySelectorAll('a[href*=".html"]').forEach(link => {
+                let href = link.getAttribute('href');
+                if (!href || href.startsWith('http') || !href.endsWith('.html')) {
+                    return;
+                }
+                const urlParts = href.split('?');
+                const path = urlParts[0];
+                const params = new URLSearchParams(urlParts.length > 1 ? urlParts[1] : '');
+                params.set('lang', lang);
+                link.href = `${path}?${params.toString()}`;
+            });
+        }
+
         function switchLang(lang) {
             document.documentElement.lang = lang;
             document.documentElement.className = lang === 'en' ? 'en' : '';
+            localStorage.setItem('language', lang);
             document.title = titles[lang];
 
             document.querySelectorAll('.lang').forEach(el => {
@@ -338,6 +368,7 @@
             });
             
             updateCharts(lang);
+            updateLinksWithLang(lang);
         }
 
         function updateCharts(lang) {
@@ -392,7 +423,13 @@
         }
         
         document.addEventListener('DOMContentLoaded', () => {
-            switchLang('ko');
+            const urlParams = new URLSearchParams(window.location.search);
+            const langFromUrl = urlParams.get('lang');
+            const langFromStorage = localStorage.getItem('language');
+            const browserLang = (navigator.language || navigator.userLanguage).startsWith('en') ? 'en' : 'ko';
+            
+            const initialLang = langFromUrl || langFromStorage || browserLang;
+            switchLang(initialLang);
         });
     </script>
 </body>
