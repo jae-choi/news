@@ -37,10 +37,24 @@
             box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05), 0 2px 4px -1px rgba(0,0,0,0.03);
             border: 1px solid var(--border-color);
         }
+        .lang-ko .lang-en,
+        .lang-en .lang-ko {
+            display: none;
+        }
+        .lang-btn {
+            transition: all 0.2s ease-in-out;
+            border-radius: 9999px;
+            padding: 0.25rem 0.75rem;
+            font-size: 0.875rem;
+        }
         .lang-btn.active {
-            font-weight: 700;
-            color: var(--text-primary);
-            text-decoration: underline;
+            font-weight: 600;
+            background-color: #2dd4bf;
+            color: #0f172a;
+        }
+        .lang-btn:not(.active) {
+            color: #94a3b8;
+            background-color: transparent;
         }
         .gradient-text {
             background: linear-gradient(90deg, var(--text-primary), var(--accent-primary));
@@ -54,10 +68,11 @@
     <div class="container mx-auto max-w-5xl p-4 md:p-8">
         
         <!-- Language Switcher -->
-        <div class="text-right mb-4">
-            <button id="btn-ko" class="lang-btn" onclick="switchLang('ko')">한국어</button>
-            <span class="text-gray-400">/</span>
-            <button id="btn-en" class="lang-btn" onclick="switchLang('en')">English</button>
+        <div class="flex justify-end mb-4">
+            <div class="flex items-center bg-gray-800 rounded-full p-1">
+                <button id="btn-ko" class="lang-btn" onclick="switchLang('ko')">KOR</button>
+                <button id="btn-en" class="lang-btn" onclick="switchLang('en')">ENG</button>
+            </div>
         </div>
 
         <header class="text-center mb-12 md:mb-16">
@@ -163,9 +178,24 @@
     </div>
 
     <script>
+        function updateLinksWithLang(lang) {
+            document.querySelectorAll('a[href*=".html"]').forEach(link => {
+                let href = link.getAttribute('href');
+                if (!href || href.startsWith('http') || !href.endsWith('.html')) {
+                    return;
+                }
+                const urlParts = href.split('?');
+                const path = urlParts[0];
+                const params = new URLSearchParams(urlParts.length > 1 ? urlParts[1] : '');
+                params.set('lang', lang);
+                link.href = `${path}?${params.toString()}`;
+            });
+        }
+
         function switchLang(lang) {
             document.body.classList.remove('ko', 'en');
             document.body.classList.add(lang);
+            localStorage.setItem('language', lang);
             document.querySelectorAll('.lang').forEach(el => {
                 el.style.display = 'none';
             });
@@ -176,15 +206,17 @@
                 btn.classList.remove('active');
             });
             document.getElementById(`btn-${lang}`).classList.add('active');
+            updateLinksWithLang(lang);
         }
 
         document.addEventListener('DOMContentLoaded', () => {
-            const userLang = navigator.language || navigator.userLanguage;
-            if (userLang.startsWith('en')) {
-                switchLang('en');
-            } else {
-                switchLang('ko');
-            }
+            const urlParams = new URLSearchParams(window.location.search);
+            const langFromUrl = urlParams.get('lang');
+            const langFromStorage = localStorage.getItem('language');
+            const browserLang = (navigator.language || navigator.userLanguage).startsWith('en') ? 'en' : 'ko';
+            
+            const initialLang = langFromUrl || langFromStorage || browserLang;
+            switchLang(initialLang);
         });
     </script>
 </body>
