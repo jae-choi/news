@@ -3,12 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>LangGraph Basic Sample Guide</title>
+    <title>LangGraph 기초 샘플 만들기 | Langfuse 가이드</title>
     <link rel="icon" href="https://avatars.githubusercontent.com/u/35217573?v=4" type="image/png" />
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Noto+Sans+KR:wght@400;500;700;900&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/lucide@latest"></script>
     <style>
         body {
             font-family: 'Inter', 'Noto Sans KR', sans-serif;
@@ -28,6 +29,7 @@
         }
         .prose h1, .prose h2, .prose h3, .prose h4, .prose strong {
             color: #f9fafb;
+            border-color: #374151;
         }
         .prose a {
             color: #60a5fa;
@@ -85,7 +87,7 @@
             scroll-behavior: smooth;
         }
         section[id] {
-            scroll-margin-top: 4rem; /* 64px */
+            scroll-margin-top: 6rem; /* Adjusted for language switcher */
         }
         /* Language switcher styles */
         .lang-ko .lang-en,
@@ -100,11 +102,11 @@
         }
         .lang-btn.active {
             font-weight: 600;
-            background-color: #2dd4bf; /* accent-color from index.html */
-            color: #0f172a; /* text-slate-900 from index.html */
+            background-color: #2dd4bf;
+            color: #0f172a;
         }
         .lang-btn:not(.active) {
-            color: #94a3b8; /* text-slate-400 from index.html */
+            color: #94a3b8;
             background-color: transparent;
         }
     </style>
@@ -112,9 +114,9 @@
 <body class="antialiased">
     <div class="flex min-h-screen">
         <!-- Sidebar -->
-        <aside class="w-72 bg-gray-900/80 p-6 hidden lg:block sticky top-0 h-screen">
+        <aside class="w-72 bg-gray-900/80 p-6 hidden lg:block sticky top-0 h-screen overflow-y-auto">
             <h1 class="text-xl font-bold text-white mb-8 flex items-center">
-                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="mr-2 text-blue-500"><path d="M3 6v12h18V6M3 12h18"/></svg>
+                <i data-lucide="file-text" class="mr-2 text-blue-500"></i>
                 <span><span class="lang lang-ko">LangGraph 가이드</span><span class="lang lang-en">LangGraph Guide</span></span>
             </h1>
             <nav class="space-y-2">
@@ -122,13 +124,13 @@
                 <a href="#env-setup" class="sidebar-link flex items-center px-4 py-2 rounded-lg text-gray-400"><span class="lang lang-ko">1. 환경 설정</span><span class="lang lang-en">1. Environment Setup</span></a>
                 <a href="#agent-design" class="sidebar-link flex items-center px-4 py-2 rounded-lg text-gray-400"><span class="lang lang-ko">2. 에이전트 설계</span><span class="lang lang-en">2. Agent Design</span></a>
                 <a href="#full-code" class="sidebar-link flex items-center px-4 py-2 rounded-lg text-gray-400"><span class="lang lang-ko">3. 전체 코드 작성</span><span class="lang lang-en">3. Full Code</span></a>
-                <a href="#visualization" class="sidebar-link flex items-center px-4 py-2 rounded-lg text-gray-400"><span class="lang lang-ko">4. 로컬 시각화</span><span class="lang lang-en">4. Local Visualization</span></a>
+                <a href="#visualization" class="sidebar-link flex items-center px-4 py-2 rounded-lg text-gray-400"><span class="lang lang-ko">4. 로컬 시각화 (Langfuse)</span><span class="lang lang-en">4. Local Visualization (Langfuse)</span></a>
             </nav>
         </aside>
 
         <!-- Main Content -->
-        <main class="flex-1 px-10 pb-10 md:px-16 md:pb-16">
-            <div class="flex justify-end my-8">
+        <main class="flex-1 p-6 md:p-10 overflow-y-auto" id="main-content">
+            <div class="flex justify-end mb-8 sticky top-4 z-10">
                 <div class="flex items-center bg-gray-800 rounded-full p-1">
                     <button id="btn-ko" class="lang-btn" onclick="switchLang('ko')">KOR</button>
                     <button id="btn-en" class="lang-btn" onclick="switchLang('en')">ENG</button>
@@ -136,154 +138,264 @@
             </div>
             <div class="prose prose-lg max-w-none">
                 
-                <section id="intro" class="pt-16">
-                    <h2 class="text-3xl font-bold border-b border-gray-700 pb-2"><span class="lang lang-ko">LangGraph 기초 샘플 만들기</span><span class="lang lang-en">Creating a Basic LangGraph Sample</span></h2>
-                    <p class="mt-6"><span class="lang lang-ko">간단한 '연구 & 글쓰기' 에이전트를 만들고, 로컬에서 실시간으로 시각화하는 방법을 안내합니다. 이 가이드를 통해 LangGraph의 기본 개념인 상태(State), 노드(Node), 엣지(Edge)를 이해하고 실제 코드로 구현해볼 수 있습니다.</span><span class="lang lang-en">This guide shows how to create a simple 'research & writing' agent and visualize it in real-time locally. Through this guide, you can understand the basic concepts of LangGraph—State, Node, and Edge—and implement them in actual code.</span></p>
+                <section id="intro">
+                    <h2 class="text-3xl font-bold border-b border-gray-700 pb-2">
+                        <span class="lang lang-ko">LangGraph 기초 샘플 만들기</span>
+                        <span class="lang lang-en">Creating a Basic LangGraph Sample</span>
+                    </h2>
+                    <p class="mt-6">
+                        <span class="lang lang-ko">간단한 '연구 & 글쓰기' 에이전트를 만들고, **Langfuse**를 이용해 로컬에서 실시간으로 시각화하는 방법을 안내합니다. 이 가이드를 통해 LangGraph의 기본 개념인 상태(State), 노드(Node), 엣지(Edge)를 이해하고 실제 코드로 구현해볼 수 있습니다.</span>
+                        <span class="lang lang-en">This guide shows how to create a simple 'Research & Write' agent and visualize it in real-time locally using **Langfuse**. Through this guide, you will understand the basic concepts of LangGraph—State, Node, and Edge—and implement them in actual code.</span>
+                    </p>
                 </section>
 
                 <!-- 1. 환경 설정 -->
                 <section id="env-setup" class="mt-16">
-                    <h3 class="text-2xl font-bold border-b border-gray-700 pb-2"><span class="lang lang-ko">1. 시작하기 전에: 환경 설정</span><span class="lang lang-en">1. Before You Start: Environment Setup</span></h3>
-                    <p class="mt-6"><span class="lang lang-ko">필요한 라이브러리들을 설치합니다. 실시간 추적을 위해 `langsmith`를 추가합니다.</span><span class="lang lang-en">Install the necessary libraries. Add `langsmith` for real-time tracing.</span></p>
+                    <h3 class="text-2xl font-bold border-b border-gray-700 pb-2">
+                        <span class="lang lang-ko">1. 시작하기 전에: 환경 설정</span>
+                        <span class="lang lang-en">1. Before You Start: Environment Setup</span>
+                    </h3>
+                    <p class="mt-6">
+                        <span class="lang lang-ko">필요한 라이브러리들을 설치합니다. 실행 과정 추적을 위해 `langfuse`와 환경 변수 관리를 위한 `python-dotenv`를 추가합니다.</span>
+                        <span class="lang lang-en">Install the necessary libraries. We'll add `langfuse` for tracking execution and `python-dotenv` for managing environment variables.</span>
+                    </p>
                     <div class="code-block" onclick="selectCodeBlock(this)" title="클릭하여 코드 선택">
-                        <pre><code>pip install langgraph langchain langchain_openai langsmith</code></pre>
+                        <pre><code>pip install langgraph langchain langchain_google_genai langfuse python-dotenv</code></pre>
                     </div>
-                    <p class="mt-4"><span class="lang lang-ko">OpenAI API 키를 환경 변수로 설정합니다.</span><span class="lang lang-en">Set your OpenAI API key as an environment variable.</span></p>
+                    <p class="mt-4">
+                        <span class="lang lang-ko">프로젝트 폴더에 `.env` 파일을 만들고 Google API 키와 나중에 발급받을 Langfuse 키를 저장할 준비를 합니다.</span>
+                        <span class="lang lang-en">Create a `.env` file in your project folder to store your Google API key and the Langfuse keys you will obtain later.</span>
+                    </p>
                      <div class="code-block" onclick="selectCodeBlock(this)" title="클릭하여 코드 선택">
-                        <pre><code><span class="token.comment"># Run in terminal</span>
-export OPENAI_API_KEY<span class="token.operator">=</span><span class="token.string">'your-api-key-here'</span></code></pre>
+                        <pre><code><span class="token.comment"># <span class="lang lang-ko">.env 파일 내용</span><span class="lang lang-en">.env file content</span></span>
+GOOGLE_API_KEY<span class="token.operator">=</span><span class="token.string">'your-google-api-key-here'</span>
+
+<span class="token.comment"># <span class="lang lang-ko">Langfuse 설정 (4단계에서 채울 예정)</span><span class="lang lang-en">Langfuse settings (to be filled in step 4)</span></span>
+LANGFUSE_SECRET_KEY<span class="token.operator">=</span><span class="token.string">""</span>
+LANGFUSE_PUBLIC_KEY<span class="token.operator">=</span><span class="token.string">""</span>
+LANGFUSE_HOST<span class="token.operator">=</span><span class="token.string">"http://localhost:3000"</span>
+</code></pre>
                     </div>
-                    <p class="mt-4"><span class="lang lang-ko">다음과 같은 디렉토리 구조로 프로젝트를 구성합니다.</span><span class="lang lang-en">Structure your project with the following directory layout.</span></p>
+                    <p class="mt-4">
+                        <span class="lang lang-ko">다음과 같은 디렉토리 구조로 프로젝트를 구성합니다.</span>
+                        <span class="lang lang-en">Structure your project with the following directory layout.</span>
+                    </p>
                     <div class="code-block">
 <pre><code>my-langgraph-agent/
+├── .env
 └── run_agent.py</code></pre>
                     </div>
                 </section>
 
                 <!-- 2. 에이전트 설계 -->
                 <section id="agent-design" class="mt-16">
-                    <h3 class="text-2xl font-bold border-b border-gray-700 pb-2"><span class="lang lang-ko">2. 에이전트 설계: 상태, 노드, 엣지</span><span class="lang lang-en">2. Agent Design: State, Nodes, and Edges</span></h3>
-                    <p class="mt-6"><span class="lang lang-ko">우리가 만들 에이전트는 '주제'를 받아 '리서치'를 수행하고, 그 결과를 바탕으로 '글을 쓰는' 간단한 워크플로우를 가집니다.</span><span class="lang lang-en">The agent we will create has a simple workflow: it takes a 'topic', performs 'research', and then 'writes' based on the results.</span></p>
+                    <h3 class="text-2xl font-bold border-b border-gray-700 pb-2">
+                        <span class="lang lang-ko">2. 에이전트 설계: 상태, 노드, 엣지</span>
+                        <span class="lang lang-en">2. Agent Design: State, Nodes, and Edges</span>
+                    </h3>
+                    <p class="mt-6">
+                        <span class="lang lang-ko">우리가 만들 에이전트는 '주제'를 받아 '리서치'를 수행하고, 그 결과를 바탕으로 '글을 쓰는' 간단한 워크플로우를 가집니다.</span>
+                        <span class="lang lang-en">The agent we will build has a simple workflow: it takes a 'topic', performs 'research', and then 'writes' based on the results.</span>
+                    </p>
                     <ul class="list-disc list-inside space-y-2 mt-4">
-                        <li><strong><span class="lang lang-ko">상태 (State):</span><span class="lang lang-en">State:</span></strong> <span class="lang lang-ko">작업 흐름 전체에서 '주제(topic)'와 '리서치 결과(research_result)'를 공유합니다.</span><span class="lang lang-en">Shares the 'topic' and 'research_result' throughout the workflow.</span></li>
-                        <li><strong><span class="lang lang-ko">노드 (Node):</span><span class="lang lang-en">Nodes:</span></strong> <span class="lang lang-ko">'리서처(researcher)'와 '작가(writer)'라는 두 개의 작업 단위를 정의합니다.</span><span class="lang lang-en">Defines two work units: a 'researcher' and a 'writer'.</span></li>
-                        <li><strong><span class="lang lang-ko">엣지 (Edge):</span><span class="lang lang-en">Edges:</span></strong> <span class="lang lang-ko">'리서처'가 끝나면 '작가'로 작업이 넘어가도록 흐름을 연결합니다.</span><span class="lang lang-en">Connects the flow so that the task moves from the 'researcher' to the 'writer' upon completion.</span></li>
+                        <li>
+                            <strong><span class="lang lang-ko">상태 (State):</span><span class="lang lang-en">State:</span></strong>
+                            <span class="lang lang-ko"> 작업 흐름 전체에서 '주제(topic)'와 '리서치 결과(research_result)'를 공유합니다.</span>
+                            <span class="lang lang-en"> Shares the 'topic' and 'research_result' throughout the entire workflow.</span>
+                        </li>
+                        <li>
+                            <strong><span class="lang lang-ko">노드 (Node):</span><span class="lang lang-en">Nodes:</span></strong>
+                            <span class="lang lang-ko"> '리서처(researcher)'와 '작가(writer)'라는 두 개의 작업 단위를 정의합니다.</span>
+                            <span class="lang lang-en"> Defines two work units: a 'researcher' and a 'writer'.</span>
+                        </li>
+                        <li>
+                            <strong><span class="lang lang-ko">엣지 (Edge):</span><span class="lang lang-en">Edges:</span></strong>
+                            <span class="lang lang-ko"> '리서처'가 끝나면 '작가'로 작업이 넘어가도록 흐름을 연결합니다.</span>
+                            <span class="lang lang-en"> Connects the flow so that the task moves from the 'researcher' to the 'writer' upon completion.</span>
+                        </li>
                     </ul>
                 </section>
 
                 <!-- 3. 전체 코드 -->
                 <section id="full-code" class="mt-16">
-                    <h3 class="text-2xl font-bold border-b border-gray-700 pb-2"><span class="lang lang-ko">3. 전체 코드 작성</span><span class="lang lang-en">3. Writing the Full Code</span></h3>
-                    <p class="mt-6"><span class="lang lang-ko">아래 코드를 `run_agent.py`와 같은 파일로 저장하세요. 코드 블록을 클릭하면 전체 코드가 선택됩니다.</span><span class="lang lang-en">Save the code below into a file like `run_agent.py`. Clicking the code block will select all the code.</span></p>
+                    <h3 class="text-2xl font-bold border-b border-gray-700 pb-2">
+                        <span class="lang lang-ko">3. 전체 코드 작성</span>
+                        <span class="lang lang-en">3. Writing the Full Code</span>
+                    </h3>
+                    <p class="mt-6">
+                        <span class="lang lang-ko">아래 코드를 `run_agent.py` 파일로 저장하세요. Langfuse와 연동하기 위한 코드가 포함되어 있습니다.</span>
+                        <span class="lang lang-en">Save the code below as `run_agent.py`. It includes the code for integration with Langfuse.</span>
+                    </p>
                     <div class="code-block" onclick="selectCodeBlock(this)" title="클릭하여 코드 선택">
 <pre><code><span class="token.keyword">import</span> os
 <span class="token.keyword">from</span> typing <span class="token.keyword">import</span> TypedDict
-<span class="token.keyword">from</span> langchain_openai <span class="token.keyword">import</span> ChatOpenAI
+<span class="token.keyword">from</span> dotenv <span class="token.keyword">import</span> load_dotenv
+<span class="token.keyword">from</span> langchain_google_genai <span class="token.keyword">import</span> ChatGoogleGenerativeAI
 <span class="token.keyword">from</span> langgraph.graph <span class="token.keyword">import</span> StateGraph, END
+<span class="token.keyword">from</span> langfuse.callback <span class="token.keyword">import</span> CallbackHandler
 
-<span class="token.comment"># 1. 상태(State) 정의</span>
+<span class="token.comment"># <span class="lang lang-ko">--- 0. 환경 변수 로드 (.env에 KEY들을 저장) ---</span><span class="lang lang-en">--- 0. Load environment variables (store KEYS in .env) ---</span></span>
+load_dotenv()
+
+<span class="token.comment"># <span class="lang lang-ko">--- 1. Langfuse 콜백 핸들러 초기화 ---</span><span class="lang lang-en">--- 1. Initialize Langfuse Callback Handler ---</span></span>
+<span class="token.comment"># <span class="lang lang-ko">.env 파일에 저장된 키를 사용하여 핸들러를 생성합니다.</span><span class="lang lang-en">Create the handler using keys stored in the .env file.</span></span>
+langfuse_handler = CallbackHandler(
+    public_key=os.getenv("LANGFUSE_PUBLIC_KEY"),
+    secret_key=os.getenv("LANGFUSE_SECRET_KEY"),
+    host=os.getenv("LANGFUSE_HOST")
+)
+
+<span class="token.comment"># <span class="lang lang-ko">--- 2. 그래프용 상태 정의 ---</span><span class="lang lang-en">--- 2. Define State for the Graph ---</span></span>
 <span class="token.keyword">class</span> <span class="token.class-name">AgentState</span>(TypedDict):
     topic: str
     research_result: str
 
-<span class="token.comment"># 2. 노드(Node) 함수 정의</span>
+<span class="token.comment"># <span class="lang lang-ko">--- 3. 노드 함수 정의 ---</span><span class="lang lang-en">--- 3. Define Node Functions ---</span></span>
 <span class="token.keyword">def</span> <span class="token.function">researcher</span>(state: AgentState):
-    print(<span class="token.string">"--- 리서처 노드 실행 ---"</span>)
-    topic = state[<span class="token.string">'topic'</span>]
-    llm = ChatOpenAI(model=<span class="token.string">"gpt-4o-mini"</span>, temperature=<span class="token.number">0</span>)
-    response = llm.invoke(f<span class="token.string">"'{topic}'에 대한 핵심적인 사실 3가지를 알려줘."</span>)
-    research_result = response.content
-    print(f<span class="token.string">"리서치 결과: {research_result}"</span>)
+    print(<span class="token.string">"<span class="lang lang-ko">--- 리서처 노드 실행 ---</span><span class="lang lang-en">--- Executing Researcher Node ---</span>"</span>)
+    topic = state[<span class="token.string">"topic"</span>]
+    llm = ChatGoogleGenerativeAI(model=<span class="token.string">"gemini-1.5-flash"</span>, temperature=<span class="token.number">0</span>)
+    research_result = llm.invoke(
+        f<span class="token.string">"<span class="lang lang-ko">'{topic}'에 대한 핵심적인 사실 3가지를 알려줘.</span><span class="lang lang-en">Tell me 3 key facts about '{topic}'.</span>"</span>
+    ).content
+    print(f<span class="token.string">"<span class="lang lang-ko">리서치 결과: </span><span class="lang lang-en">Research Result: </span>{research_result}"</span>)
     <span class="token.keyword">return</span> {<span class="token.string">"research_result"</span>: research_result}
 
 <span class="token.keyword">def</span> <span class="token.function">writer</span>(state: AgentState):
-    print(<span class="token.string">"--- 작가 노드 실행 ---"</span>)
+    print(<span class="token.string">"<span class="lang lang-ko">--- 작가 노드 실행 ---</span><span class="lang lang-en">--- Executing Writer Node ---</span>"</span>)
     research_result = state[<span class="token.string">'research_result'</span>]
-    llm = ChatOpenAI(model=<span class="token.string">"gpt-4o-mini"</span>, temperature=<span class="token.number">0.7</span>)
-    response = llm.invoke(f<span class="token.string">"다음 정보를 바탕으로 흥미로운 단락을 작성해줘:\n\n{research_result}"</span>)
-    final_output = response.content
-    print(f<span class="token.string">"최종 결과물:\n{final_output}"</span>)
+    llm = ChatGoogleGenerativeAI(model=<span class="token.string">"gemini-1.5-flash"</span>, temperature=<span class="token.number">0.7</span>)
+    final_output = llm.invoke(
+        f<span class="token.string">"<span class="lang lang-ko">다음 정보를 바탕으로 흥미로운 단락을 작성해줘:\n\n</span><span class="lang lang-en">Write an interesting paragraph based on the following information:\n\n</span>{research_result}"</span>
+    ).content
+    print(f<span class="token.string">"<span class="lang lang-ko">최종 결과물:\n</span><span class="lang lang-en">Final Output:\n</span>{final_output}"</span>)
     <span class="token.keyword">return</span> {}
 
-<span class="token.comment"># 3. 그래프(Graph) 구성</span>
+<span class="token.comment"># <span class="lang lang-ko">--- 4. 그래프 구축 ---</span><span class="lang lang-en">--- 4. Build the Graph ---</span></span>
 workflow = StateGraph(AgentState)
 workflow.add_node(<span class="token.string">"researcher"</span>, researcher)
 workflow.add_node(<span class="token.string">"writer"</span>, writer)
 workflow.set_entry_point(<span class="token.string">"researcher"</span>)
 workflow.add_edge(<span class="token.string">"researcher"</span>, <span class="token.string">"writer"</span>)
 workflow.add_edge(<span class="token.string">"writer"</span>, END)
-
-<span class="token.comment"># 4. 그래프 컴파일 및 실행</span>
 app = workflow.compile()
-inputs = {<span class="token.string">"topic"</span>: <span class="token.string">"인공지능의 역사"</span>}
-app.invoke(inputs)
 
-print(<span class="token.string">"\n\n--- 실행 완료 ---"</span>)
-print(<span class="token.string">"로컬 LangSmith UI(http://localhost:1984)에서 실행 과정을 확인하세요."</span>)
+<span class="token.comment"># <span class="lang lang-ko">--- 5. 실행 ---</span><span class="lang lang-en">--- 5. Execute ---</span></span>
+inputs = {<span class="token.string">"topic"</span>: <span class="token.string">"<span class="lang lang-ko">인공지능의 역사</span><span class="lang lang-en">The History of Artificial Intelligence</span>"</span>}
+print(<span class="token.string">"<span class="lang lang-ko">Langfuse와 함께 그래프 실행을 시작합니다…</span><span class="lang lang-en">Starting graph execution with Langfuse…</span>"</span>)
+app.invoke(inputs, config={<span class="token.string">"callbacks"</span>: [langfuse_handler]})
+
+<span class="token.comment"># <span class="lang lang-ko">--- 6. 남은 이벤트 전송 ---</span><span class="lang lang-en">--- 6. Flush remaining events ---</span></span>
+langfuse_handler.flush()
+print(<span class="token.string">"<span class="lang lang-ko">완료! 대시보드에서 확인하세요 →</span><span class="lang lang-en">Done! Check it out on the dashboard →</span>"</span>, os.getenv(<span class="token.string">"LANGFUSE_HOST"</span>))
 </code></pre>
                     </div>
                 </section>
                 
                 <!-- 4. 로컬 시각화 -->
                 <section id="visualization" class="mt-16">
-                    <h3 class="text-2xl font-bold border-b border-gray-700 pb-2"><span class="lang lang-ko">4. 로컬에서 실시간 시각화하기 (LangSmith)</span><span class="lang lang-en">4. Real-time Local Visualization (LangSmith)</span></h3>
+                    <h3 class="text-2xl font-bold border-b border-gray-700 pb-2">
+                        <span class="lang lang-ko">4. 로컬에서 실시간 시각화하기 (Langfuse)</span>
+                        <span class="lang lang-en">4. Real-time Local Visualization (Langfuse)</span>
+                    </h3>
                     <div class="space-y-6 mt-6">
                         <div>
-                            <h4 class="text-xl font-semibold"><span class="lang lang-ko">단계 1: LangSmith Docker 컨테이너 실행</span><span class="lang lang-en">Step 1: Run the LangSmith Docker Container</span></h4>
-                            <p class="mt-4"><span class="lang lang-ko">LangSmith를 로컬에서 사용하려면 Docker가 필요합니다. 터미널을 열고 아래 명령어를 실행하여 LangSmith 서버를 백그라운드에서 실행시키세요.</span><span class="lang lang-en">To use LangSmith locally, you need Docker. Open a terminal and run the command below to start the LangSmith server in the background.</span></p>
+                            <h4 class="text-xl font-semibold">
+                                <span class="lang lang-ko">단계 1: Langfuse Docker 컨테이너 실행</span>
+                                <span class="lang lang-en">Step 1: Run the Langfuse Docker Container</span>
+                            </h4>
+                            <p class="mt-4">
+                                <span class="lang lang-ko">Langfuse를 로컬에서 사용하려면 Docker가 필요합니다. 터미널을 열고 아래 명령어를 실행하여 공식 `docker-compose.yml` 파일을 다운로드하세요.</span>
+                                <span class="lang lang-en">To use Langfuse locally, you need Docker. Open a terminal and run the command below to download the official `docker-compose.yml` file.</span>
+                            </p>
                             <div class="code-block" onclick="selectCodeBlock(this)" title="클릭하여 코드 선택">
-                                <pre><code>docker run -d --name langsmith -p 1984:1984 -p 8000:8000 --env IS_DOCKER=true langchain/langsmith</code></pre>
+                                <pre><code>curl -o docker-compose.yml https://raw.githubusercontent.com/langfuse/langfuse/main/docker-compose.yml</code></pre>
+                            </div>
+                             <p class="mt-4">
+                                <span class="lang lang-ko">다운로드가 완료되면, 아래 명령어로 Langfuse 서버를 백그라운드에서 실행시킵니다.</span>
+                                <span class="lang lang-en">Once the download is complete, run the following command to start the Langfuse server in the background.</span>
+                            </p>
+                             <div class="code-block" onclick="selectCodeBlock(this)" title="클릭하여 코드 선택">
+                                <pre><code>docker compose up -d</code></pre>
                             </div>
                         </div>
 
                         <div>
-                            <h4 class="text-xl font-semibold"><span class="lang lang-ko">단계 2: LangSmith 연동을 위한 환경 변수 설정</span><span class="lang lang-en">Step 2: Set Environment Variables for LangSmith Integration</span></h4>
-                            <p class="mt-4"><span class="lang lang-ko">Python 스크립트가 로컬 LangSmith 서버를 인식하고 실행 기록을 전송하도록, 코드를 실행할 터미널에서 아래 환경 변수들을 설정합니다.</span><span class="lang lang-en">To allow the Python script to recognize the local LangSmith server and send execution traces, set the following environment variables in the terminal where you will run the code.</span></p>
+                            <h4 class="text-xl font-semibold">
+                                <span class="lang lang-ko">단계 2: Langfuse UI 접속 및 API 키 발급</span>
+                                <span class="lang lang-en">Step 2: Access Langfuse UI and Get API Keys</span>
+                            </h4>
+                            <p class="mt-4">
+                                <span class="lang lang-ko">웹 브라우저에서 <a href="http://localhost:3000" target="_blank" class="text-blue-400 hover:underline">http://localhost:3000</a> 주소로 접속하세요. 처음 접속 시 계정을 생성하고 로그인한 뒤, 새로운 프로젝트를 만듭니다. 그 다음, 프로젝트의 <strong>Settings > API Keys</strong> 메뉴로 이동하여 `Secret Key`와 `Public Key`를 복사합니다.</span>
+                                <span class="lang lang-en">Open your web browser and go to <a href="http://localhost:3000" target="_blank" class="text-blue-400 hover:underline">http://localhost:3000</a>. On your first visit, create an account, log in, and then create a new project. Next, navigate to the project's <strong>Settings > API Keys</strong> menu to copy the `Secret Key` and `Public Key`.</span>
+                            </p>
+                        </div>
+
+                        <div>
+                            <h4 class="text-xl font-semibold">
+                                <span class="lang lang-ko">단계 3: .env 파일에 API 키 설정</span>
+                                <span class="lang lang-en">Step 3: Set API Keys in the .env File</span>
+                            </h4>
+                            <p class="mt-4">
+                                <span class="lang lang-ko">1단계에서 만들었던 `.env` 파일을 열고, 방금 복사한 키들을 붙여넣습니다.</span>
+                                <span class="lang lang-en">Open the `.env` file you created in Step 1 and paste the keys you just copied.</span>
+                            </p>
                             <div class="code-block" onclick="selectCodeBlock(this)" title="클릭하여 코드 선택">
-                                <pre><code><span class="token.comment"># 추적 기능 활성화</span>
-export LANGCHAIN_TRACING_V2<span class="token.operator">=</span><span class="token.string">"true"</span>
-<span class="token.comment"># 로컬 LangSmith 서버 주소</span>
-export LANGCHAIN_ENDPOINT<span class="token.operator">=</span><span class="token.string">"http://localhost:1984"</span>
-<span class="token.comment"># API 키 (로컬에서는 아무 값이나 넣어도 무방)</span>
-export LANGCHAIN_API_KEY<span class="token.operator">=</span><span class="token.string">"dummy_key"</span>
-<span class="token.comment"># 프로젝트 이름 설정 (UI에서 구분을 위함)</span>
-export LANGCHAIN_PROJECT<span class="token.operator">=</span><span class="token.string">"My First Agent"</span></code></pre>
+                                <pre><code><span class="token.comment"># <span class="lang lang-ko">.env 파일</span><span class="lang lang-en">.env file</span></span>
+GOOGLE_API_KEY<span class="token.operator">=</span><span class="token.string">'your-google-api-key-here'</span>
+
+LANGFUSE_SECRET_KEY<span class="token.operator">=</span><span class="token.string">"sk-lf-..."</span> <span class="token.comment"># <span class="lang lang-ko">복사한 Secret Key</span><span class="lang lang-en">Copied Secret Key</span></span>
+LANGFUSE_PUBLIC_KEY<span class="token.operator">=</span><span class="token.string">"pk-lf-..."</span> <span class="token.comment"># <span class="lang lang-ko">복사한 Public Key</span><span class="lang lang-en">Copied Public Key</span></span>
+LANGFUSE_HOST<span class="token.operator">=</span><span class="token.string">"http://localhost:3000"</span>
+</code></pre>
                             </div>
                         </div>
 
                         <div>
-                            <h4 class="text-xl font-semibold"><span class="lang lang-ko">단계 3: Python 스크립트 실행 및 결과 확인</span><span class="lang lang-en">Step 3: Run the Python Script and Check the Results</span></h4>
-                            <p class="mt-4"><span class="lang lang-ko">이제 위에서 저장한 `run_agent.py` 파일을 실행합니다.</span><span class="lang lang-en">Now, run the `run_agent.py` file you saved earlier.</span></p>
+                            <h4 class="text-xl font-semibold">
+                                <span class="lang lang-ko">단계 4: Python 스크립트 실행 및 결과 확인</span>
+                                <span class="lang lang-en">Step 4: Run the Python Script and Check the Results</span>
+                            </h4>
+                            <p class="mt-4">
+                                <span class="lang lang-ko">이제 모든 설정이 완료되었습니다. 터미널에서 `run_agent.py` 파일을 실행합니다.</span>
+                                <span class="lang lang-en">All settings are now complete. Run the `run_agent.py` file from your terminal.</span>
+                            </p>
                             <div class="code-block" onclick="selectCodeBlock(this)" title="클릭하여 코드 선택">
                                 <pre><code>python run_agent.py</code></pre>
                             </div>
-                            <p class="mt-4"><span class="lang lang-ko">스크립트 실행이 완료된 후, 웹 브라우저를 열고 <a href="http://localhost:1984" target="_blank" class="text-blue-400 hover:underline">http://localhost:1984</a> 주소로 접속하세요. 아래와 같이 에이전트의 실행 과정을 시각적으로 추적할 수 있습니다.</span><span class="lang lang-en">After the script finishes, open a web browser and go to <a href="http://localhost:1984" target="_blank" class="text-blue-400 hover:underline">http://localhost:1984</a>. You can visually trace the agent's execution process as shown below.</span></p>
+                            <p class="mt-4">
+                                <span class="lang lang-ko">스크립트 실행이 완료된 후, 다시 <a href="http://localhost:3000" target="_blank" class="text-blue-400 hover:underline">http://localhost:3000</a>의 Langfuse 대시보드를 확인하세요. 아래와 같이 에이전트의 실행 과정(Trace)이 생성된 것을 시각적으로 추적할 수 있습니다.</span>
+                                <span class="lang lang-en">After the script finishes, check the Langfuse dashboard at <a href="http://localhost:3000" target="_blank" class="text-blue-400 hover:underline">http://localhost:3000</a> again. You will be able to visually track the agent's execution process (Trace) as shown below.</span>
+                            </p>
                             
-                            <!-- LangSmith UI Infographic -->
+                            <!-- Langfuse UI Infographic -->
                             <div class="mt-6 bg-gray-800 text-white rounded-xl shadow-2xl p-4 sm:p-6 font-mono text-xs sm:text-sm">
                                 <div class="flex items-center justify-between pb-3 border-b border-gray-600">
                                     <div class="flex items-center space-x-2">
-                                        <svg class="w-6 h-6 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z"></path></svg>
-                                        <span class="font-bold">Project: My First Agent</span>
+                                        <i data-lucide="activity" class="w-6 h-6 text-blue-400"></i>
+                                        <span class="font-bold">Project: My Local Project</span>
                                     </div>
-                                    <span class="text-gray-400 hidden sm:block">Trace ID: a1b2c3d4-e5f6</span>
+                                    <span class="text-gray-400 hidden sm:block">Traces</span>
                                 </div>
-                                <div class="mt-4 space-y-4">
-                                    <div class="bg-gray-900/50 p-3 rounded-lg">
-                                        <div class="font-bold text-green-400 flex items-center"><svg class="w-4 h-4 mr-2" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path></svg>Node: researcher</div>
-                                        <div class="mt-2 pl-4 border-l-2 border-gray-600 space-y-1">
-                                            <div class="text-yellow-400">Inputs:</div>
-                                            <div class="text-gray-300 bg-gray-700/50 p-2 rounded">{'topic': '인공지능의 역사'}</div>
-                                            <div class="mt-2 text-yellow-400">Outputs:</div>
-                                            <div class="text-gray-300 bg-gray-700/50 p-2 rounded">{'research_result': '1. 앨런 튜링의 튜링 테스트 제안...'}</div>
+                                <div class="mt-4 space-y-2">
+                                    <div class="bg-gray-900/50 p-3 rounded-lg flex justify-between items-center">
+                                        <div>
+                                            <div class="font-bold text-blue-400">invoke</div>
+                                            <div class="text-gray-400 text-xs mt-1">ID: a1b2c3d4-e5f6</div>
+                                        </div>
+                                        <div class="text-right">
+                                            <div class="text-green-400 font-semibold">2 Observations</div>
+                                            <div class="text-gray-400 text-xs mt-1">Latency: 3.2s</div>
                                         </div>
                                     </div>
-                                    <div class="text-center text-gray-500 text-lg">↓</div>
-                                    <div class="bg-gray-900/50 p-3 rounded-lg">
-                                        <div class="font-bold text-green-400 flex items-center"><svg class="w-4 h-4 mr-2" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path></svg>Node: writer</div>
-                                        <div class="mt-2 pl-4 border-l-2 border-gray-600 space-y-1">
-                                            <div class="text-yellow-400">Outputs:</div>
-                                            <div class="text-gray-300 bg-gray-700/50 p-2 rounded">{'final_output': '인공지능의 역사는 앨런 튜링이 제안한...'}</div>
+                                    <div class="bg-gray-900/50 p-3 rounded-lg flex justify-between items-center">
+                                        <div>
+                                            <div class="font-bold text-blue-400">invoke</div>
+                                            <div class="text-gray-400 text-xs mt-1">ID: b2c3d4e5-f6a7</div>
+                                        </div>
+                                        <div class="text-right">
+                                            <div class="text-green-400 font-semibold">2 Observations</div>
+                                            <div class="text-gray-400 text-xs mt-1">Latency: 2.8s</div>
                                         </div>
                                     </div>
                                 </div>
@@ -296,6 +408,8 @@ export LANGCHAIN_PROJECT<span class="token.operator">=</span><span class="token.
     </div>
 
     <script>
+        lucide.createIcons();
+
         function switchLang(lang) {
             document.documentElement.lang = lang;
             document.documentElement.classList.remove('lang-ko', 'lang-en');
@@ -338,14 +452,15 @@ export LANGCHAIN_PROJECT<span class="token.operator">=</span><span class="token.
             const initialLang = langFromStorage || browserLang;
             switchLang(initialLang);
 
+            const mainContent = document.querySelector('#main-content');
             const sections = document.querySelectorAll('main section');
             const navLi = document.querySelectorAll('aside nav a');
 
-            window.addEventListener('scroll', () => {
+            mainContent.addEventListener('scroll', () => {
                 let current = '';
                 sections.forEach(section => {
                     const sectionTop = section.offsetTop;
-                    if (pageYOffset >= sectionTop - 64) { // Match scroll-margin-top (4rem = 64px)
+                    if (mainContent.scrollTop >= sectionTop - 100) {
                         current = section.getAttribute('id');
                     }
                 });
@@ -360,7 +475,9 @@ export LANGCHAIN_PROJECT<span class="token.operator">=</span><span class="token.
             
             // Set initial active link
             if (navLi.length > 0) {
-                navLi[0].classList.add('active');
+                setTimeout(() => {
+                    mainContent.dispatchEvent(new Event('scroll'));
+                }, 100);
             }
         });
     </script>
