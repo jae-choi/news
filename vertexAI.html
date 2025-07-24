@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Vertex AI Interactive Infographic</title>
   <link rel="icon" href="https://avatars.githubusercontent.com/u/35217573?v=4" type="image/png" />
+  <link rel="icon" href="favicon.png" type="image/png" />
 
   <!-- Tailwind & Fonts -->
   <script src="https://cdn.tailwindcss.com"></script>
@@ -134,20 +135,21 @@
         <a href="#rag"                class="sidebar-link flex items-center px-4 py-2 rounded-lg text-gray-400">RAG Engine</a>
         <a href="#gen-ai-overview"    class="sidebar-link flex items-center px-4 py-2 rounded-lg text-gray-400"><span class="lang lang-ko">BigQuery 연동</span><span class="lang lang-en">BigQuery Integration</span></a>
         <a href="#use-cases"          class="sidebar-link flex items-center px-4 py-2 rounded-lg text-gray-400">Use Cases</a>
-        <a href="https://jae-choi.github.io/news/adk.html" target="_blank" class="sidebar-link flex items-center px-4 py-2 rounded-lg text-gray-400"><span class="lang lang-ko">ADK실습</span><span class="lang lang-en">ADK Workshop</span></a>
+        <a href="ADK.html" target="_blank" class="sidebar-link flex items-center px-4 py-2 rounded-lg text-gray-400"><span class="lang lang-ko">ADK실습_1</span><span class="lang lang-en">ADK Workshop 1</span></a>
+        <a href="Semantic_Lexical_latest.html" target="_blank" class="sidebar-link flex items-center px-4 py-2 rounded-lg text-gray-400"><span class="lang lang-ko">ADK실습_2</span><span class="lang lang-en">ADK Workshop 2</span></a>
         <a href="ADKvs.html" target="_blank" class="sidebar-link flex items-center px-4 py-2 rounded-lg text-gray-400">ADK vs Langraph</a>
     </aside>
 
     <!-- Main Content -->
     <!-- scroll-smooth + scroll-pt-20 : 헤더 높이 80px 만큼 여백 확보 -->
     <main class="flex-1 p-6 md:p-10 overflow-y-auto scroll-smooth">
-        <div class="flex justify-between items-center mb-8">
-            <a href="index.html" class="back-link">&larr; <span class="lang lang-ko">메인으로 돌아가기</span><span class="lang lang-en">Back to Main</span></a>
-            <div class="flex items-center bg-gray-800 rounded-full p-1">
-                <button id="btn-ko" class="lang-btn" onclick="switchLang('ko')">KOR</button>
-                <button id="btn-en" class="lang-btn" onclick="switchLang('en')">ENG</button>
-            </div>
+      <div class="flex justify-between items-center mb-8">
+        <a href="index.html" class="back-link">&larr; <span class="lang lang-ko">메인으로 돌아가기</span><span class="lang lang-en">Back to Main</span></a>
+        <div class="flex items-center bg-gray-800 rounded-full p-1">
+            <button id="btn-ko" class="lang-btn" onclick="switchLang('ko')">KOR</button>
+            <button id="btn-en" class="lang-btn" onclick="switchLang('en')">ENG</button>
         </div>
+      </div>
       <div class="prose prose-lg max-w-none">
 
         <!-- ============== SECTION 1 ============== -->
@@ -374,7 +376,7 @@ graph TD
               <div class="md:w-2/3 p-8">
                 <h4 class="text-xl font-bold text-gray-200 mb-3"><span class="lang lang-ko">자연어 기반 데이터 분석 시스템</span><span class="lang lang-en">Natural Language-Based Data Analysis System</span></h4>
                 <p class="text-gray-400 mb-4 leading-relaxed"><strong>Challenge:</strong> <span class="lang lang-ko">방대한 데이터를 일반 사용자가 자연어 질의로 쉽게 분석하여 데이터 활용도를 극대화하고 의사결정 과정 효율화</span><span class="lang lang-en">Enable general users to easily analyze vast amounts of data with natural language queries to maximize data utilization and streamline decision-making.</span></p>
-                <p class="text-gray-400 mb-4 leading-relaxed"><strong>Solution:</strong> <span class="lang lang-ko"></span>Vertex AI의 NLP 기능으로 데이터 스키마와 컨텍스트를 이해하고, 사용자의 질의에 맞는 SQL 쿼리 생성</span><span class="lang lang-en">Used Vertex AI's NLP capabilities to understand data schema and context, and generate appropriate SQL queries for user questions.</span></p>
+                <p class="text-gray-400 mb-4 leading-relaxed"><strong>Solution:</strong> <span class="lang lang-ko">Vertex AI의 NLP 기능으로 데이터 스키마와 컨텍스트를 이해하고, 사용자의 질의에 맞는 SQL 쿼리 생성</span><span class="lang lang-en">Used Vertex AI's NLP capabilities to understand data schema and context, and generate appropriate SQL queries for user questions.</span></p>
                 <p class="text-xs text-gray-500 mt-4">Products: VertexAI, Gemini model Pro/Flash, Vertex Colab CPU, BigQuery</p>
               </div>
               <div class="md:w-1/3 bg-gradient-to-r from-green-800 to-green-700 p-8 flex flex-col justify-center items-center text-white">
@@ -436,7 +438,7 @@ graph TD
               </div>
               <div class="md:w-1/3 bg-gradient-to-r from-fuchsia-700 to-fuchsia-600 p-8 flex flex-col justify-center items-center text-white">
                 <div class="text-6xl mb-4">🎤</div>
-                <h3 class="text-2xl font-bold"><span class="lang lang-ko"></span>엔터테인먼트 분야</span><span class="lang lang-en">Entertainment</span></h3>
+                <h3 class="text-2xl font-bold"><span class="lang lang-ko">엔터테인먼트 분야</span><span class="lang lang-en">Entertainment</span></h3>
               </div>
             </div>
 
@@ -521,7 +523,7 @@ graph TD
               <div class="md:w-2/3 p-8">
                 <h4 class="text-xl font-bold text-gray-200 mb-3"><span class="lang lang-ko">Databricks to BigQuery 마이그레이션</span><span class="lang lang-en">Databricks to BigQuery Migration</span></h4>
                 <p class="text-gray-400 mb-4 leading-relaxed"><strong>Challenge:</strong> <span class="lang lang-ko">데이터 분석 환경의 확장성과 효율성 증대.</span><span class="lang lang-en">Increase the scalability and efficiency of the data analysis environment.</span></p>
-                <p class="text-gray-400 mb-4 leading-relaxed"><strong>Solution:</strong> <span class="lang lang-ko"></span>Databricks의 데이터를 Google BigQuery로 이전하여 데이터 분석 환경을 고도화.</span><span class="lang lang-en">Advanced the data analysis environment by migrating data from Databricks to Google BigQuery.</span></p>
+                <p class="text-gray-400 mb-4 leading-relaxed"><strong>Solution:</strong> <span class="lang lang-ko">Databricks의 데이터를 Google BigQuery로 이전하여 데이터 분석 환경을 고도화.</span><span class="lang lang-en">Advanced the data analysis environment by migrating data from Databricks to Google BigQuery.</span></p>
                 <p class="text-xs text-gray-500 mt-4">Products: BigQuery, Databricks</p>
               </div>
             </div>
@@ -533,7 +535,7 @@ graph TD
       <!-- Footer -->
       <footer class="mt-24 py-8 border-t border-gray-700">
         <div class="text-center">
-          <p class="text-gray-500">&copy; 2025 Vertex AI Architect. Peter Choi.</p>
+          <p class="text-gray-500">&copy; 2025 Vertex AI Architect. Megazone.</p>
         </div>
       </footer>
     </main>
@@ -564,10 +566,11 @@ graph TD
     }
 
     document.addEventListener("DOMContentLoaded", () => {
-        const langFromStorage = localStorage.getItem('language');
-        const browserLang = (navigator.language || navigator.userLanguage).startsWith('en') ? 'en' : 'ko';
-        const initialLang = langFromStorage || browserLang;
-        switchLang(initialLang);
+      const langFromStorage = localStorage.getItem('language');
+      const browserLang = (navigator.language || navigator.userLanguage).startsWith('en') ? 'en' : 'ko';
+      const initialLang = langFromStorage || browserLang;
+      switchLang(initialLang);
+
       const menuToggle = document.getElementById("menu-toggle");
       const sidebar = document.getElementById("sidebar");
       const openIcon = document.getElementById("menu-open-icon");
