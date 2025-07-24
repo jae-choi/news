@@ -1,0 +1,1094 @@
+<!DOCTYPE html>
+<html lang="ko" class="lang-ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GenAI Search System Guide</title>
+    <link rel="icon" href="https://avatars.githubusercontent.com/u/35217573?v=4" type="image/png" />
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Noto+Sans+KR:wght@400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+    <script>hljs.highlightAll();</script>
+    <style>
+        body {
+            font-family: 'Inter', 'Noto Sans KR', sans-serif;
+        }
+        .gradient-text {
+            background: linear-gradient(to right, #4f46e5, #ec4899);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        .card {
+            background-color: white;
+            border-radius: 0.75rem;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+        }
+        code.language-python, code.language-sql, code.language-bash {
+            font-family: 'Fira Code', 'D2Coding', monospace;
+        }
+        pre code.hljs {
+            display: block;
+            padding: 1.5rem;
+            border-radius: 0.5rem;
+            white-space: pre-wrap;
+            word-break: break-all;
+        }
+        .tag {
+            display: inline-block;
+            padding: 0.25rem 0.75rem;
+            border-radius: 9999px;
+            font-weight: 500;
+            font-size: 0.875rem;
+        }
+        pre:hover {
+            filter: brightness(120%);
+            transition: filter 0.2s ease;
+        }
+        .sidebar {
+            position: fixed;
+            top: 10rem;
+            left: 2rem;
+            background: white;
+            border-radius: 0.5rem;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            padding: 1rem;
+            width: 22rem;
+        }
+        .sidebar .menu-item > a {
+            display: block;
+            padding: 0.5rem 1rem;
+            border-radius: 0.375rem;
+            color: #4b5563;
+            font-weight: 600; /* Bolder for main categories */
+            transition: background-color 0.2s, color 0.2s;
+            cursor: pointer;
+        }
+        .sidebar .submenu a {
+            display: block;
+            padding: 0.4rem 1rem 0.4rem 2rem; /* Indented */
+            border-radius: 0.375rem;
+            color: #6b7280;
+            font-weight: 400; /* Lighter for sub-categories */
+            font-size: 0.9rem; /* Smaller font for sub-categories */
+            transition: background-color 0.2s, color 0.2s;
+        }
+        .sidebar a:hover {
+            background-color: #f3f4f6;
+        }
+        .sidebar a.active {
+            background-color: #4f46e5;
+            color: white !important;
+        }
+        .sidebar .submenu {
+            display: none; /* Hide submenu by default */
+            padding-left: 0;
+            margin-top: 0.25rem;
+            margin-bottom: 0.25rem;
+        }
+        .sidebar .menu-item.open > .submenu {
+            display: block; /* Show submenu when parent is open */
+        }
+        @keyframes pulse-arrow {
+            0%, 100% { transform: translateX(0) rotate(var(--tw-rotate)); }
+            50% { transform: translateX(5px) rotate(var(--tw-rotate)); }
+        }
+        .arrow-animate {
+            animation: pulse-arrow 1.5s ease-in-out infinite;
+        }
+        @media (max-width: 1280px) {
+            .sidebar {
+                display: none;
+            }
+        }
+        /* Language switcher styles */
+        .lang-ko .lang-en,
+        .lang-en .lang-ko {
+            display: none;
+        }
+        .lang-btn {
+            transition: all 0.2s ease-in-out;
+            border-radius: 9999px;
+            padding: 0.25rem 0.75rem;
+            font-size: 0.875rem;
+            border: 1px solid transparent;
+        }
+        .lang-btn.active {
+            font-weight: 600;
+            background-color: #4f46e5; /* indigo-600 */
+            color: white;
+        }
+        .lang-btn:not(.active) {
+            color: #4b5563; /* gray-600 */
+            background-color: transparent;
+        }
+    </style>
+</head>
+<body class="bg-gray-50 text-gray-800">
+
+    <!-- Sidebar Navigation -->
+    <nav class="sidebar">
+        <div class="menu-item"><a href="#overview"><span class="lang lang-ko">1. 개요</span><span class="lang lang-en">1. Overview</span></a></div>
+        <div class="menu-item"><a href="#architecture"><span class="lang lang-ko">2. 아키텍처</span><span class="lang lang-en">2. Architecture</span></a></div>
+        <div class="menu-item">
+            <a data-toggle-submenu><span class="lang lang-ko">3. 코드 구조</span><span class="lang lang-en">3. Code Structure</span></a>
+            <div class="submenu">
+                <a href="#functions-core"><span class="lang lang-ko">3.1. 핵심 함수</span><span class="lang lang-en">3.1. Core Functions</span></a>
+                <a href="#functions-full-code"><span class="lang lang-ko">3.2. 전체 코드</span><span class="lang lang-en">3.2. Full Code</span></a>
+                <a href="#functions-adk-guide"><span class="lang lang-ko">3.3. ADK 전환 가이드</span><span class="lang lang-en">3.3. ADK Conversion Guide</span></a>
+            </div>
+        </div>
+        <div class="menu-item">
+            <a data-toggle-submenu><span class="lang lang-ko">4. 실행 방법</span><span class="lang lang-en">4. Execution Guide</span></a>
+            <div class="submenu">
+                <a href="#execution-data-prep"><span class="lang lang-ko">4.1. 데이터 준비</span><span class="lang lang-en">4.1. Data Preparation</span></a>
+                <a href="#execution-prereqs"><span class="lang lang-ko">4.2. 사전 준비 사항</span><span class="lang lang-en">4.2. Prerequisites</span></a>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container px-4 py-12 max-w-5xl xl:ml-[26rem]">
+        
+        <div class="flex justify-end items-center mb-8">
+            <div class="flex items-center bg-white rounded-full p-1 shadow-md">
+                <button id="btn-ko" class="lang-btn" onclick="switchLang('ko')">KOR</button>
+                <button id="btn-en" class="lang-btn" onclick="switchLang('en')">ENG</button>
+            </div>
+        </div>
+
+        <!-- Header -->
+        <header class="text-center mb-16">
+            <h1 class="text-4xl md:text-5xl font-bold tracking-tight mb-4">
+                <span class="gradient-text"><span class="lang lang-ko">GenAI 기반 검색시스템 구축</span><span class="lang lang-en">Building a GenAI-Powered Search System</span></span>
+            </h1>
+            <p class="text-lg text-gray-600"><span class="lang lang-ko">Discovery Engine과 LLM을 활용한 Q&A 챗봇 개발 가이드</span><span class="lang lang-en">A Guide to Developing a Q&A Chatbot using Discovery Engine and LLMs</span></p>
+        </header>
+
+        <main class="space-y-16">
+
+            <!-- Section 1: 개요 -->
+            <section id="overview" class="card p-8">
+                <h2 class="flex items-center text-2xl font-bold mb-6 border-b pb-4">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="mr-3 text-indigo-500"><path d="m12 14 4-4"></path><path d="M3.34 19a10 10 0 1 1 17.32 0"></path></svg>
+                    <span class="lang lang-ko">1. 개요</span><span class="lang lang-en">1. Overview</span>
+                </h2>
+                <p class="mb-8 text-gray-600">
+                    <span class="lang lang-ko">이 애플리케이션은 Streamlit을 사용하여 구축된 대화형 Q&A 시스템입니다. 사용자가 자연어 질문을 입력하면, Google Cloud의 Discovery Engine과 BigQuery를 통해 연구 논문 데이터베이스를 검색하고, Google Gemini Pro (LLM)를 활용하여 질문에 대한 답변을 생성합니다.</span>
+                    <span class="lang lang-en">This application is an interactive Q&A system built using Streamlit. When a user enters a natural language question, it searches a research paper database via Google Cloud's Discovery Engine and BigQuery, and generates an answer using Google Gemini Pro (LLM).</span>
+                </p>
+
+                <div class="grid md:grid-cols-2 gap-8">
+                    <div>
+                        <h3 class="text-xl font-semibold mb-4"><span class="lang lang-ko">주요 기능</span><span class="lang lang-en">Key Features</span></h3>
+                        <ul class="space-y-3">
+                            <li class="flex items-start"><span class="text-indigo-500 mr-3 mt-1">✓</span><span><strong><span class="lang lang-ko">자연어 질의응답:</span><span class="lang lang-en">Natural Language Q&A:</span></strong> <span class="lang lang-ko">논문 내용, 저자, 연도 등 다양한 조건으로 질문</span><span class="lang lang-en">Ask questions with various criteria like content, author, and year.</span></span></li>
+                            <li class="flex items-start"><span class="text-indigo-500 mr-3 mt-1">✓</span><span><strong><span class="lang lang-ko">정확한 ID 검색:</span><span class="lang lang-en">Exact ID Search:</span></strong> <span class="lang lang-ko">BigQuery에서 직접 데이터를 조회하여 빠르고 정확한 검색 지원</span><span class="lang lang-en">Supports fast and accurate search by directly querying data from BigQuery.</span></span></li>
+                            <li class="flex items-start"><span class="text-indigo-500 mr-3 mt-1">✓</span><span><strong><span class="lang lang-ko">의미 기반 검색:</span><span class="lang lang-en">Semantic Search:</span></strong> <span class="lang lang-ko">Discovery Engine으로 사용자 의도를 파악하여 유사 문서 검색</span><span class="lang lang-en">Searches for similar documents by understanding user intent with Discovery Engine.</span></span></li>
+                            <li class="flex items-start"><span class="text-indigo-500 mr-3 mt-1">✓</span><span><strong><span class="lang lang-ko">복합 및 후속 질문 처리:</span><span class="lang lang-en">Complex & Follow-up Questions:</span></strong> <span class="lang lang-ko">대화 맥락을 기억하여 후속 질문 처리</span><span class="lang lang-en">Handles follow-up questions by remembering the conversation context.</span></span></li>
+                            <li class="flex items-start"><span class="text-indigo-500 mr-3 mt-1">✓</span><span><strong><span class="lang lang-ko">관련 논문 추천:</span><span class="lang lang-en">Related Paper Recommendations:</span></strong> <span class="lang lang-ko">TF-IDF와 코사인 유사도 기반으로 관련 논문 추천</span><span class="lang lang-en">Recommends related papers based on TF-IDF and cosine similarity.</span></span></li>
+                            <li class="flex items-start"><span class="text-indigo-500 mr-3 mt-1">✓</span><span><strong><span class="lang lang-ko">대화 히스토리 및 시각화:</span><span class="lang lang-en">History & Visualization:</span></strong> <span class="lang lang-ko">대화 기록 관리 및 검색 결과 시각화</span><span class="lang lang-en">Manages conversation history and visualizes search results.</span></span></li>
+                        </ul>
+                    </div>
+                    <div>
+                        <h3 class="text-xl font-semibold mb-4"><span class="lang lang-ko">사용 기술 스택</span><span class="lang lang-en">Technology Stack</span></h3>
+                        <div class="flex flex-wrap gap-3">
+                            <span class="tag bg-blue-100 text-blue-800">Streamlit</span>
+                            <span class="tag bg-green-100 text-green-800">Google Gemini Pro</span>
+                            <span class="tag bg-yellow-100 text-yellow-800">Discovery Engine</span>
+                            <span class="tag bg-purple-100 text-purple-800">BigQuery</span>
+                            <span class="tag bg-red-100 text-red-800">Pandas</span>
+                            <span class="tag bg-gray-200 text-gray-800">Scikit-learn</span>
+                            <span class="tag bg-indigo-100 text-indigo-800">LangChain</span>
+                            <span class="tag bg-green-200 text-green-900">Google ADK</span>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Section 2: 시스템 아키텍처 -->
+            <section id="architecture" class="card p-8">
+                <h2 class="flex items-center text-2xl font-bold mb-6 border-b pb-4">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="mr-3 text-indigo-500"><path d="M12 20V10"></path><path d="M18 20V4"></path><path d="M6 20V16"></path></svg>
+                    <span class="lang lang-ko">2. 시스템 아키텍처</span><span class="lang lang-en">2. System Architecture</span>
+                </h2>
+
+                <!-- Infographic Start -->
+                <div class="my-10 p-6 bg-slate-50 rounded-xl border border-slate-200">
+                    <h3 class="font-semibold text-xl text-center mb-8 text-slate-700"><span class="lang lang-ko">시스템 구성도</span><span class="lang lang-en">System Diagram</span></h3>
+                    <div class="flex flex-col md:flex-row items-center justify-center space-y-6 md:space-y-0 md:space-x-4">
+                        
+                        <!-- Step 1: Input -->
+                        <div class="flex flex-col items-center text-center w-40">
+                            <div class="w-20 h-20 rounded-full bg-blue-100 flex items-center justify-center border-2 border-blue-200">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-10 h-10 text-blue-600"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/><path d="m15 5 4 4"/></svg>
+                            </div>
+                            <div class="mt-3 flex flex-col justify-center" style="min-height: 60px;">
+                                <p class="font-bold text-slate-800"><span class="lang lang-ko">1. 질의</span><span class="lang lang-en">1. Query</span></p>
+                                <p class="text-sm text-slate-500"><span class="lang lang-ko">사용자 입력</span><span class="lang lang-en">User Input</span></p>
+                            </div>
+                        </div>
+
+                        <div class="text-3xl text-slate-400 transform md:rotate-0 rotate-90 arrow-animate">›</div>
+
+                        <!-- Step 2: Analysis -->
+                        <div class="flex flex-col items-center text-center w-40">
+                            <div class="w-20 h-20 rounded-full bg-purple-100 flex items-center justify-center border-2 border-purple-200">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-10 h-10 text-purple-600"><path d="m21.73 18-8-14a2 2 0 0 0-3.46 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"/><path d="M12 9v4"/><path d="M12 17h.01"/></svg>
+                            </div>
+                            <div class="mt-3 flex flex-col justify-center" style="min-height: 60px;">
+                                <p class="font-bold text-slate-800"><span class="lang lang-ko">2. 분석/검색</span><span class="lang lang-en">2. Analyze/Search</span></p>
+                                <p class="text-sm text-slate-500"><span class="lang lang-ko">유형 분석 및<br>데이터 조회</span><span class="lang lang-en">Type Analysis &<br>Data Retrieval</span></p>
+                            </div>
+                        </div>
+
+                        <div class="text-3xl text-slate-400 transform md:rotate-0 rotate-90 arrow-animate">›</div>
+
+                        <!-- Step 3: Generation -->
+                        <div class="flex flex-col items-center text-center w-40">
+                            <div class="w-20 h-20 rounded-full bg-green-100 flex items-center justify-center border-2 border-green-200">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-10 h-10 text-green-600"><path d="M12 8V4H8"/><rect width="16" height="12" x="4" y="8" rx="2"/><path d="M2 14h2"/><path d="M20 14h2"/><path d="M15 13v2"/><path d="M9 13v2"/></svg>
+                            </div>
+                            <div class="mt-3 flex flex-col justify-center" style="min-height: 60px;">
+                                <p class="font-bold text-slate-800"><span class="lang lang-ko">3. 생성</span><span class="lang lang-en">3. Generate</span></p>
+                                <p class="text-sm text-slate-500"><span class="lang lang-ko">LLM 프롬프트 및<br>답변 생성</span><span class="lang lang-en">LLM Prompt &<br>Answer Generation</span></p>
+                            </div>
+                        </div>
+
+                        <div class="text-3xl text-slate-400 transform md:rotate-0 rotate-90 arrow-animate">›</div>
+
+                        <!-- Step 4: Display -->
+                        <div class="flex flex-col items-center text-center w-40">
+                            <div class="w-20 h-20 rounded-full bg-pink-100 flex items-center justify-center border-2 border-pink-200">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-10 h-10 text-pink-600"><path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><line x1="10" y1="9" x2="8" y2="9"/></svg>
+                            </div>
+                            <div class="mt-3 flex flex-col justify-center" style="min-height: 60px;">
+                                <p class="font-bold text-slate-800"><span class="lang lang-ko">4. 결과</span><span class="lang lang-en">4. Result</span></p>
+                                <p class="text-sm text-slate-500"><span class="lang lang-ko">UI 렌더링 및<br>스트리밍</span><span class="lang lang-en">UI Rendering &<br>Streaming</span></p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="mt-6 text-center text-sm text-slate-600">
+                        <p><strong><span class="lang lang-ko">주요 구성 요소:</span><span class="lang lang-en">Key Components:</span></strong> Google Discovery Engine, BigQuery, Gemini Pro, Streamlit/ADK</p>
+                    </div>
+                </div>
+                <!-- Infographic End -->
+                <ol class="relative border-l border-gray-200 space-y-10 ml-4">
+                    <li class="ml-6">
+                        <span class="absolute flex items-center justify-center w-8 h-8 bg-indigo-100 rounded-full -left-4 ring-8 ring-white">1</span>
+                        <h3 class="font-semibold text-lg"><span class="lang lang-ko">질문 입력 (User Input)</span><span class="lang lang-en">User Input</span></h3>
+                        <p class="text-gray-600"><span class="lang lang-ko">사용자가 웹 UI(Streamlit 또는 ADK Web)에서 질문을 입력합니다.</span><span class="lang lang-en">The user enters a question in the web UI (Streamlit or ADK Web).</span></p>
+                    </li>
+                    <li class="ml-6">
+                        <span class="absolute flex items-center justify-center w-8 h-8 bg-indigo-100 rounded-full -left-4 ring-8 ring-white">2</span>
+                        <h3 class="font-semibold text-lg"><span class="lang lang-ko">질의 유형 분석 (Query Analysis)</span><span class="lang lang-en">Query Analysis</span></h3>
+                        <p class="text-gray-600"><span class="lang lang-ko">ID, 후속 질문 키워드 등을 분석하여 질문 유형을 판단합니다.</span><span class="lang lang-en">The system analyzes keywords for IDs, follow-up questions, etc., to determine the query type.</span></p>
+                    </li>
+                    <li class="ml-6">
+                        <span class="absolute flex items-center justify-center w-8 h-8 bg-indigo-100 rounded-full -left-4 ring-8 ring-white">3</span>
+                        <h3 class="font-semibold text-lg"><span class="lang lang-ko">데이터 검색 (Data Retrieval)</span><span class="lang lang-en">Data Retrieval</span></h3>
+                        <p class="text-gray-600"><span class="lang lang-ko">ID 검색은 BigQuery, 그 외는 Discovery Engine을 사용합니다. ADK에서는 이 기능들이 `@tool`로 정의됩니다.</span><span class="lang lang-en">BigQuery is used for ID searches, and Discovery Engine for all others. In ADK, these functions are defined as `@tool`.</span></p>
+                    </li>
+                    <li class="ml-6">
+                        <span class="absolute flex items-center justify-center w-8 h-8 bg-indigo-100 rounded-full -left-4 ring-8 ring-white">4</span>
+                        <h3 class="font-semibold text-lg"><span class="lang lang-ko">데이터 필터링 및 정제 (Filtering & Refinement)</span><span class="lang lang-en">Filtering & Refinement</span></h3>
+                        <p class="text-gray-600"><span class="lang lang-ko">키워드, 연도, 유사도 등으로 검색 결과를 정제합니다.</span><span class="lang lang-en">Search results are refined by keyword, year, similarity, etc.</span></p>
+                    </li>
+                    <li class="ml-6">
+                        <span class="absolute flex items-center justify-center w-8 h-8 bg-indigo-100 rounded-full -left-4 ring-8 ring-white">5</span>
+                        <h3 class="font-semibold text-lg"><span class="lang lang-ko">LLM 프롬프트 생성 (Prompt Generation)</span><span class="lang lang-en">Prompt Generation</span></h3>
+                        <p class="text-gray-600"><span class="lang lang-ko">검색 결과와 대화 히스토리를 조합해 LLM용 프롬프트를 만듭니다.</span><span class="lang lang-en">An LLM prompt is created by combining search results and conversation history.</span></p>
+                    </li>
+                    <li class="ml-6">
+                        <span class="absolute flex items-center justify-center w-8 h-8 bg-indigo-100 rounded-full -left-4 ring-8 ring-white">6</span>
+                        <h3 class="font-semibold text-lg"><span class="lang lang-ko">답변 생성 및 스트리밍 (Answer Generation)</span><span class="lang lang-en">Answer Generation</span></h3>
+                        <p class="text-gray-600"><span class="lang lang-ko">LLM이 생성하는 답변을 실시간으로 UI에 표시합니다. ADK에서는 `adk-chat` 컴포넌트가 이를 처리합니다.</span><span class="lang lang-en">The answer generated by the LLM is streamed to the UI in real-time. In ADK, the `adk-chat` component handles this.</span></p>
+                    </li>
+                    <li class="ml-6">
+                        <span class="absolute flex items-center justify-center w-8 h-8 bg-indigo-100 rounded-full -left-4 ring-8 ring-white">7</span>
+                        <h3 class="font-semibold text-lg"><span class="lang lang-ko">결과 표시 (Display Results)</span><span class="lang lang-en">Display Results</span></h3>
+                        <p class="text-gray-600"><span class="lang lang-ko">답변과 함께 검색된 데이터(테이블)를 UI에 렌더링합니다.</span><span class="lang lang-en">The answer and the retrieved data (table) are rendered in the UI.</span></p>
+                    </li>
+                </ol>
+            </section>
+
+            <!-- Section 3: 코드 구조 및 핵심 함수 설명 -->
+            <section id="functions" class="card p-8">
+                <h2 class="flex items-center text-2xl font-bold mb-6 border-b pb-4">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="mr-3 text-indigo-500"><polyline points="16 18 22 12 16 6"></polyline><polyline points="8 6 2 12 8 18"></polyline></svg>
+                    <span class="lang lang-ko">3. 코드 구조 및 핵심 함수 설명</span><span class="lang lang-en">3. Code Structure and Core Functions</span>
+                </h2>
+                <div class="space-y-12">
+                    <div id="functions-core">
+                        <h3 class="font-semibold text-xl mb-4"><span class="lang lang-ko">3.1. 핵심 함수</span><span class="lang lang-en">3.1. Core Functions</span></h3>
+                        <div class="space-y-6">
+                            <div>
+                                <h4 class="font-semibold text-lg"><code>retrieve_documents_as_dataframe(question)</code></h4>
+                                <p class="text-gray-600"><span class="lang lang-ko">Discovery Engine API를 호출하여 문서를 검색하고, 결과를 1시간 동안 캐싱합니다.</span><span class="lang lang-en">Calls the Discovery Engine API to search for documents and caches the results for 1 hour.</span></p>
+                            </div>
+                            <div>
+                                <h4 class="font-semibold text-lg"><code>query_bigquery_by_id(doc_id)</code></h4>
+                                <p class="text-gray-600"><span class="lang lang-ko">논문 ID를 사용해 BigQuery 테이블을 직접 쿼리하며, SQL 인젝션을 방지합니다.</span><span class="lang lang-en">Directly queries the BigQuery table using a paper ID, preventing SQL injection.</span></p>
+                            </div>
+                            <div>
+                                <h4 class="font-semibold text-lg"><code>find_related_documents(target_doc, all_docs_df)</code></h4>
+                                <p class="text-gray-600"><span class="lang lang-ko">TF-IDF와 코사인 유사도를 계산하여 기준 논문과 가장 유사한 논문을 찾습니다.</span><span class="lang lang-en">Finds the most similar papers to a reference paper by calculating TF-IDF and cosine similarity.</span></p>
+                            </div>
+                            <div>
+                                <h4 class="font-semibold text-lg"><code>generate_answer_stream(question, docs)</code></h4>
+                                <p class="text-gray-600"><span class="lang lang-ko">대화 히스토리, 참고 문서를 조합하여 LLM 프롬프트를 구성하고 답변을 스트리밍합니다.</span><span class="lang lang-en">Constructs an LLM prompt by combining conversation history and reference documents, then streams the answer.</span></p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Full Code Section -->
+                    <div id="functions-full-code" class="pt-8 border-t mt-8">
+                        <h3 class="font-semibold text-xl mb-3"><span class="lang lang-ko">3.2. 전체 코드 (Streamlit)</span><span class="lang lang-en">3.2. Full Code (Streamlit)</span></h3>
+                        <p class="text-gray-600 mb-4">
+                            <span class="lang lang-ko">아래는 이 매뉴얼의 기반이 되는 원본 Streamlit 애플리케이션의 전체 Python 코드입니다.</span>
+                            <span class="lang lang-en">Below is the full Python code for the original Streamlit application that this manual is based on.</span>
+                        </p>
+                        <div class="relative">
+<pre><code id="full-code" class="language-python">
+# 이 코드는 Streamlit 버전의 원본 코드입니다.
+# ADK 버전으로의 변환은 아래 가이드를 참고하세요.
+import streamlit as st
+import requests
+import re
+import pandas as pd
+from google.auth import default, exceptions as google_auth_exceptions
+from google.auth.transport.requests import Request
+from google.cloud import bigquery
+from langchain_google_genai import ChatGoogleGenerativeAI
+import os
+from sklearn.feature_extraction.text import TfidfVectorizer
+from sklearn.metrics.pairwise import cosine_similarity
+import logging
+
+# ------------------------------
+# 로깅 설정
+# ------------------------------
+logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
+
+# ------------------------------
+# 환경 설정
+# ------------------------------
+# 중요: 실제 운영 환경에서는 API 키와 같은 민감한 정보를 코드에 직접 하드코딩하지 마세요.
+# Streamlit Secrets, 환경 변수, 또는 Google Secret Manager와 같은 안전한 방법을 사용하세요.
+os.environ["GOOGLE_API_KEY"] = "YOUR_API_KEY"
+PROJECT_NUMBER = "YOUR_PROJECT_NUMBER"
+ENGINE_ID = "YOUR_ENGINE_ID"
+BIGQUERY_TABLE = "YOUR_PROJECT_ID.YOUR_DATASET.YOUR_TABLE"
+
+DISCOVERY_ENDPOINT = f"https://discoveryengine.googleapis.com/v1alpha/projects/{PROJECT_NUMBER}/locations/global/collections/default_collection/engines/{ENGINE_ID}/servingConfigs/default_search:search"
+
+llm = ChatGoogleGenerativeAI(model="gemini-2.0-flash-001", streaming=True)
+
+# Streamlit 세션 상태 초기화
+if "chat_history" not in st.session_state:
+    st.session_state.chat_history = []
+if "last_authors" not in st.session_state:
+    st.session_state.last_authors = None
+if "last_doc_ids" not in st.session_state:
+    st.session_state.last_doc_ids = set()
+if "context_docs" not in st.session_state:
+    st.session_state.context_docs = []
+if "last_search_query" not in st.session_state:
+    st.session_state.last_search_query = ""
+
+# ------------------------------
+# 유틸 함수
+# ------------------------------
+def extract_id(question: str):
+    match = re.search(r'id[=\s:]+([a-f0-9\-]+)', question, re.IGNORECASE)
+    return match.group(1) if match else None
+
+def extract_doi_or_url(question: str):
+    doi_match = re.search(r'(10\.\d{4,9}/[^\s]+)', question)
+    if doi_match: return doi_match.group(1)
+    url_match = re.search(r'https://(?:www\.)?biorxiv\.org/content/([^\s]+)', question)
+    if url_match: return url_match.group(1)
+    return None
+
+def extract_keywords_and_years(question: str):
+    years = re.findall(r'(19|20)\d{2}', question)
+    year = years[0] if years else None
+    words = re.findall(r'\b([A-Z][a-zA-Z\-\'.]+(?:\s[A-Z][a-zA-Z\-\'.]+)*)\b', question)
+    keyword = " ".join(words) if words else None
+    return keyword, year
+
+def extract_keywords_from_question(question: str) -> str:
+    keywords = re.findall(r'\b\w+\b', question)
+    return " ".join([word for word in keywords if len(word) > 2])
+
+# ------------------------------
+# 필터 함수
+# ------------------------------
+def filter_relevant_documents(df: pd.DataFrame, question: str) -> pd.DataFrame:
+    logging.info(f"필터링 시작. 입력 행 개수: {len(df)}")
+    if df.empty: return pd.DataFrame()
+
+    keyword, year = extract_keywords_and_years(question)
+    
+    if not keyword and not year: return df
+
+    def row_matches(row):
+        keyword_match = True
+        if keyword:
+            keyword_match = any(keyword.lower() in str(row.get(col, "")).lower() for col in ["title", "abstract", "authors"])
+        
+        year_match = True
+        if year:
+            year_match = str(year) in str(row.get("date", ""))
+            
+        return keyword_match and year_match
+
+    return df[df.apply(row_matches, axis=1)]
+
+# ------------------------------
+# 검색 함수
+# ------------------------------
+@st.cache_data(ttl=3600)
+def retrieve_documents_as_dataframe(question: str, top_k: int = 20):
+    logging.info(f"Discovery Engine 검색: '{question}'")
+    try:
+        credentials, _ = default(scopes=["https://www.googleapis.com/auth/cloud-platform"])
+        credentials.refresh(Request())
+    except Exception as e:
+        st.error(f"❌ Google Cloud 인증 실패: {e}")
+        return pd.DataFrame()
+
+    headers = {"Authorization": f"Bearer {credentials.token}", "Content-Type": "application/json"}
+    body = {
+        "pageSize": top_k,
+        "query": question,
+        "languageCode": "ko",
+        "queryExpansionSpec": {"condition": "AUTO"},
+        "spellCorrectionSpec": {"mode": "AUTO"}
+    }
+
+    try:
+        response = requests.post(DISCOVERY_ENDPOINT, headers=headers, json=body)
+        response.raise_for_status()
+        data = response.json()
+        rows = [doc.get("document", {}).get("structData", {}) for doc in data.get("results", [])]
+        logging.info(f"Discovery Engine 검색 성공. 결과 {len(rows)}개")
+        return pd.DataFrame(rows)
+    except requests.exceptions.RequestException as e:
+        st.error(f"❌ Discovery Engine 검색 실패: {e}")
+        return pd.DataFrame()
+
+# ------------------------------
+# BigQuery 직접 쿼리 함수
+# ------------------------------
+@st.cache_data(ttl=3600)
+def query_bigquery_by_id(doc_id: str) -> pd.DataFrame:
+    logging.info(f"BigQuery 쿼리: ID='{doc_id}'")
+    try:
+        bq_client = bigquery.Client()
+        query = f"SELECT * FROM `{BIGQUERY_TABLE}` WHERE id = @doc_id"
+        job_config = bigquery.QueryJobConfig(query_parameters=[bigquery.ScalarQueryParameter("doc_id", "STRING", doc_id)])
+        return bq_client.query(query, job_config=job_config).to_dataframe()
+    except Exception as e:
+        st.error(f"❌ BigQuery 쿼리 오류: {e}")
+        return pd.DataFrame()
+
+# ------------------------------
+# 관련 논문 찾기 함수
+# ------------------------------
+def preprocess_text(text):
+    return re.sub(r'[^\w\s]', '', str(text)).lower() if text else ""
+
+def find_related_documents(target_doc, all_docs_df: pd.DataFrame, top_k=5):
+    if target_doc is None or all_docs_df.empty: return pd.DataFrame()
+
+    all_docs_df["combined_text"] = all_docs_df["title"].fillna("") + " " + all_docs_df["abstract"].fillna("")
+    all_docs_df["combined_text"] = all_docs_df["combined_text"].apply(preprocess_text)
+    target_text = preprocess_text(target_doc.get("title", "") + " " + target_doc.get("abstract", ""))
+    
+    tfidf = TfidfVectorizer()
+    all_docs_tfidf = tfidf.fit_transform(all_docs_df["combined_text"])
+    target_tfidf = tfidf.transform([target_text])
+    
+    similarities = cosine_similarity(target_tfidf, all_docs_tfidf).flatten()
+    related_indices = similarities.argsort()[::-1]
+    related_indices = [i for i in related_indices if all_docs_df.iloc[i].get("id") != target_doc.get("id")]
+    
+    return all_docs_df.iloc[related_indices[:top_k]]
+
+# ------------------------------
+# 복합 질의 처리 함수
+# ------------------------------
+def handle_complex_query(question: str, context_df: pd.DataFrame) -> pd.DataFrame:
+    if "관련된 논문" in question.lower() and not context_df.empty:
+        target_doc = context_df.iloc[0].to_dict()
+        search_query = target_doc.get("title", "")
+        all_docs_df = retrieve_documents_as_dataframe(search_query)
+        return find_related_documents(target_doc, all_docs_df)
+    
+    return filter_relevant_documents(context_df, question)
+
+# ------------------------------
+# LLM 응답 생성
+# ------------------------------
+def generate_answer_stream(question: str, docs: list):
+    context = "\n\n---\n\n".join([str(doc) for doc in docs])
+    history = "\n".join([f"Q: {turn['question']}\nA: {turn['answer']}" for turn in st.session_state.chat_history])
+    prompt = f"""
+대화 기록:
+{history}
+
+참고 문서:
+{context}
+
+위 대화 기록과 참고 문서를 바탕으로 다음 질문에 대해 상세하고 친절하게 답변해 주세요.
+질문: {question}
+답변:
+"""
+    with st.chat_message("assistant"):
+        message_placeholder = st.empty()
+        full_response = ""
+        for chunk in llm.stream(prompt):
+            full_response += chunk.content
+            message_placeholder.markdown(full_response + "▌")
+        message_placeholder.markdown(full_response)
+    return full_response
+
+# ------------------------------
+# Streamlit UI
+# ------------------------------
+st.set_page_config(page_title="QA (Discovery Engine)", layout="wide")
+st.title("🔍 VertexAI 기반 BigQuery QA")
+question_input = st.text_input("질문을 입력하세요", placeholder="예: 논문 ID, 저자, 키워드 등으로 검색")
+
+if question_input:
+    with st.spinner("🔎 검색 및 LLM 분석 중..."):
+        extracted_id = extract_id(question_input)
+        is_complex = st.session_state.chat_history and any(k in question_input.lower() for k in ["다른", "관련된"])
+
+        if extracted_id:
+            filtered_df = query_bigquery_by_id(extracted_id)
+        elif is_complex:
+            context_df = pd.DataFrame(st.session_state.context_docs)
+            filtered_df = handle_complex_query(question_input, context_df)
+        else:
+            df = retrieve_documents_as_dataframe(question_input)
+            filtered_df = filter_relevant_documents(df, question_input)
+            st.session_state.last_search_query = question_input
+        
+        if not filtered_df.empty:
+            st.session_state.context_docs = filtered_df.to_dict('records')
+        
+        docs = st.session_state.context_docs
+        with st.chat_message("user"):
+            st.markdown(question_input)
+        
+        answer = generate_answer_stream(question_input, docs)
+        st.session_state.chat_history.append({"question": question_input, "answer": answer, "df": filtered_df})
+
+# 대화 히스토리 표시
+if st.session_state.chat_history:
+    st.subheader("💬 대화 히스토리")
+    for i, turn in enumerate(reversed(st.session_state.chat_history)):
+        with st.expander(f"#{len(st.session_state.chat_history)-i} {turn['question'][:60]}..."):
+            with st.chat_message("user"): st.markdown(turn["question"])
+            with st.chat_message("assistant"): st.markdown(turn['answer'])
+            
+            df = turn.get("df")
+            if df is not None and not df.empty:
+                st.markdown("#### 📊 검색 결과")
+                st.dataframe(df, use_container_width=True)
+</code></pre>
+                        </div>
+                    </div>
+
+                    <!-- ADK Conversion Guide Section -->
+                    <div id="functions-adk-guide" class="pt-8 border-t mt-8">
+                        <h3 class="font-semibold text-xl mb-3"><span class="lang lang-ko">3.3. Streamlit에서 Google Agent Development Kit (ADK)으로 전환 가이드</span><span class="lang lang-en">3.3. Guide: Converting from Streamlit to Google Agent Development Kit (ADK)</span></h3>
+                        <p class="text-gray-600 mb-4">
+                            <span class="lang lang-ko">Streamlit은 빠른 프로토타이핑에 매우 유용하지만, Google ADK는 에이전트의 핵심 로직과 UI를 분리하고, 도구(Tool) 기반의 아키텍처를 적용하여 더 구조적이고 확장 가능한 애플리케이션을 만들 수 있게 해줍니다. ADK는 특히 Google Cloud 서비스와의 긴밀한 통합 및 배포를 염두에 두고 설계되었습니다.</span>
+                            <span class="lang lang-en">While Streamlit is excellent for rapid prototyping, Google ADK allows for more structured and scalable applications by separating the agent's core logic from the UI and applying a tool-based architecture. ADK is designed with close integration and deployment with Google Cloud services in mind.</span>
+                        </p>
+                        <p class="text-gray-600 mb-6">
+                            <span class="lang lang-ko">이 가이드에서는 기존 Streamlit 코드의 핵심 기능을 ADK의 구조에 맞게 재구성하여 웹 기반 채팅 에이전트로 실행하는 방법을 설명합니다.</span>
+                            <span class="lang lang-en">This guide explains how to refactor the core functionality of the existing Streamlit code to fit ADK's structure and run it as a web-based chat agent.</span>
+                        </p>
+
+                        <div class="space-y-8">
+                            <div>
+                                <h4 class="font-semibold text-lg mb-3"><span class="lang lang-ko">1단계: 프로젝트 구조 설정 및 설치</span><span class="lang lang-en">Step 1: Project Setup and Installation</span></h4>
+                                <p class="text-gray-600 mb-4">
+                                    <span class="lang lang-ko">ADK 프로젝트는 일반적으로 에이전트 로직, 웹 프론트엔드, 실행 스크립트로 구성됩니다. 먼저 필요한 라이브러리를 설치합니다.</span>
+                                    <span class="lang lang-en">An ADK project typically consists of agent logic, a web frontend, and an execution script. First, install the necessary libraries.</span>
+                                </p>
+                                <div class="relative">
+                                    <pre><code class="language-bash">
+# google-adk와 함께 필요한 라이브러리들을 설치합니다.
+# Install the required libraries along with google-adk.
+pip install google-adk langchain-google-genai google-cloud-bigquery pandas scikit-learn
+                                    </code></pre>
+                                </div>
+                                <p class="text-gray-600 mt-4">
+                                    <span class="lang lang-ko">아래와 같이 프로젝트 파일 구조를 만듭니다.</span>
+                                    <span class="lang lang-en">Create the project file structure as shown below.</span>
+                                </p>
+                                <div class="relative">
+                                    <pre><code class="language-bash">
+your-adk-project/
+├── agent.py         # 에이전트의 핵심 로직 및 도구 정의 (Agent's core logic and tool definitions)
+├── main.py          # ADK 웹 서버 실행 (Run the ADK web server)
+└── static/
+    └── index.html   # 웹 프론트엔드 UI (Web frontend UI)
+                                    </code></pre>
+                                </div>
+                            </div>
+
+                            <div>
+                                <h4 class="font-semibold text-lg mb-3"><span class="lang lang-ko">2단계: 에이전트 및 도구 정의 (`agent.py`)</span><span class="lang lang-en">Step 2: Define Agent and Tools (`agent.py`)</span></h4>
+                                <p class="text-gray-600 mb-4">
+                                    <span class="lang lang-ko">기존 Streamlit의 함수들을 ADK가 인식할 수 있는 '도구(Tool)'로 변환합니다. `@tool` 데코레이터를 사용하여 각 함수를 래핑하고, 이 도구들을 사용하는 에이전트 클래스를 정의합니다.</span>
+                                    <span class="lang lang-en">Convert the functions from the Streamlit code into 'Tools' that ADK can recognize. Wrap each function with the `@tool` decorator and define an agent class that uses these tools.</span>
+                                </p>
+                                <div class="relative">
+                                    <pre><code class="language-python">
+# agent.py
+
+import os
+import re
+import pandas as pd
+import requests
+from google.auth import default
+from google.auth.transport.requests import Request
+from google.cloud import bigquery
+from langchain_google_genai import ChatGoogleGenerativeAI
+from sklearn.feature_extraction.text import TfidfVectorizer
+from sklearn.metrics.pairwise import cosine_similarity
+from adk.api import*
+
+# --- 환경 변수 설정 (Set Environment Variables) ---
+# 실제 운영 환경에서는 Secret Manager 사용을 권장합니다. (Using Secret Manager is recommended in production)
+os.environ["GOOGLE_API_KEY"] = "YOUR_API_KEY"
+PROJECT_NUMBER = "YOUR_PROJECT_NUMBER"
+ENGINE_ID = "YOUR_ENGINE_ID"
+BIGQUERY_TABLE = "YOUR_PROJECT_ID.YOUR_DATASET.YOUR_TABLE"
+DISCOVERY_ENDPOINT = f"https://discoveryengine.googleapis.com/v1alpha/projects/{PROJECT_NUMBER}/locations/global/collections/default_collection/engines/{ENGINE_ID}/servingConfigs/default_search:search"
+
+# --- 기존 함수를 ADK 도구로 변환 (Convert existing functions to ADK tools) ---
+
+@tool
+def search_papers_with_discovery_engine(query: str) -> str:
+    """
+    사용자의 자연어 질문을 기반으로 Discovery Engine을 사용해 관련 논문을 검색합니다.
+    일반적인 질문, 주제, 키워드 검색에 사용됩니다.
+    결과는 Markdown 테이블 형식의 문자열로 반환됩니다.
+    (Searches for relevant papers using Discovery Engine based on the user's natural language query.
+    Used for general questions, topics, and keyword searches.
+    The result is returned as a Markdown table string.)
+    """
+    # ... (기존 retrieve_documents_as_dataframe 함수의 로직) ...
+    # 인증 및 API 호출 로직은 동일 (Authentication and API call logic remains the same)
+    try:
+        credentials, _ = default(scopes=["https://www.googleapis.com/auth/cloud-platform"])
+        credentials.refresh(Request())
+        headers = {"Authorization": f"Bearer {credentials.token}", "Content-Type": "application/json"}
+        body = {"pageSize": 10, "query": query, "languageCode": "ko"}
+        response = requests.post(DISCOVERY_ENDPOINT, headers=headers, json=body)
+        response.raise_for_status()
+        data = response.json()
+        rows = [doc.get("document", {}).get("structData", {}) for doc in data.get("results", [])]
+        if not rows:
+            return "검색 결과가 없습니다. (No search results found.)"
+        df = pd.DataFrame(rows)[['id', 'title', 'authors']].head(5)
+        return df.to_markdown()
+    except Exception as e:
+        return f"Discovery Engine 검색 중 오류 발생 (Error during Discovery Engine search): {e}"
+
+@tool
+def get_paper_details_by_id(paper_id: str) -> str:
+    """
+    정확한 논문 ID를 사용하여 BigQuery에서 논문의 상세 정보를 조회합니다.
+    사용자가 'id'나 특정 ID 형식을 언급할 때 사용합니다.
+    결과는 Markdown 테이블 형식의 문자열로 반환됩니다.
+    (Retrieves detailed information for a paper from BigQuery using its exact ID.
+    Used when the user mentions 'id' or a specific ID format.
+    The result is returned as a Markdown table string.)
+    """
+    # ... (기존 query_bigquery_by_id 함수의 로직) ...
+    try:
+        bq_client = bigquery.Client()
+        query = f"SELECT id, title, abstract, authors, date FROM `{BIGQUERY_TABLE}` WHERE id = @doc_id"
+        job_config = bigquery.QueryJobConfig(query_parameters=[bigquery.ScalarQueryParameter("doc_id", "STRING", paper_id)])
+        df = bq_client.query(query, job_config=job_config).to_dataframe()
+        if df.empty:
+            return f"ID '{paper_id}'에 해당하는 논문을 찾을 수 없습니다. (Paper with ID '{paper_id}' not found.)"
+        return df.to_markdown()
+    except Exception as e:
+        return f"BigQuery 조회 중 오류 발생 (Error during BigQuery query): {e}"
+
+# --- 에이전트 정의 (Define Agent) ---
+class PaperQaAgent(Agent):
+    def __call__(self, query: str, history: History) -> Message:
+        """사용자 질문에 답변하는 논문 검색 에이전트 (A paper search agent that answers user questions)"""
+        
+        # LLM이 도구를 사용할 수 있도록 시스템 프롬프트 설정 (Set system prompt for the LLM to use tools)
+        prompt = f"""
+You are an AI assistant with access to a research paper database.
+Analyze the user's intent and use the most appropriate tool.
+- For general keywords, topics, or author names, use 'search_papers_with_discovery_engine'.
+- For questions containing the word 'id' or a clear ID format (e.g., a1b2c3d4), use 'get_paper_details_by_id'.
+
+Conversation History:
+{history.format()}
+
+User Question: {query}
+"""
+        llm = ChatGoogleGenerativeAI(model="gemini-2.0-flash-001", convert_system_message_to_human=True)
+        
+        # LLM이 도구 사용을 포함한 답변을 생성하도록 호출 (Invoke the LLM to generate a response, including tool use)
+        response = llm.invoke(prompt, tools=[search_papers_with_discovery_engine, get_paper_details_by_id])
+        
+        return Message(content=response.content, tool_calls=response.tool_calls)
+
+                                    </code></pre>
+                                </div>
+                            </div>
+
+                            <div>
+                                <h4 class="font-semibold text-lg mb-3"><span class="lang lang-ko">3단계: 웹 프론트엔드 생성 (`static/index.html`)</span><span class="lang lang-en">Step 3: Create Web Frontend (`static/index.html`)</span></h4>
+                                <p class="text-gray-600 mb-4">
+                                    <span class="lang lang-ko">ADK가 제공하는 `adk-chat` 웹 컴포넌트를 사용하여 매우 간단하게 채팅 UI를 만들 수 있습니다. 이 컴포넌트는 백엔드 에이전트와의 통신, 대화 기록 관리, 스트리밍 응답 표시, Markdown 렌더링 등을 자동으로 처리합니다.</span>
+                                    <span class="lang lang-en">You can easily create a chat UI using the `adk-chat` web component provided by ADK. This component automatically handles communication with the backend agent, conversation history management, streaming response display, Markdown rendering, and more.</span>
+                                </p>
+                                <div class="relative">
+                                    <pre><code class="language-html">
+<!-- static/index.html -->
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>ADK-based Paper QA System</title>
+    <script
+      type="module"
+      src="https://storage.googleapis.com/adk-web-components/adk-web-components-v0.1.0.js"
+    ></script>
+    <style>
+      body, html { margin: 0; padding: 0; height: 100%; font-family: 'Noto Sans KR', sans-serif; }
+      adk-chat {
+        --adk-chat-prompt-input-placeholder: 'Ask about papers by ID, author, keyword...';
+        --adk-chat-header-text: 'Paper QA Agent';
+        --adk-font-family: "'Noto Sans KR', sans-serif";
+      }
+    </style>
+  </head>
+  <body>
+    <adk-chat server="http://127.0.0.1:8080"></adk-chat>
+  </body>
+</html>
+                                    </code></pre>
+                                </div>
+                            </div>
+                            
+                            <div>
+                                <h4 class="font-semibold text-lg mb-3"><span class="lang lang-ko">4단계: ADK 서버 실행 (`main.py`)</span><span class="lang lang-en">Step 4: Run ADK Server (`main.py`)</span></h4>
+                                <p class="text-gray-600 mb-4">
+                                    <span class="lang lang-ko">`agent.py`에서 정의한 에이전트와 `static` 폴더의 웹 프론트엔드를 연결하여 서버를 실행하는 스크립트입니다.</span>
+                                    <span class="lang lang-en">This script runs the server, connecting the agent defined in `agent.py` with the web frontend in the `static` folder.</span>
+                                </p>
+                                <div class="relative">
+                                    <pre><code class="language-python">
+# main.py
+
+from adk.web import start_server
+from agent import PaperQaAgent
+
+if __name__ == "__main__":
+    start_server(PaperQaAgent, "static")
+                                    </code></pre>
+                                </div>
+                            </div>
+
+                            <div>
+                                <h4 class="font-semibold text-lg mb-3"><span class="lang lang-ko">5단계: 애플리케이션 실행</span><span class="lang lang-en">Step 5: Run the Application</span></h4>
+                                <p class="text-gray-600 mb-4">
+                                    <span class="lang lang-ko">모든 파일이 준비되었으면, 터미널에서 `main.py`를 실행하여 ADK 웹 서버를 시작합니다.</span>
+                                    <span class="lang lang-en">Once all files are ready, run `main.py` from the terminal to start the ADK web server.</span>
+                                </p>
+                                <div class="relative">
+                                    <pre><code class="language-bash">
+python main.py
+                                    </code></pre>
+                                </div>
+                                <p class="text-gray-600 mt-4">
+                                    <span class="lang lang-ko">서버가 실행되면 터미널에 표시된 주소(기본값: http://127.0.0.1:8080)로 접속하여 채팅 에이전트를 사용할 수 있습니다.</span>
+                                    <span class="lang lang-en">When the server is running, you can access the chat agent by navigating to the address shown in the terminal (default: http://127.0.0.1:8080).</span>
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Section 4: 실행 방법 -->
+            <section id="execution" class="card p-8">
+                <h2 class="flex items-center text-2xl font-bold mb-6 border-b pb-4">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="mr-3 text-indigo-500"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.72"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.72-1.72"></path></svg>
+                    <span class="lang lang-ko">4. 실행 방법</span><span class="lang lang-en">4. Execution Guide</span>
+                </h2>
+                
+                <div class="space-y-8">
+                    <div>
+                        <h3 id="execution-data-prep" class="font-semibold text-xl mb-3"><span class="lang lang-ko">4.1. BigQuery 데이터 준비 (GCS를 통한 마이그레이션)</span><span class="lang lang-en">4.1. BigQuery Data Preparation (Migration via GCS)</span></h3>
+                        <p class="text-gray-600 mb-4">
+                            <span class="lang lang-ko">이 애플리케이션은 BigQuery 데이터를 사용합니다. 실습을 위해 기존 프로젝트(`YOUR_SOURCE_PROJECT_ID`)의 `ds_test` 데이터셋을 Google Cloud Storage(GCS)로 내보낸 후, 여러분의 신규 프로젝트에 로드하는 과정을 안내합니다.</span>
+                            <span class="lang lang-en">This application uses BigQuery data. For this lab, we will guide you through exporting the `ds_test` dataset from an existing project (`YOUR_SOURCE_PROJECT_ID`) to Google Cloud Storage (GCS) and then loading it into your new project.</span>
+                        </p>
+                        
+                        <div class="mt-6 border-t pt-6">
+                            <h4 class="font-semibold text-lg mb-3"><span class="lang lang-ko">1단계: 소스 데이터셋을 GCS로 내보내기 (Export)</span><span class="lang lang-en">Step 1: Export Source Dataset to GCS (Export)</span></h4>
+                            <p class="text-gray-600 mb-4">
+                                <span class="lang lang-ko">아래 BigQuery 스크립트는 `YOUR_SOURCE_PROJECT_ID` 프로젝트의 `ds_test` 데이터셋에 있는 모든 테이블을 GCS 버킷(`gs://YOUR_BUCKET_NAME/ds_test/`)으로 내보냅니다. 이 스크립트는 CSV로 직접 내보낼 수 없는 ARRAY 같은 복잡한 데이터 타입을 가진 열을 자동으로 제외하여 오류를 방지합니다.</span>
+                                <span class="lang lang-en">The BigQuery script below exports all tables from the `ds_test` dataset in the `YOUR_SOURCE_PROJECT_ID` project to a GCS bucket (`gs://YOUR_BUCKET_NAME/ds_test/`). This script automatically excludes columns with complex data types like ARRAY that cannot be directly exported to CSV, preventing errors.</span>
+                                <br>
+                                <strong><span class="lang lang-ko">소스 프로젝트(`YOUR_SOURCE_PROJECT_ID`)의 BigQuery 콘솔에서 아래 스크립트를 실행하세요.</span><span class="lang lang-en">Run the script below in the BigQuery console of your source project (`YOUR_SOURCE_PROJECT_ID`).</span></strong>
+                            </p>
+                             <div class="relative">
+                                <pre><code id="bq-export-command" class="language-sql">
+-- BigQuery 스크립팅을 사용하여 ds_test 데이터셋의 모든 테이블을 GCS로 내보냅니다.
+-- 이 스크립트는 소스 프로젝트(YOUR_SOURCE_PROJECT_ID)의 BigQuery 콘솔에서 실행해야 합니다.
+
+-- 1. 내보낼 테이블 목록을 담을 변수를 선언합니다.
+DECLARE tables_to_export ARRAY<STRUCT<table_name STRING>>;
+-- 2. 루프에서 사용할 변수들을 선언합니다.
+DECLARE table_name, column_names STRING;
+
+-- 3. ds_test 데이터셋에 있는 모든 'BASE TABLE'의 이름을 가져와 변수에 할당합니다.
+SET tables_to_export = (
+  SELECT ARRAY_AGG(STRUCT(t.table_name))
+  FROM `YOUR_SOURCE_PROJECT_ID.ds_test.INFORMATION_SCHEMA.TABLES` AS t
+  WHERE t.table_type = 'BASE TABLE'
+);
+
+-- 4. 각 테이블에 대해 루프를 실행합니다.
+FOR tbl_row IN (SELECT * FROM UNNEST(tables_to_export)) DO
+  SET table_name = tbl_row.table_name;
+
+  -- 5. CSV로 직접 내보낼 수 없는 ARRAY 타입을 제외하고, 모든 컬럼 이름을 동적으로 구성합니다.
+  SET column_names = (
+    SELECT STRING_AGG(c.column_name, ', ')
+    FROM `YOUR_SOURCE_PROJECT_ID.ds_test.INFORMATION_SCHEMA.COLUMNS` AS c
+    WHERE c.table_name = table_name
+      AND NOT STARTS_WITH(c.data_type, 'ARRAY')
+  );
+
+  -- 6. 동적으로 생성된 컬럼 목록을 사용하여 EXPORT DATA 쿼리를 실행합니다.
+  -- 각 테이블은 GCS 버킷 'gs://YOUR_BUCKET_NAME/ds_test/'에 '테이블명-*.csv' 형식으로 저장됩니다.
+  EXECUTE IMMEDIATE FORMAT("""
+    EXPORT DATA OPTIONS(
+      uri='gs://YOUR_BUCKET_NAME/ds_test/%s-*.csv',
+      format='CSV',
+      header=true,
+      overwrite=true
+    ) AS
+    SELECT %s
+    FROM `YOUR_SOURCE_PROJECT_ID.ds_test`.`%s`;
+  """, table_name, column_names, table_name);
+
+END FOR;
+</code></pre>
+                            </div>
+                        </div>
+
+                        <div class="mt-8 border-t pt-6">
+                            <h4 class="font-semibold text-lg mb-3"><span class="lang lang-ko">2단계: GCS의 CSV 파일을 새 프로젝트의 BigQuery로 로드하기 (Load)</span><span class="lang lang-en">Step 2: Load CSV files from GCS to BigQuery in the New Project (Load)</span></h4>
+                            <p class="text-gray-600 mb-4">
+                                <span class="lang lang-ko">1단계가 완료되어 GCS에 CSV 파일들이 저장되었다면, 이제 <strong>여러분의 새로운 Google Cloud 프로젝트</strong>에서 아래 절차에 따라 데이터를 BigQuery로 가져옵니다.</span>
+                                <span class="lang lang-en">Once Step 1 is complete and the CSV files are in GCS, follow the steps below in <strong>your new Google Cloud project</strong> to import the data into BigQuery.</span>
+                            </p>
+                            <ol class="list-decimal list-inside space-y-4 text-gray-600">
+                                <li>
+                                    <strong><span class="lang lang-ko">데이터세트 생성:</span><span class="lang lang-en">Create a Dataset:</span></strong>
+                                    <ul class="list-disc list-inside ml-4 mt-2 space-y-1">
+                                        <li><span class="lang lang-ko">새 프로젝트의 BigQuery Studio로 이동합니다.</span><span class="lang lang-en">Go to the BigQuery Studio in your new project.</span></li>
+                                        <li><span class="lang lang-ko">탐색기 패널에서 프로젝트 ID 옆의 점 3개 아이콘(⋮)을 클릭하고 '데이터세트 만들기'를 선택합니다.</span><span class="lang lang-en">In the Explorer panel, click the three-dot icon (⋮) next to your project ID and select 'Create dataset'.</span></li>
+                                        <li><span class="lang lang-ko">'데이터세트 ID'(예: `ds_test_loaded`)를 입력하고 '데이터세트 만들기'를 클릭합니다.</span><span class="lang lang-en">Enter a 'Dataset ID' (e.g., `ds_test_loaded`) and click 'Create dataset'.</span></li>
+                                    </ul>
+                                </li>
+                                <li>
+                                    <strong><span class="lang lang-ko">테이블 만들기:</span><span class="lang lang-en">Create a Table:</span></strong>
+                                     <ul class="list-disc list-inside ml-4 mt-2 space-y-1">
+                                        <li><span class="lang lang-ko">방금 만든 데이터세트 옆의 점 3개 아이콘(⋮)을 클릭하고 '테이블 만들기'를 선택합니다.</span><span class="lang lang-en">Click the three-dot icon (⋮) next to the dataset you just created and select 'Create table'.</span></li>
+                                        <li><strong><span class="lang lang-ko">소스:</span><span class="lang lang-en">Source:</span></strong> <span class="lang lang-ko">'다음 위치에서 테이블 만들기' 항목에서 'Google Cloud Storage'를 선택합니다.</span><span class="lang lang-en">Under 'Create table from', select 'Google Cloud Storage'.</span></li>
+                                        <li><strong><span class="lang lang-ko">GCS 경로:</span><span class="lang lang-en">GCS Path:</span></strong> <span class="lang lang-ko">'GCS 버킷에서 파일 선택...' 필드에 `gs://YOUR_BUCKET_NAME/ds_test/*`를 입력합니다.</span><span class="lang lang-en">In the 'Select file from GCS bucket...' field, enter `gs://YOUR_BUCKET_NAME/ds_test/*`.</span></li>
+                                        <li><strong><span class="lang lang-ko">파일 형식:</span><span class="lang lang-en">File format:</span></strong> <span class="lang lang-ko">'CSV'를 선택합니다.</span><span class="lang lang-en">Select 'CSV'.</span></li>
+                                    </ul>
+                                </li>
+                                 <li>
+                                    <strong><span class="lang lang-ko">스키마 및 옵션 설정:</span><span class="lang lang-en">Set Schema and Options:</span></strong>
+                                     <ul class="list-disc list-inside ml-4 mt-2 space-y-1">
+                                        <li><strong><span class="lang lang-ko">테이블 이름:</span><span class="lang lang-en">Table name:</span></strong> <span class="lang lang-ko">로드할 테이블의 이름을 지정합니다. GCS의 각 파일이 별도의 테이블이 되므로, 파일별로 이 과정을 반복해야 합니다.</span><span class="lang lang-en">Specify the name of the table to load. Since each file in GCS will be a separate table, you must repeat this process for each file.</span></li>
+                                        <li><strong><span class="lang lang-ko">스키마:</span><span class="lang lang-en">Schema:</span></strong> <span class="lang lang-ko">'자동 감지' 체크박스를 활성화합니다.</span><span class="lang lang-en">Enable the 'Auto detect' checkbox.</span></li>
+                                        <li><strong><span class="lang lang-ko">고급 옵션:</span><span class="lang lang-en">Advanced options:</span></strong> <span class="lang lang-ko">'헤더 행 건너뛰기' 필드에 `1`을 입력하여 헤더 줄을 데이터로 읽지 않도록 합니다.</span><span class="lang lang-en">In the 'Header rows to skip' field, enter `1` to prevent the header from being read as data.</span></li>
+                                    </ul>
+                                </li>
+                                <li>
+                                    <strong><span class="lang lang-ko">로드 완료:</span><span class="lang lang-en">Complete Load:</span></strong>
+                                    <ul class="list-disc list-inside ml-4 mt-2 space-y-1">
+                                        <li><span class="lang lang-ko">'테이블 만들기' 버튼을 클릭합니다.</span><span class="lang lang-en">Click the 'Create table' button.</span></li>
+                                        <li><span class="lang lang-ko">GCS 버킷에 있는 모든 CSV 파일에 대해 2~4단계를 반복하여 모든 테이블을 로드합니다.</span><span class="lang lang-en">Repeat steps 2-4 for all CSV files in the GCS bucket to load all tables.</span></li>
+                                        <li><span class="lang lang-ko">마지막으로, 스크립트 상단의 <code class="text-sm bg-gray-200 rounded px-1 py-0.5">BIGQUERY_TABLE</code> 환경 변수를 새로 로드한 테이블 경로(예: `YOUR_NEW_PROJECT_ID.ds_test_loaded.YOUR_TABLE_NAME`)로 수정합니다.</span><span class="lang lang-en">Finally, update the `BIGQUERY_TABLE` environment variable at the top of the script to the path of the newly loaded table (e.g., `YOUR_NEW_PROJECT_ID.ds_test_loaded.YOUR_TABLE_NAME`).</span></li>
+                                    </ul>
+                                </li>
+                            </ol>
+                        </div>
+                    </div>
+
+                    <div>
+                        <h3 id="execution-prereqs" class="font-semibold text-xl mb-3"><span class="lang lang-ko">4.2. 사전 준비 사항</span><span class="lang lang-en">4.2. Prerequisites</span></h3>
+                        <ul class="list-disc list-inside space-y-2 text-gray-600">
+                            <li><span class="lang lang-ko">Python 3.8 이상 환경</span><span class="lang lang-en">Python 3.8+ environment</span></li>
+                            <li><span class="lang lang-ko">필요한 라이브러리 설치 (아래 명령어 참조)</span><span class="lang lang-en">Required libraries installed (see command below)</span></li>
+                            <li><span class="lang lang-ko">Vertex AI, Discovery Engine, BigQuery API가 활성화된 Google Cloud 프로젝트</span><span class="lang lang-en">A Google Cloud project with Vertex AI, Discovery Engine, and BigQuery APIs enabled</span></li>
+                            <li><span class="lang lang-ko">Google Cloud CLI를 통한 로컬 환경 인증 (<code class="text-sm bg-gray-200 rounded px-1 py-0.5">gcloud auth application-default login</code>)</span><span class="lang lang-en">Local environment authenticated via Google Cloud CLI (<code class="text-sm bg-gray-200 rounded px-1 py-0.5">gcloud auth application-default login</code>)</span></li>
+                        </ul>
+                    </div>
+                    
+                    <div>
+                        <h3 id="execution-install" class="font-semibold text-xl mb-3"><span class="lang lang-ko">4.3. 라이브러리 설치</span><span class="lang lang-en">4.3. Library Installation</span></h3>
+                        <div class="relative">
+                            <pre><code id="pip-command" class="language-bash">pip install google-adk langchain-google-genai google-cloud-bigquery pandas scikit-learn requests</code></pre>
+                        </div>
+                    </div>
+
+                    <div>
+                        <h3 id="execution-run" class="font-semibold text-xl mb-3"><span class="lang lang-ko">4.4. 스크립트 실행 (ADK)</span><span class="lang lang-en">4.4. Run Script (ADK)</span></h3>
+                        <ol class="list-decimal list-inside space-y-2 text-gray-600 mb-4">
+                            <li><span class="lang lang-ko">위 가이드에 따라 `agent.py`, `main.py`, `static/index.html` 파일을 생성합니다.</span><span class="lang lang-en">Create `agent.py`, `main.py`, and `static/index.html` files according to the guide above.</span></li>
+                            <li><span class="lang lang-ko">`agent.py` 파일 상단의 환경 변수들을 자신의 환경에 맞게 수정합니다.</span><span class="lang lang-en">Modify the environment variables at the top of `agent.py` to match your environment.</span></li>
+                            <li><span class="lang lang-ko">터미널에서 아래 명령어를 실행하여 ADK 웹 서버를 시작합니다.</span><span class="lang lang-en">Run the command below in your terminal to start the ADK web server.</span></li>
+                        </ol>
+                        <div class="relative">
+                            <pre><code id="run-command" class="language-bash">python main.py</code></pre>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+        </main>
+        
+        <footer class="text-center mt-16 text-gray-500">
+            <p>&copy; 2025 Professional Code Manual. All rights reserved.</p>
+        </footer>
+
+    </div>
+
+    <script>
+        // Make switchLang globally accessible
+        function switchLang(lang) {
+            document.documentElement.lang = lang;
+            document.documentElement.classList.remove('lang-ko', 'lang-en');
+            document.documentElement.classList.add(`lang-${lang}`);
+            localStorage.setItem('language', lang);
+
+            const btnKo = document.getElementById('btn-ko');
+            const btnEn = document.getElementById('btn-en');
+
+            if (btnKo && btnEn) {
+                if (lang === 'ko') {
+                    btnKo.classList.add('active');
+                    btnEn.classList.remove('active');
+                } else {
+                    btnEn.classList.add('active');
+                    btnKo.classList.remove('active');
+                }
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            // --- Initialize Language ---
+            const langFromStorage = localStorage.getItem('language');
+            const browserLang = (navigator.language || navigator.userLanguage).startsWith('en') ? 'en' : 'ko';
+            const initialLang = langFromStorage || browserLang;
+            switchLang(initialLang);
+
+            // --- Code Block Selection ---
+            const codeBlocks = document.querySelectorAll('pre');
+            codeBlocks.forEach(preElement => {
+                preElement.style.cursor = 'pointer';
+                preElement.setAttribute('title', 'Click to select all code');
+                preElement.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    
+                    const codeElement = preElement.querySelector('code');
+                    if (codeElement) {
+                        const selection = window.getSelection();
+                        const range = document.createRange();
+                        range.selectNodeContents(codeElement);
+                        selection.removeAllRanges();
+                        selection.addRange(range);
+                    }
+                });
+            });
+
+            // --- Sidebar Accordion Menu ---
+            const submenuToggles = document.querySelectorAll('[data-toggle-submenu]');
+            submenuToggles.forEach(toggle => {
+                toggle.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    const menuItem = toggle.closest('.menu-item');
+                    menuItem.classList.toggle('open');
+                });
+            });
+
+            // --- Sidebar Active Link ---
+            const sections = document.querySelectorAll('section[id], div[id^="functions-"], h3[id^="execution-"]');
+            const allLinks = document.querySelectorAll('.sidebar a');
+
+            const observer = new IntersectionObserver((entries) => {
+                let topmostEntry = null;
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        if (!topmostEntry || entry.boundingClientRect.top < topmostEntry.boundingClientRect.top) {
+                            topmostEntry = entry;
+                        }
+                    }
+                });
+
+                if (topmostEntry) {
+                    const id = topmostEntry.target.id;
+                    const activeLink = document.querySelector(`.sidebar a[href="#${id}"]`);
+                    
+                    allLinks.forEach(link => link.classList.remove('active'));
+
+                    if (activeLink) {
+                        activeLink.classList.add('active');
+                        const parentMenuItem = activeLink.closest('.menu-item');
+                        if (parentMenuItem) {
+                            parentMenuItem.classList.add('open');
+                            const parentToggle = parentMenuItem.querySelector('[data-toggle-submenu]');
+                            if (parentToggle) {
+                                parentToggle.classList.add('active');
+                            } else {
+                                // For top-level items without a submenu
+                                const mainLink = parentMenuItem.querySelector('a');
+                                if(mainLink) mainLink.classList.add('active');
+                            }
+                        }
+                    }
+                }
+            }, {
+                threshold: 0,
+                rootMargin: '0px 0px -80% 0px'
+            });
+
+            sections.forEach(section => {
+                observer.observe(section);
+            });
+        });
+    </script>
+</body>
+</html>
