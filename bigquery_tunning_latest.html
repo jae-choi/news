@@ -1,0 +1,844 @@
+<!DOCTYPE html>
+<html lang="ko" class="lang-ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><span class="lang lang-ko">Google Cloud 데이터 분석 플랫폼 심층 분석</span><span class="lang lang-en">Deep Dive into Google Cloud Data Analytics Platform</span></title>
+    <meta name="description" content="Google Cloud 데이터 분석 플랫폼의 성능 최적화, 통합 거버넌스, AI 기반 분석 전략에 대한 심층 분석 보고서입니다.">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Noto+Sans+KR:wght@400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+    <style>
+        body { font-family: 'Inter', 'Noto Sans KR', sans-serif; scroll-behavior: smooth; }
+        .gradient-text { background: linear-gradient(to right, #4f46e5, #1e90ff); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        .card { background-color: white; border-radius: 0.75rem; box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05); transition: transform 0.3s ease, box-shadow 0.3s ease; }
+        .card:hover { transform: translateY(-5px); box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04); }
+        code.language-sql, code.language-bash { font-family: 'Fira Code', 'D2Coding', monospace; }
+        pre code.hljs { display: block; padding: 1.5rem; border-radius: 0.5rem; white-space: pre-wrap; word-break: break-all; }
+        pre:hover { filter: brightness(120%); transition: filter 0.2s ease; }
+        body { padding-top: 4.5rem; }
+        .top-nav { position: fixed; top: 0; left: 0; right: 0; background-color: white; box-shadow: 0 2px 4px rgba(0,0,0,0.1); z-index: 1000; }
+        .top-nav-container { display: flex; justify-content: space-between; align-items: center; height: 4.5rem; padding: 0 2rem; max-width: 80rem; margin: 0 auto; }
+        .top-nav .menu { display: none; gap: 0.5rem; align-items: center; }
+        @media (min-width: 1024px) { .top-nav .menu { display: flex; } }
+        .top-nav .menu-item { position: relative; }
+        .top-nav .menu-item > a { display: block; padding: 0.5rem 1rem; border-radius: 0.375rem; color: #4b5563; font-weight: 600; transition: background-color 0.2s, color 0.2s; cursor: pointer; white-space: nowrap; }
+        .top-nav .menu-item > a:hover { background-color: #f3f4f6; }
+        .top-nav .menu-item > a.active { background-color: #4f46e5; color: white !important; }
+        .top-nav .menu-item > a.active span { color: white !important; }
+        .top-nav .submenu { display: none; position: absolute; top: 100%; left: 0; background: white; border-radius: 0.5rem; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06); padding: 0.5rem; min-width: 240px; z-index: 1010; border: 1px solid #e5e7eb; }
+        .top-nav .submenu a { display: block; padding: 0.5rem 1rem; border-radius: 0.375rem; color: #6b7280; font-size: 0.9rem; transition: background-color 0.2s, color 0.2s; white-space: nowrap; }
+        .top-nav .submenu a:hover { background-color: #f3f4f6; }
+        .top-nav .menu-item:hover > .submenu { display: block; }
+        .lang-ko .lang-en, .lang-en .lang-ko { display: none; }
+        .lang-btn { transition: all 0.2s ease-in-out; border-radius: 9999px; padding: 0.25rem 0.75rem; font-size: 0.875rem; border: 1px solid transparent; }
+        .lang-btn.active { font-weight: 600; background-color: #4f46e5; color: white; }
+        .lang-btn:not(.active) { color: #4b5563; background-color: transparent; }
+        section[id], article[id] { scroll-margin-top: 6rem; }
+        .code-container { cursor: pointer; }
+        .copy-feedback { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); background-color: #10b981; color: white; padding: 0.5rem 1rem; border-radius: 0.5rem; font-weight: 600; z-index: 10; opacity: 0; transition: opacity 0.3s ease; pointer-events: none; }
+        .copy-feedback.show { opacity: 1; }
+    </style>
+</head>
+<body class="bg-gray-50 text-gray-800">
+
+    <!-- Top Navigation -->
+    <nav class="top-nav">
+        <div class="top-nav-container">
+            <div class="flex items-center">
+                <h1 class="text-lg font-bold text-slate-900"><span class="lang lang-ko">GCP 데이터 플랫폼 가이드</span><span class="lang lang-en">GCP Data Platform Guide</span></h1>
+            </div>
+            <div class="menu">
+                <div class="menu-item"><a href="#summary">Summary</a></div>
+                <div class="menu-item">
+                    <a href="#section1"><span class="lang lang-ko">I. BQ 최적화</span><span class="lang lang-en">I. BQ Opt.</span></a>
+                    <div class="submenu">
+                        <a href="#section1-1"><span class="lang lang-ko">1.1. 스토리지 튜닝</span><span class="lang lang-en">1.1. Storage Tuning</span></a>
+                        <a href="#section1-2"><span class="lang lang-ko">1.2. 쿼리 튜닝</span><span class="lang lang-en">1.2. Query Tuning</span></a>
+                        <a href="#section1-3"><span class="lang lang-ko">1.3. 자율 성능 향상</span><span class="lang lang-en">1.3. Autonomous Features</span></a>
+                        <a href="#section1-4"><span class="lang lang-ko">1.4. 용량 튜닝</span><span class="lang lang-en">1.4. Capacity Tuning</span></a>
+                    </div>
+                </div>
+                <div class="menu-item">
+                    <a href="#section2"><span class="lang lang-ko">II. 통합 플랫폼</span><span class="lang lang-en">II. Unified Platform</span></a>
+                    <div class="submenu">
+                        <a href="#section2-1"><span class="lang lang-ko">2.1. AI-Native Lakehouse</span><span class="lang lang-en">2.1. AI-Native Lakehouse</span></a>
+                        <a href="#section2-2"><span class="lang lang-ko">2.2. BigLake</span><span class="lang lang-en">2.2. BigLake</span></a>
+                        <a href="#section2-3"><span class="lang lang-ko">2.3. Dataplex</span><span class="lang lang-en">2.3. Dataplex</span></a>
+                        <a href="#section2-4"><span class="lang lang-ko">2.4. 데이터 보안</span><span class="lang lang-en">2.4. Data Security</span></a>
+                    </div>
+                </div>
+                <div class="menu-item">
+                    <a href="#section3"><span class="lang lang-ko">III. AI 민주화</span><span class="lang lang-en">III. Democratization</span></a>
+                    <div class="submenu">
+                        <a href="#section3-1"><span class="lang lang-ko">3.1. BQML</span><span class="lang lang-en">3.1. BQML</span></a>
+                        <a href="#section3-2"><span class="lang lang-ko">3.2. MLOps</span><span class="lang lang-en">3.2. MLOps</span></a>
+                        <a href="#section3-3"><span class="lang lang-ko">3.3. 생성형 AI</span><span class="lang lang-en">3.3. Generative AI</span></a>
+                    </div>
+                </div>
+                <div class="menu-item">
+                    <a href="#section4"><span class="lang lang-ko">IV. 데이터 에이전트</span><span class="lang lang-en">IV. Data Agent</span></a>
+                    <div class="submenu">
+                        <a href="#section4-1"><span class="lang lang-ko">4.1. Gemini 에이전트</span><span class="lang lang-en">4.1. Gemini Agent</span></a>
+                        <a href="#section4-2"><span class="lang lang-ko">4.2. ADK</span><span class="lang lang-en">4.2. ADK</span></a>
+                        <a href="#section4-3"><span class="lang lang-ko">4.3. 배포</span><span class="lang lang-en">4.3. Deployment</span></a>
+                    </div>
+                </div>
+                <div class="menu-item"><a href="#section5"><span class="lang lang-ko">V. 종합</span><span class="lang lang-en">V. Summary</span></a></div>
+            </div>
+            <div class="flex items-center">
+                <div class="flex items-center bg-white rounded-full p-1 shadow-sm border">
+                    <button id="btn-ko" class="lang-btn" onclick="switchLang('ko')">KOR</button>
+                    <button id="btn-en" class="lang-btn" onclick="switchLang('en')">ENG</button>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container px-4 py-12 max-w-5xl mx-auto">
+        
+        <div class="flex justify-end items-center mb-8" style="display: none;">
+            <div class="flex items-center bg-white rounded-full p-1 shadow-md">
+                <button id="btn-ko" class="lang-btn" onclick="switchLang('ko')">KOR</button>
+                <button id="btn-en" class="lang-btn" onclick="switchLang('en')">ENG</button>
+            </div>
+        </div>
+
+        <!-- Header -->
+        <header class="text-center mb-16">
+            <h1 class="text-4xl md:text-5xl font-bold tracking-tight mb-4">
+                <span class="gradient-text">
+                    <span class="lang lang-ko">Google Cloud 데이터 분석 플랫폼 심층 분석</span>
+                    <span class="lang lang-en">Deep Dive into Google Cloud Data Analytics Platform</span>
+                </span>
+            </h1>
+            <p class="text-lg text-gray-600">
+                <span class="lang lang-ko">성능 최적화, 통합 거버넌스, 그리고 AI 기반 분석 전략</span>
+                <span class="lang lang-en">Performance Optimization, Unified Governance, and AI-Powered Analytics Strategy</span>
+            </p>
+        </header>
+
+        <main class="space-y-16">
+
+            <!-- Section: Summary -->
+            <section id="summary" class="card p-8">
+                <h2 class="flex items-center text-2xl font-bold mb-6 border-b pb-4">Executive Summary</h2>
+                <p class="text-gray-700 leading-relaxed">
+                    <span class="lang lang-ko">본 가이드는 Google Cloud 데이터 플랫폼의 핵심적인 기술적 진화와 전략적 방향성을 공유합니다. Google Cloud 데이터 분석 플랫폼은 단순히 개별 서비스의 집합을 넘어, 성능 최적화, 데이터 거버넌스, 그리고 인공지능(AI)이 유기적으로 통합된 단일 지능형 플랫폼으로 진화하고 있음이 명확해졌습니다. 이 플랫폼의 핵심 가치는 세 가지 주요 축으로 요약됩니다. <br><strong>첫째, 자율적 최적화(Autonomous Optimization)</strong>입니다. History-Based Optimization, CMETA와 같은 기능들은 사용자의 개입을 최소화하면서도 지속적으로 쿼리 성능을 향상시켜, 데이터 전문가가 미세 조정(tuning)이 아닌 아키텍처 설계에 집중할 수 있도록 지원합니다. <br><strong>둘째, 거버넌스 기반 AI(Governance-driven AI)</strong>입니다. BigLake와 Dataplex를 중심으로 한 AI Lakehouse 아키텍처는 분산된 데이터를 통합하고, 자동화된 데이터 품질, 계보(lineage), 보안 정책을 통해 신뢰할 수 있는 데이터 기반을 구축합니다. 이는 확장 가능하고 안전한 AI 활용의 필수 전제 조건으로 작용합니다. <br><strong>셋째, AI의 민주화(Democratization of AI)</strong>입니다. BigQuery ML(BQML)은 SQL 인터페이스 내에서 머신러닝 및 생성형 AI 모델을 직접 활용할 수 있게 함으로써, 데이터 분석가들이 복잡한 코딩 없이도 고급 분석을 수행할 수 있는 길을 열어줍니다. 나아가, Gemini 데이터 에이전트와 Agent Development Kit(ADK)는 데이터와의 상호작용 방식을 근본적으로 변화시켜, 자율적인 데이터 분석 및 관리의 미래를 예고합니다. 본 가이드는 이러한 핵심 기술들을 상세히 분석하고, 조직이 이 지능형 데이터 플랫폼을 성공적으로 도입하고 활용하기 위한 구체적인 실행 방법과 단계별 전략 로드맵을 제공합니다.</span>
+                    <span class="lang lang-en">This guide presents the key technological advancements and strategic roadmap of the Google Cloud data platform. It has become clear that the Google Cloud Data Analytics Platform is evolving beyond a mere collection of individual services into a single, intelligent platform where performance optimization, data governance, and artificial intelligence (AI) are organically integrated. The core values of this platform can be summarized into three main pillars. <br><strong>First, Autonomous Optimization.</strong> Features like History-Based Optimization and CMETA continuously improve query performance with minimal user intervention, allowing data experts to focus on architectural design rather than fine-tuning. <br><strong>Second, Governance-driven AI.</strong> The AI Lakehouse architecture, centered around BigLake and Dataplex, integrates distributed data and builds a trusted data foundation through automated data quality, lineage, and security policies. This serves as an essential prerequisite for scalable and secure AI utilization. <br><strong>Third, Democratization of AI.</strong> BigQuery ML (BQML) enables data analysts to perform advanced analytics without complex coding by allowing them to directly use machine learning and generative AI models within the SQL interface. Furthermore, the Gemini Data Agent and Agent Development Kit (ADK) are fundamentally changing the way we interact with data, heralding a future of autonomous data analysis and management. This guide analyzes these core technologies in detail and provides concrete implementation methods and a step-by-step strategic roadmap for organizations to successfully adopt and leverage this intelligent data platform.</span>
+                </p>
+            </section>
+            
+            <!-- Section 1 -->
+            <section id="section1" class="card p-8 space-y-12">
+                <header>
+                    <h2 class="text-3xl font-bold text-slate-900 border-b-2 border-sky-500 pb-4">
+                        <span class="lang lang-ko">I. BigQuery 성능 마스터하기: 최적화 전략의 3요소</span>
+                        <span class="lang lang-en">I. Mastering BigQuery Performance: The 3 Pillars of Optimization</span>
+                    </h2>
+                    <p class="mt-4 text-lg text-slate-600 leading-loose">
+                        <span class="lang lang-ko">Google BigQuery의 성능과 비용 효율성을 극대화하는 것은 단순히 빠른 쿼리를 실행하는 것을 넘어, 데이터 아키텍처 전반에 걸친 체계적인 접근을 요구합니다. 본 섹션에서는 BigQuery 성능 관리의 세 가지 핵심 기둥인 스토리지 튜닝, 쿼리 튜닝, 그리고 용량 튜닝을 심층적으로 분석합니다.</span>
+                        <span class="lang lang-en">Maximizing the performance and cost-efficiency of Google BigQuery requires more than just running fast queries; it demands a systematic approach across the entire data architecture. This section provides an in-depth analysis of the three core pillars of BigQuery performance management: storage tuning, query tuning, and capacity tuning.</span>
+                    </p>
+                </header>
+                
+                <article id="section1-1" class="space-y-8">
+                    <h3 class="text-2xl font-semibold text-slate-800">
+                        <span class="lang lang-ko">1.1. 스토리지 튜닝과 아키텍처: 성능의 기초</span>
+                        <span class="lang lang-en">1.1. Storage Tuning and Architecture: The Foundation of Performance</span>
+                    </h3>
+                    <p class="leading-loose">
+                        <span class="lang lang-ko">쿼리 성능과 비용은 쿼리가 실행되기 훨씬 전, 데이터가 저장되는 방식에 의해 결정됩니다. 효과적인 스토리지 아키텍처는 BigQuery가 불필요한 데이터를 효율적으로 건너뛰고(pruning), 필요한 데이터에 신속하게 접근할 수 있도록 하는 가장 기본적인 전제 조건입니다.</span>
+                        <span class="lang lang-en">Query performance and cost are determined long before a query is executed—by the way data is stored. An effective storage architecture is the most fundamental prerequisite for enabling BigQuery to efficiently skip (prune) unnecessary data and quickly access the data it needs.</span>
+                    </p>
+                    
+                    <div class="space-y-4">
+                        <h4 class="text-xl font-semibold text-slate-700">
+                            <span class="lang lang-ko">파티셔닝과 클러스터링: 스캔 최소화의 핵심</span>
+                            <span class="lang lang-en">Partitioning and Clustering: Key to Minimizing Scans</span>
+                        </h4>
+                        <p class="leading-loose">
+                            <span class="lang lang-ko">파티셔닝(Partitioning)과 클러스터링(Clustering)은 데이터 스캔 양을 줄여 비용을 절감하고 성능을 향상시키는 가장 중요한 두 가지 스토리지 기능입니다. <strong>파티셔닝</strong>은 테이블을 날짜, 시간, 정수 범위 등 단일 컬럼을 기준으로 논리적인 세그먼트로 나눕니다. 이를 통해 쿼리가 특정 파티션만 읽도록 하여 스캔 범위를 크게 줄일 수 있습니다. 반면, <strong>클러스터링</strong>은 지정된 컬럼(최대 4개)의 값을 기준으로 데이터를 물리적으로 정렬하여 저장합니다. 필터 조건이 클러스터링 키에 해당할 경우, BigQuery는 관련 블록만 읽어 성능을 향상시킵니다.</span>
+                            <span class="lang lang-en">Partitioning and Clustering are the two most important storage features for reducing the amount of data scanned, thereby cutting costs and improving performance. <strong>Partitioning</strong> divides a table into logical segments based on a single column, such as a date, time, or integer range. This allows queries to read only specific partitions, significantly reducing the scan scope. In contrast, <strong>Clustering</strong> physically sorts and stores data based on the values in specified columns (up to four). If a filter condition corresponds to a clustering key, BigQuery reads only the relevant blocks, enhancing performance.</span>
+                        </p>
+                        <div class="code-container bg-slate-800 rounded-lg overflow-hidden relative" onclick="selectAndCopyCode(this)">
+                            <div class="flex justify-between items-center bg-slate-700 px-4 py-2 text-sm">
+                                <span class="text-slate-300 font-semibold">SQL: Partitioning & Clustering</span>
+                                <span class="text-slate-400 text-xs flex items-center gap-1">
+                                    <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 16 16"><path d="M4 1.5H3a2 2 0 0 0-2 2V14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V3.5a2 2 0 0 0-2-2h-1v1h1a1 1 0 0 1 1 1V14a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1V3.5a1 1 0 0 1 1-1h1v-1z"/><path d="M9.5 1a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5h-3a.5.5 0 0 1-.5-.5v-1a.5.5 0 0 1 .5-.5h3zM-1 1.5A1.5 1.5 0 0 1 .5 0h3A1.5 1.5 0 0 1 5 1.5v1A1.5 1.5 0 0 1 3.5 4h-3A1.5 1.5 0 0 1-1 2.5v-1z"/></svg>
+                                    <span>Click to Copy</span>
+                                </span>
+                            </div>
+                            <pre class="text-white p-4 text-base overflow-x-auto"><code>CREATE TABLE mydataset.sales (
+  sale_id INT64,
+  product_id INT64,
+  sales_rep STRING,
+  sale_date DATE,
+  amount FLOAT64
+)
+PARTITION BY sale_date
+CLUSTER BY sales_rep, product_id;</code></pre>
+                        </div>
+                        <p class="text-sm text-slate-600">
+                            <span class="lang lang-ko">위 예제는 `sale_date`로 테이블을 파티셔닝하고, `sales_rep`과 `product_id`로 클러스터링하여 관련 쿼리의 성능을 최적화합니다.</span>
+                            <span class="lang lang-en">The example above partitions the table by `sale_date` and clusters it by `sales_rep` and `product_id` to optimize the performance of related queries.</span>
+                        </p>
+                    </div>
+                    
+                    <div class="space-y-4">
+                        <h4 class="text-xl font-semibold text-slate-700">
+                            <span class="lang lang-ko">BigQuery 적응형 캐싱 계층</span>
+                            <span class="lang lang-en">BigQuery Adaptive Caching Layers</span>
+                        </h4>
+                        <p class="leading-loose">
+                            <span class="lang lang-ko">BigQuery는 성능을 극대화하기 위해 다단계 지능형 캐싱 아키텍처를 사용합니다. 이 아키텍처는 데이터의 사용 빈도(temperature)에 따라 자동으로 데이터를 다른 캐시 계층에 배치하여 응답 시간을 최소화합니다. 자주 액세스하는 '뜨거운(hot)' 데이터는 BI Engine과 같은 초고속 인메모리 캐시에, '차가운(cold)' 데이터는 저비용의 분산 스토리지에 보관됩니다. 이 모든 과정은 완전 자동으로 이루어져 사용자의 개입 없이 최적의 성능을 제공합니다.</span>
+                            <span class="lang lang-en">To maximize performance, BigQuery uses a multi-level intelligent caching architecture. This architecture automatically places data in different cache tiers based on its usage frequency (temperature) to minimize response times. Frequently accessed 'hot' data is placed in ultra-fast in-memory caches like BI Engine, while 'cold' data is kept in low-cost distributed storage. This entire process is fully automated, providing optimal performance without user intervention.</span>
+                        </p>
+                        <div class="my-4 p-6 bg-slate-100 rounded-xl border border-slate-200">
+                            <h5 class="text-xl font-bold text-center text-slate-800 mb-6">BigQuery Adaptive Caching Architecture</h5>
+                            <div class="flex flex-col items-center space-y-4">
+                                <div class="w-full max-w-xs text-center"><div class="bg-sky-500 text-white font-bold py-2 px-4 rounded-t-lg">BI Engine</div><div class="bg-sky-100 text-sky-800 p-3 rounded-b-lg text-sm"><p class="font-semibold">Very Hot Data (GBs)</p><p>In-memory, low latency</p></div></div>
+                                <div class="text-slate-400">↓</div>
+                                <div class="w-full max-w-md text-center"><div class="bg-orange-500 text-white font-bold py-2 px-4 rounded-t-lg">Hot Cache (SSD)</div><div class="bg-orange-100 text-orange-800 p-3 rounded-b-lg text-sm"><p class="font-semibold">Hot Data (10s TBs)</p><p>Automatic query rewrite</p></div></div>
+                                <div class="text-slate-400">↓</div>
+                                <div class="w-full max-w-lg text-center"><div class="bg-yellow-500 text-white font-bold py-2 px-4 rounded-t-lg">Warm Cache</div><div class="bg-yellow-100 text-yellow-800 p-3 rounded-b-lg text-sm"><p class="font-semibold">Warm Data (100s TBs)</p><p>Flexible partitioning & reclustering</p></div></div>
+                                <div class="text-slate-400">↓</div>
+                                <div class="w-full max-w-xl text-center"><div class="bg-slate-500 text-white font-bold py-2 px-4 rounded-t-lg">Cold Storage (Colossus)</div><div class="bg-slate-200 text-slate-800 p-3 rounded-b-lg text-sm"><p class="font-semibold">Cold Data (PBs)</p><p>High throughput streaming ingest</p></div></div>
+                            </div>
+                        </div>
+                    </div>
+                </article>
+
+                <article id="section1-2" class="space-y-8">
+                    <h3 class="text-2xl font-semibold text-slate-800">
+                        <span class="lang lang-ko">1.2. 고급 쿼리 튜닝 및 안티패턴</span>
+                        <span class="lang lang-en">1.2. Advanced Query Tuning and Anti-Patterns</span>
+                    </h3>
+                    <p class="leading-loose">
+                        <span class="lang lang-ko">잘 설계된 스토리지 아키텍처 위에서, SQL 코드 자체의 효율성은 성능에 직접적인 영향을 미칩니다. BigQuery의 쿼리 실행 계획을 이해하고, 일반적인 안티패턴을 피하며, 최적화된 SQL을 작성하는 것은 성능 튜닝의 핵심입니다.</span>
+                        <span class="lang lang-en">On top of a well-designed storage architecture, the efficiency of the SQL code itself directly impacts performance. Understanding BigQuery's query execution plan, avoiding common anti-patterns, and writing optimized SQL are key to performance tuning.</span>
+                    </p>
+                    
+                    <div class="space-y-4">
+                        <h4 class="text-xl font-semibold text-slate-700">
+                            <span class="lang lang-ko">쿼리 실행 계획 이해하기</span>
+                            <span class="lang lang-en">Understanding the Query Execution Plan</span>
+                        </h4>
+                        <p class="leading-loose">
+                            <span class="lang lang-ko">모든 BigQuery 쿼리는 여러 단계(Stage)로 나뉘어 분산 실행됩니다. 쿼리 계획을 분석하면 각 단계에서 소요된 시간, 처리된 행 수, 데이터 셔플(shuffle) 발생 여부 등을 파악하여 병목 지점을 찾을 수 있습니다. 예를 들어, 집계(Aggregation) 쿼리는 데이터를 셔플하는 과정에서 많은 리소스를 소모할 수 있으므로, 쿼리 초반에 데이터를 최대한 필터링하는 것이 중요합니다.</span>
+                            <span class="lang lang-en">Every BigQuery query is divided into multiple stages for distributed execution. By analyzing the query plan, you can identify bottlenecks by examining the time spent, rows processed, and data shuffling occurrences at each stage. For example, aggregation queries can consume significant resources during data shuffling, so it's crucial to filter data as much as possible early in the query.</span>
+                        </p>
+                    </div>
+
+                    <div class="space-y-6">
+                        <h4 class="text-xl font-semibold text-slate-700">
+                            <span class="lang lang-ko">최적화 기법 및 실습 예제</span>
+                            <span class="lang lang-en">Optimization Techniques and Practical Examples</span>
+                        </h4>
+                        <div class="p-4 bg-slate-100 rounded-lg space-y-2">
+                            <p class="font-semibold text-slate-700">
+                                <span class="lang lang-ko">1. 필요한 컬럼만 선택하기 (SELECT * EXCEPT)</span>
+                                <span class="lang lang-en">1. Select Only Necessary Columns (SELECT * EXCEPT)</span>
+                            </p>
+                            <p class="text-sm text-slate-600">
+                                <span class="lang lang-ko">`SELECT *`는 비용과 성능 면에서 비효율적입니다. 필요한 컬럼만 명시적으로 선택하고, 제외할 컬럼이 더 적을 경우 `EXCEPT`를 사용하세요.</span>
+                                <span class="lang lang-en">`SELECT *` is inefficient in terms of cost and performance. Explicitly select only the columns you need, or use `EXCEPT` if there are fewer columns to exclude.</span>
+                            </p>
+                            <div class="code-container bg-slate-800 rounded-lg overflow-hidden relative" onclick="selectAndCopyCode(this)"><div class="flex justify-between items-center bg-slate-700 px-4 py-2 text-sm"><span class="text-slate-300 font-semibold">SQL: Column Selection</span><span class="text-slate-400 text-xs flex items-center gap-1"><svg class="w-4 h-4" fill="currentColor" viewBox="0 0 16 16"><path d="M4 1.5H3a2 2 0 0 0-2 2V14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V3.5a2 2 0 0 0-2-2h-1v1h1a1 1 0 0 1 1 1V14a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1V3.5a1 1 0 0 1 1-1h1v-1z"/><path d="M9.5 1a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5h-3a.5.5 0 0 1-.5-.5v-1a.5.5 0 0 1 .5-.5h3zM-1 1.5A1.5 1.5 0 0 1 .5 0h3A1.5 1.5 0 0 1 5 1.5v1A1.5 1.5 0 0 1 3.5 4h-3A1.5 1.5 0 0 1-1 2.5v-1z"/></svg><span>Click to Copy</span></span></div><pre class="text-white p-4 text-base overflow-x-auto"><code>-- Anti-pattern
+SELECT * FROM `dataset.table`;
+
+-- Optimized
+SELECT col1, col2, col3 FROM `dataset.table`;
+
+-- When there are fewer columns to exclude
+SELECT * EXCEPT (dim1, dim2) FROM `dataset.table`;</code></pre></div>
+                        </div>
+                        <div class="p-4 bg-slate-100 rounded-lg space-y-2">
+                            <p class="font-semibold text-slate-700">
+                                <span class="lang lang-ko">2. WHERE 절 조건 순서 최적화</span>
+                                <span class="lang lang-en">2. Optimize WHERE Clause Condition Order</span>
+                            </p>
+                            <p class="text-sm text-slate-600">
+                                <span class="lang lang-ko">BigQuery는 WHERE 절의 조건 순서를 재정렬하지 않으므로, 가장 선택적인(가장 많은 데이터를 필터링하는) 조건을 앞에 두는 것이 성능에 유리합니다.</span>
+                                <span class="lang lang-en">BigQuery does not reorder conditions in the WHERE clause, so placing the most selective (filters the most data) condition first is beneficial for performance.</span>
+                            </p>
+                            <div class="code-container bg-slate-800 rounded-lg overflow-hidden relative" onclick="selectAndCopyCode(this)"><div class="flex justify-between items-center bg-slate-700 px-4 py-2 text-sm"><span class="text-slate-300 font-semibold">SQL: WHERE Clause Order</span><span class="text-slate-400 text-xs flex items-center gap-1"><svg class="w-4 h-4" fill="currentColor" viewBox="0 0 16 16"><path d="M4 1.5H3a2 2 0 0 0-2 2V14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V3.5a2 2 0 0 0-2-2h-1v1h1a1 1 0 0 1 1 1V14a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1V3.5a1 1 0 0 1 1-1h1v-1z"/><path d="M9.5 1a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5h-3a.5.5 0 0 1-.5-.5v-1a.5.5 0 0 1 .5-.5h3zM-1 1.5A1.5 1.5 0 0 1 .5 0h3A1.5 1.5 0 0 1 5 1.5v1A1.5 1.5 0 0 1 3.5 4h-3A1.5 1.5 0 0 1-1 2.5v-1z"/></svg><span>Click to Copy</span></span></div><pre class="text-white p-4 text-base overflow-x-auto"><code>-- Anti-pattern: Expensive LIKE operation first
+SELECT text FROM `stackoverflow.comments` WHERE text LIKE '%java%' AND user_display_name = 'anon';
+
+-- Optimized: Apply the more selective filter first
+SELECT text FROM `stackoverflow.comments` WHERE user_display_name = 'anon' AND text LIKE '%java%';</code></pre></div>
+                        </div>
+                        <div class="p-4 bg-slate-100 rounded-lg space-y-2">
+                            <p class="font-semibold text-slate-700">
+                                <span class="lang lang-ko">3. JOIN 전에 데이터 줄이기</span>
+                                <span class="lang lang-en">3. Reduce Data Before JOIN</span>
+                            </p>
+                            <p class="text-sm text-slate-600">
+                                <span class="lang lang-ko">JOIN을 수행하기 전에 집계(aggregation)나 필터링을 통해 처리할 데이터 양을 미리 줄이면, 셔플되는 데이터가 감소하여 성능이 크게 향상됩니다.</span>
+                                <span class="lang lang-en">Reducing the amount of data to be processed through aggregation or filtering before performing a JOIN significantly improves performance by decreasing the data shuffled.</span>
+                            </p>
+                            <div class="code-container bg-slate-800 rounded-lg overflow-hidden relative" onclick="selectAndCopyCode(this)"><div class="flex justify-between items-center bg-slate-700 px-4 py-2 text-sm"><span class="text-slate-300 font-semibold">SQL: JOIN Optimization</span><span class="text-slate-400 text-xs flex items-center gap-1"><svg class="w-4 h-4" fill="currentColor" viewBox="0 0 16 16"><path d="M4 1.5H3a2 2 0 0 0-2 2V14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V3.5a2 2 0 0 0-2-2h-1v1h1a1 1 0 0 1 1 1V14a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1V3.5a1 1 0 0 1 1-1h1v-1z"/><path d="M9.5 1a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5h-3a.5.5 0 0 1-.5-.5v-1a.5.5 0 0 1 .5-.5h3zM-1 1.5A1.5 1.5 0 0 1 .5 0h3A1.5 1.5 0 0 1 5 1.5v1A1.5 1.5 0 0 1 3.5 4h-3A1.5 1.5 0 0 1-1 2.5v-1z"/></svg><span>Click to Copy</span></span></div><pre class="text-white p-4 text-base overflow-x-auto"><code>-- Anti-pattern: JOINing large tables first
+SELECT u.id, COUNT(c.text)
+FROM stackoverflow.users AS u
+JOIN stackoverflow.comments AS c ON u.id = c.user_id
+GROUP BY u.id;
+
+-- Optimized: Aggregate the comments table first
+SELECT u.id, c.comments_count
+FROM stackoverflow.users AS u
+JOIN (
+  SELECT user_id, COUNT(text) AS comments_count
+  FROM stackoverflow.comments
+  GROUP BY user_id
+) AS c ON u.id = c.user_id;</code></pre></div>
+                        </div>
+                        <div class="p-4 bg-slate-100 rounded-lg space-y-2">
+                            <p class="font-semibold text-slate-700">
+                                <span class="lang lang-ko">4. 근사 집계 함수 활용</span>
+                                <span class="lang lang-en">4. Utilize Approximate Aggregation Functions</span>
+                            </p>
+                            <p class="text-sm text-slate-600">
+                                <span class="lang lang-ko">정확한 값이 필요하지 않은 경우, `COUNT(DISTINCT ...)` 대신 `APPROX_COUNT_DISTINCT(...)`와 같은 근사 함수를 사용하면 훨씬 빠른 성능을 얻을 수 있습니다. 결과는 일반적으로 실제 값의 1% 내외 오차를 가집니다.</span>
+                                <span class="lang lang-en">If an exact value is not required, using approximate functions like `APPROX_COUNT_DISTINCT(...)` instead of `COUNT(DISTINCT ...)` can yield much faster performance. The result is typically within a 1% margin of error of the actual value.</span>
+                            </p>
+                            <div class="code-container bg-slate-800 rounded-lg overflow-hidden relative" onclick="selectAndCopyCode(this)"><div class="flex justify-between items-center bg-slate-700 px-4 py-2 text-sm"><span class="text-slate-300 font-semibold">SQL: Approximate Aggregation</span><span class="text-slate-400 text-xs flex items-center gap-1"><svg class="w-4 h-4" fill="currentColor" viewBox="0 0 16 16"><path d="M4 1.5H3a2 2 0 0 0-2 2V14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V3.5a2 2 0 0 0-2-2h-1v1h1a1 1 0 0 1 1 1V14a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1V3.5a1 1 0 0 1 1-1h1v-1z"/><path d="M9.5 1a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5h-3a.5.5 0 0 1-.5-.5v-1a.5.5 0 0 1 .5-.5h3zM-1 1.5A1.5 1.5 0 0 1 .5 0h3A1.5 1.5 0 0 1 5 1.5v1A1.5 1.5 0 0 1 3.5 4h-3A1.5 1.5 0 0 1-1 2.5v-1z"/></svg><span>Click to Copy</span></span></div><pre class="text-white p-4 text-base overflow-x-auto"><code>-- Standard function
+SELECT dim1, COUNT(DISTINCT dim2) FROM `dataset.table` GROUP BY 1;
+
+-- Optimized (using approximate function)
+SELECT dim1, APPROX_COUNT_DISTINCT(dim2) FROM `dataset.table` GROUP BY 1;</code></pre></div>
+                        </div>
+                    </div>
+                </article>
+
+                 <article id="section1-3" class="space-y-8">
+                    <h3 class="text-2xl font-semibold text-slate-800">
+                        <span class="lang lang-ko">1.3. 자율 성능 향상 기능</span>
+                        <span class="lang lang-en">1.3. Autonomous Performance Enhancement Features</span>
+                    </h3>
+                    <p class="leading-loose">
+                        <span class="lang lang-ko">BigQuery 플랫폼은 사용자의 직접적인 개입 없이도 쿼리 성능을 자동으로 개선하는 지능형 기능들을 지속적으로 도입하고 있습니다. 이러한 기능들은 워크로드에 대한 변경 없이 가격 대비 성능을 향상시켜, 데이터 플랫폼의 운영 패러다임을 근본적으로 변화시키는 중요한 진화입니다.</span>
+                        <span class="lang lang-en">The BigQuery platform continuously introduces intelligent features that automatically improve query performance without direct user intervention. These features enhance price-performance without requiring changes to workloads, fundamentally transforming the operational paradigm of data platforms.</span>
+                    </p>
+                    <div class="space-y-6">
+                        <div class="bg-slate-100 p-6 rounded-lg space-y-2"><h4 class="text-xl font-semibold text-slate-800">History-Based Optimization</h4><p class="text-base text-slate-600 leading-loose"><span class="lang lang-ko">과거에 실행된 유사한 쿼리의 실행 계획과 성능 데이터를 학습하여, 후속 쿼리를 자동으로 최적화하는 자가 학습 기능입니다. 예를 들어, BigQuery는 과거 쿼리 실행에서 특정 JOIN 조건의 선택도(selectivity)가 낮다는 것을 학습하면, 다음 실행 시에는 해당 JOIN을 쿼리 계획의 뒷부분으로 미루어 처리할 데이터의 양을 미리 줄입니다. 이처럼 복잡한 다중 조인 쿼리에서도 애플리케이션이나 스키마 변경 없이 최대 100배의 쿼리 지연 시간 개선을 제공할 수 있습니다. 이 기능은 성능 향상이 확실할 때만 적용되며, 효과가 미미할 경우 자동으로 비활성화되는 안전장치를 포함한 폐쇄 루프 시스템(Closed-loop system)으로 작동합니다.</span><span class="lang lang-en">This is a self-learning feature that learns from the execution plans and performance data of previously run similar queries to automatically optimize subsequent queries. For example, if BigQuery learns from past query executions that a particular JOIN condition has low selectivity, it will postpone that JOIN to a later part of the query plan in the next execution to reduce the amount of data processed beforehand. This can provide up to a 100x improvement in query latency for complex multi-join queries without any application or schema changes. This feature operates as a closed-loop system with a safety mechanism that applies it only when performance improvement is certain and automatically disables it if the effect is negligible.</span></p></div>
+                        <div class="bg-slate-100 p-6 rounded-lg space-y-2"><h4 class="text-xl font-semibold text-slate-800">Short Query Optimized Mode</h4><p class="text-base text-slate-600 leading-loose"><span class="lang lang-ko">1GB 미만을 스캔하는 작은(short) 쿼리들을 위해 설계된 최적화 모드입니다. 내부적인 작업 생성 오버헤드를 제거하고 SELECT 문의 결과를 인라인으로 제공하는 방식으로, 작은 쿼리의 실행 속도를 최대 50%까지 향상시킵니다. 이 기능은 BI 대시보드나 실시간 애플리케이션의 응답성을 높이는 데 특히 유용하며, 모든 BigQuery 클라이언트에서 자동으로 적용됩니다. `INFORMATION_SCHEMA.JOBS` 뷰를 통해 어떤 쿼리가 이 기능으로 가속화되었는지 확인할 수 있습니다.</span><span class="lang lang-en">This is an optimization mode designed for small (short) queries that scan less than 1GB. By eliminating internal job creation overhead and providing the results of SELECT statements inline, it improves the execution speed of small queries by up to 50%. This feature is particularly useful for enhancing the responsiveness of BI dashboards and real-time applications and is automatically applied across all BigQuery clients. You can check which queries have been accelerated by this feature through the `INFORMATION_SCHEMA.JOBS` view.</span></p></div>
+                        <div class="bg-slate-100 p-6 rounded-lg space-y-2"><h4 class="text-xl font-semibold text-slate-800">CMETA (Columnar Metadata)</h4><p class="text-base text-slate-600 leading-loose"><span class="lang lang-ko">BigQuery는 내부 스토리지 파일(Capacitor)별로 각 컬럼의 메타데이터(최소/최대값, 고유값 수 등)를 CMETA라는 인덱스에 저장합니다. 쿼리 실행 시, BigQuery 옵티마이저는 WHERE 절의 필터 조건을 이 CMETA 인덱스와 비교하여, 조건에 맞지 않는 데이터 블록 전체를 읽지 않고 건너뜁니다. 이를 통해 불필요한 I/O를 원천적으로 차단하여 100GB에서 10TB에 이르는 대용량 테이블에서도 5배에서 10배까지 쿼리 실행 시간을 단축시킬 수 있습니다.</span><span class="lang lang-en">BigQuery stores metadata for each column (min/max values, number of unique values, etc.) for each internal storage file (Capacitor) in an index called CMETA. During query execution, the BigQuery optimizer compares the filter conditions in the WHERE clause with this CMETA index and skips reading entire data blocks that do not meet the conditions. This fundamentally prevents unnecessary I/O, reducing query execution time by 5 to 10 times even for large tables ranging from 100GB to 10TB.</span></p></div>
+                        <div class="bg-slate-100 p-6 rounded-lg space-y-2">
+                            <h4 class="text-xl font-semibold text-slate-800">Fine-grained DML</h4>
+                            <p class="text-base text-slate-600 leading-loose"><span class="lang lang-ko">`UPDATE`, `DELETE`, `MERGE`와 같은 DML 문의 실행을 최적화하는 기능입니다. 기존에는 DML 작업 시 변경이 필요한 데이터가 포함된 전체 파일 그룹을 다시 작성해야 했습니다. 하지만 이 기능을 활성화하면, BigQuery는 파일 그룹보다 더 세분화된 수준에서 변경을 수행하여 다시 써야 하는 데이터의 양을 최소화합니다. 이는 특히 소수의 행만 변경되는 트랜잭션성 데이터 관리에서 총 사용 슬롯과 쿼리 지연 시간을 크게 개선하는 효과를 가져옵니다.</span><span class="lang lang-en">This feature optimizes the execution of DML statements like `UPDATE`, `DELETE`, and `MERGE`. Previously, DML operations required rewriting the entire file group containing the data that needed to be changed. However, with this feature enabled, BigQuery performs changes at a more granular level than the file group, minimizing the amount of data that needs to be rewritten. This is particularly effective in improving total slot usage and query latency for transactional data management where only a few rows are changed.</span></p>
+                            <div class="code-container bg-slate-800 rounded-lg overflow-hidden mt-2 relative" onclick="selectAndCopyCode(this)"><div class="flex justify-between items-center bg-slate-700 px-4 py-2 text-sm"><span class="text-slate-300 font-semibold">SQL: Enable Fine-grained DML</span><span class="text-slate-400 text-xs flex items-center gap-1"><svg class="w-4 h-4" fill="currentColor" viewBox="0 0 16 16"><path d="M4 1.5H3a2 2 0 0 0-2 2V14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V3.5a2 2 0 0 0-2-2h-1v1h1a1 1 0 0 1 1 1V14a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1V3.5a1 1 0 0 1 1-1h1v-1z"/><path d="M9.5 1a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5h-3a.5.5 0 0 1-.5-.5v-1a.5.5 0 0 1 .5-.5h3zM-1 1.5A1.5 1.5 0 0 1 .5 0h3A1.5 1.5 0 0 1 5 1.5v1A1.5 1.5 0 0 1 3.5 4h-3A1.5 1.5 0 0 1-1 2.5v-1z"/></svg><span>Click to Copy</span></span></div><pre class="text-white p-4 text-base overflow-x-auto"><code>-- How to enable the feature
+ALTER TABLE mydataset.mytable SET OPTIONS(enable_fine_grained_mutations = TRUE);</code></pre></div>
+                        </div>
+                        <div class="bg-slate-100 p-6 rounded-lg space-y-2"><h4 class="text-xl font-semibold text-slate-800">BigQuery Advanced Runtime (Preview)</h4><p class="text-base text-slate-600 leading-loose"><span class="lang lang-ko">쿼리 프로세서에 향상된 벡터화(Enhanced Vectorization) 기술을 적용하여 성능을 극대화합니다. 벡터화는 SIMD(Single Instruction, Multiple Data) 연산을 통해 여러 데이터 포인트를 한 번의 명령으로 동시에 처리하는 기술입니다. 이 런타임을 활성화하면 필터 평가, 데이터 인코딩/디코딩과 같은 쿼리 처리의 주요 측면이 최적화되어, SQL 스크립트 변경 없이도 고성능을 제공받을 수 있습니다.</span><span class="lang lang-en">This applies Enhanced Vectorization technology to the query processor to maximize performance. Vectorization is a technique that processes multiple data points simultaneously with a single instruction through SIMD (Single Instruction, Multiple Data) operations. Activating this runtime optimizes key aspects of query processing such as filter evaluation and data encoding/decoding, providing high performance without any changes to SQL scripts.</span></p></div>
+                    </div>
+                </article>
+
+                <article id="section1-4" class="space-y-8">
+                    <h3 class="text-2xl font-semibold text-slate-800">
+                        <span class="lang lang-ko">1.4. 용량 튜닝 및 워크로드 관리</span>
+                        <span class="lang lang-en">1.4. Capacity Tuning and Workload Management</span>
+                    </h3>
+                    <p class="leading-loose">
+                        <span class="lang lang-ko">성능 최적화의 마지막 퍼즐은 컴퓨팅 용량, 즉 '슬롯(slots)'을 경제적으로 구매하고 효율적으로 할당하는 것입니다. 슬롯은 BigQuery의 분석을 위한 컴퓨팅 단위(CPU, RAM, Network의 조합)이며, 효과적인 슬롯 관리는 예측 가능한 성능을 보장하고 비용을 통제하기 위한 핵심적인 관리 활동입니다.</span>
+                        <span class="lang lang-en">The final piece of the performance optimization puzzle is economically purchasing and efficiently allocating computing capacity, or 'slots'. Slots are the computational units for analysis in BigQuery (a combination of CPU, RAM, and Network), and effective slot management is a key administrative activity for ensuring predictable performance and controlling costs.</span>
+                    </p>
+
+                    <div class="space-y-4">
+                        <h4 class="text-xl font-semibold text-slate-700">
+                            <span class="lang lang-ko">BigQuery Editions 및 슬롯 관리</span>
+                            <span class="lang lang-en">BigQuery Editions and Slot Management</span>
+                        </h4>
+                        <p class="leading-loose">
+                            <span class="lang lang-ko">BigQuery는 워크로드 요구사항에 맞춰 Standard, Enterprise, Enterprise Plus 세 가지 에디션을 제공합니다. 각 에디션은 슬롯 관리, 유휴 슬롯 공유, BigQuery ML 접근성 등에서 차이가 있습니다.</span>
+                            <span class="lang lang-en">BigQuery offers three editions to meet workload requirements: Standard, Enterprise, and Enterprise Plus. Each edition differs in terms of slot management, idle slot sharing, BigQuery ML accessibility, and more.</span>
+                        </p>
+                        <div class="overflow-x-auto"><table class="w-full bg-white border border-slate-300 rounded-lg shadow table-auto">
+                            <thead class="bg-slate-100"><tr><th class="p-3 text-left text-base font-semibold text-slate-700 w-[30%]">Feature</th><th class="p-3 text-left text-base font-semibold text-slate-700 w-[18%]">Standard</th><th class="p-3 text-left text-base font-semibold text-slate-700 w-[18%]">Enterprise</th><th class="p-3 text-left text-base font-semibold text-slate-700 w-[34%]">Enterprise Plus</th></tr></thead>
+                            <tbody><tr class="border-t"><td class="p-3 text-base break-words">Compute Model</td><td class="p-3 text-base break-words">Autoscaling</td><td class="p-3 text-base break-words">Autoscaling + Baseline</td><td class="p-3 text-base break-words">Autoscaling + Baseline</td></tr><tr class="border-t"><td class="p-3 text-base break-words">Idle Capacity Sharing</td><td class="p-3 text-base break-words">No</td><td class="p-3 text-base break-words">Yes</td><td class="p-3 text-base break-words">Yes</td></tr><tr class="border-t"><td class="p-3 text-base break-words">BigQuery ML</td><td class="p-3 text-base break-words">No access</td><td class="p-3 text-base break-words">Included</td><td class="p-3 text-base break-words">Included</td></tr><tr class="border-t"><td class="p-3 text-base break-words">Compliance Controls</td><td class="p-3 text-base break-words">No</td><td class="p-3 text-base break-words">No</td><td class="p-3 text-base break-words">Yes (via Assured Workloads)</td></tr></tbody>
+                        </table></div>
+                        <p class="leading-loose">
+                            <span class="lang lang-ko"><strong>예약(Reservation)</strong>을 생성하여 특정 프로젝트나 워크로드에 슬롯을 할당할 수 있습니다. <strong>베이스라인(Baseline)</strong>은 예약에 항상 할당되는 최소 슬롯 수를 의미하며, <strong>자동 확장(Autoscaling)</strong>은 워크로드 증가 시 최대 한도까지 슬롯을 자동으로 추가 할당합니다. Enterprise 에디션 이상에서는 다른 예약에서 사용하지 않는 <strong>유휴 슬롯(Idle Slots)</strong>을 공유하여 리소스 활용률을 극대화할 수 있습니다.</span>
+                            <span class="lang lang-en">You can create a <strong>Reservation</strong> to assign slots to a specific project or workload. A <strong>Baseline</strong> is the minimum number of slots always allocated to the reservation, while <strong>Autoscaling</strong> automatically adds slots up to a maximum limit as the workload increases. In the Enterprise edition and above, you can share <strong>Idle Slots</strong> that are not being used by other reservations to maximize resource utilization.</span>
+                        </p>
+                    </div>
+
+                    <div class="space-y-4">
+                        <h4 class="text-xl font-semibold text-slate-700">
+                            <span class="lang lang-ko">워크로드 관리 및 모니터링</span>
+                            <span class="lang lang-en">Workload Management and Monitoring</span>
+                        </h4>
+                        <p class="leading-loose">
+                            <span class="lang lang-ko">BigQuery는 다양한 작업 유형(Job Type)을 지원하며, 각 유형에 맞는 예약을 할당하여 워크로드를 격리하고 관리할 수 있습니다. 예를 들어, 중요한 `QUERY` 작업과 대용량 `PIPELINE`(Load/Extract) 작업을 별도의 예약으로 분리하여 서로 영향을 주지 않도록 할 수 있습니다.</span>
+                            <span class="lang lang-en">BigQuery supports various Job Types, and you can assign reservations tailored to each type to isolate and manage workloads. For example, you can separate critical `QUERY` jobs from large-volume `PIPELINE` (Load/Extract) jobs into different reservations to prevent them from impacting each other.</span>
+                        </p>
+                        <div class="p-4 bg-slate-100 rounded-lg space-y-2">
+                            <p class="font-semibold text-slate-700">
+                                <span class="lang lang-ko">실습 예제: 런타임에 예약 할당 변경하기 (Preview)</span>
+                                <span class="lang lang-en">Example: Changing Reservation Assignment at Runtime (Preview)</span>
+                            </p>
+                            <p class="text-sm text-slate-600">
+                                <span class="lang lang-ko">적절한 권한이 있는 사용자는 쿼리 실행 시 기본 예약을 재정의하여 다른 예약에서 쿼리를 실행할 수 있습니다. 이는 특정 고부하 쿼리를 별도의 대용량 예약에서 실행할 때 유용합니다.</span>
+                                <span class="lang lang-en">Users with appropriate permissions can override the default reservation at query time to run a query in a different reservation. This is useful for running specific high-load queries in a separate, larger reservation.</span>
+                            </p>
+                            <div class="code-container bg-slate-800 rounded-lg overflow-hidden relative" onclick="selectAndCopyCode(this)"><div class="flex justify-between items-center bg-slate-700 px-4 py-2 text-sm"><span class="text-slate-300 font-semibold">Shell: Change Reservation Assignment</span><span class="text-slate-400 text-xs flex items-center gap-1"><svg class="w-4 h-4" fill="currentColor" viewBox="0 0 16 16"><path d="M4 1.5H3a2 2 0 0 0-2 2V14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V3.5a2 2 0 0 0-2-2h-1v1h1a1 1 0 0 1 1 1V14a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1V3.5a1 1 0 0 1 1-1h1v-1z"/><path d="M9.5 1a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5h-3a.5.5 0 0 1-.5-.5v-1a.5.5 0 0 1 .5-.5h3zM-1 1.5A1.5 1.5 0 0 1 .5 0h3A1.5 1.5 0 0 1 5 1.5v1A1.5 1.5 0 0 1 3.5 4h-3A1.5 1.5 0 0 1-1 2.5v-1z"/></svg><span>Click to Copy</span></span></div><pre class="text-white p-4 text-base overflow-x-auto"><code># Example using gcloud CLI
+gcloud alpha bq query --use_legacy_sql=false \
+--project_id=my-query-project \
+--reservation_id=my-runtime-reservation \
+'SELECT * FROM `my-data-project.mydataset.mytable` LIMIT 10'</code></pre></div>
+                        </div>
+                    </div>
+
+                    <div class="space-y-4">
+                        <h4 class="text-xl font-semibold text-slate-700">
+                            <span class="lang lang-ko">용량 계획을 위한 도구</span>
+                            <span class="lang lang-en">Tools for Capacity Planning</span>
+                        </h4>
+                        <p class="leading-loose">
+                            <span class="lang lang-ko">BigQuery는 비용을 최적화하고 적절한 용량을 계획할 수 있도록 <strong>슬롯 추천기(Slot Recommender)</strong>와 <strong>슬롯 추정기(Slot Estimator)</strong>를 제공합니다. 추천기는 지난 30일간의 사용량을 분석하여 On-demand 요금제에서 정액제(예약)로 전환 시 비용 절감 효과를 알려줍니다. 추정기는 슬롯 용량을 늘리거나 줄였을 때 작업 성능에 미칠 영향을 모델링하여 보여줍니다. 이러한 도구들을 활용하여 데이터 기반의 용량 계획을 수립할 수 있습니다.</span>
+                            <span class="lang lang-en">BigQuery provides the <strong>Slot Recommender</strong> and <strong>Slot Estimator</strong> to help optimize costs and plan appropriate capacity. The recommender analyzes usage over the past 30 days to show potential cost savings from switching from on-demand pricing to a flat-rate (reservation) model. The estimator models the impact on job performance if you increase or decrease slot capacity. You can use these tools to establish data-driven capacity plans.</span>
+                        </p>
+                    </div>
+                </article>
+            </section>
+
+            <section id="section2" class="card p-8 space-y-12">
+                <header>
+                    <h2 class="text-3xl font-bold text-slate-900 border-b-2 border-sky-500 pb-4">
+                        <span class="lang lang-ko">II. 통합 데이터 & AI 플랫폼: BigLake와 Dataplex</span>
+                        <span class="lang lang-en">II. Unified Data & AI Platform: BigLake and Dataplex</span>
+                    </h2>
+                    <p class="mt-4 text-lg text-slate-600 leading-loose">
+                        <span class="lang lang-ko">현대 기업의 데이터 환경은 정형 데이터 중심의 데이터 웨어하우스와 비정형 데이터를 포함한 모든 유형의 데이터를 저장하는 데이터 레이크로 양분되어 왔습니다. 이러한 사일로(silo)는 데이터 중복, 관리 복잡성, 통합 분석의 어려움을 야기합니다. 본 섹션에서는 Google Cloud가 이러한 문제를 해결하고 데이터와 AI를 통합하기 위해 제시하는 AI-Native Lakehouse 아키텍처를 분석합니다.</span>
+                        <span class="lang lang-en">The modern enterprise data landscape has been divided between data warehouses, focused on structured data, and data lakes, which store all types of data, including unstructured. These silos lead to data duplication, management complexity, and difficulties in unified analytics. This section analyzes the AI-Native Lakehouse architecture proposed by Google Cloud to solve these problems and integrate data with AI.</span>
+                    </p>
+                </header>
+                
+                <article id="section2-1" class="space-y-8">
+                    <h3 class="text-2xl font-semibold text-slate-800">
+                        <span class="lang lang-ko">2.1. AI-Native Lakehouse로의 진화</span>
+                        <span class="lang lang-en">2.1. Evolution to the AI-Native Lakehouse</span>
+                    </h3>
+                    <p class="leading-loose">
+                        <span class="lang lang-ko">데이터 플랫폼은 보고서 작성을 위한 <strong>데이터 웨어하우스</strong>에서 시작하여, 모든 유형의 데이터를 저장하고 데이터 과학을 지원하는 <strong>데이터 레이크</strong>로 발전했습니다. 그리고 이제, 두 세계의 장점을 결합한 <strong>레이크하우스(Lakehouse)</strong>를 넘어, 실시간 멀티모달 데이터를 기반으로 모든 비즈니스 전문가를 위한 에이전틱 AI 경험을 제공하는 <strong>AI-Native 플랫폼</strong>으로 진화하고 있습니다. 이 플랫폼은 통합, 개방성, 유연성을 핵심 가치로 삼습니다.</span>
+                        <span class="lang lang-en">Data platforms began with the <strong>Data Warehouse</strong> for reporting, evolved into the <strong>Data Lake</strong> to store all data types and support data science, and are now moving beyond the <strong>Lakehouse</strong>—which combines the best of both worlds—to the <strong>AI-Native Platform</strong>. This new paradigm provides agentic AI experiences for all business professionals, built on real-time, multimodal data, and is founded on the core values of integration, openness, and flexibility.</span>
+                    </p>
+                </article>
+
+                <article id="section2-2" class="space-y-8">
+                    <h3 class="text-2xl font-semibold text-slate-800">
+                        <span class="lang lang-ko">2.2. BigLake 아키텍처: 스토리지 계층에서의 데이터 통합</span>
+                        <span class="lang lang-en">2.2. BigLake Architecture: Data Integration at the Storage Layer</span>
+                    </h3>
+                    <p class="leading-loose">
+                        <span class="lang lang-ko">BigLake는 Google Cloud Storage(GCS), BigQuery Managed Storage, 심지어 AWS S3나 Azure Storage와 같은 멀티 클라우드 환경에 분산된 데이터를 단일 가상 데이터 레이크로 통합하는 스토리지 엔진입니다. 데이터 이동 없이 Apache Iceberg, Delta Lake, Hudi와 같은 오픈 포맷 데이터를 BigQuery에서 직접 쿼리하고, 일관된 보안 및 거버넌스 정책을 적용할 수 있습니다. 이를 통해 데이터 중복을 제거하고, 분석 및 AI 엔진이 어디에 있든 단일 데이터 복사본을 활용할 수 있습니다.</span>
+                        <span class="lang lang-en">BigLake is a storage engine that unifies distributed data across Google Cloud Storage (GCS), BigQuery Managed Storage, and even multi-cloud environments like AWS S3 or Azure Storage into a single virtual data lake. It allows you to query open formats like Apache Iceberg, Delta Lake, and Hudi directly from BigQuery without data movement and apply consistent security and governance policies. This eliminates data duplication and enables the use of a single copy of data, regardless of where the analytics and AI engines reside.</span>
+                    </p>
+                    <div class="my-4 p-6 bg-slate-100 rounded-xl border border-slate-200">
+                        <h5 class="text-xl font-bold text-center text-slate-800 mb-6">BigLake Unified Storage Architecture</h5>
+                        <div class="space-y-4"><div class="text-center"><div class="font-bold text-slate-700 mb-2">Analytics & AI Engines</div><div class="flex justify-center gap-2 flex-wrap"><span class="bg-blue-200 text-blue-800 text-sm font-semibold px-3 py-1 rounded-full">BigQuery</span><span class="bg-green-200 text-green-800 text-sm font-semibold px-3 py-1 rounded-full">OSS Engines (Spark)</span><span class="bg-purple-200 text-purple-800 text-sm font-semibold px-3 py-1 rounded-full">Vertex AI</span><span class="bg-gray-200 text-gray-800 text-sm font-semibold px-3 py-1 rounded-full">3rd Party</span></div></div><div class="flex justify-center items-center"><div class="w-px h-8 bg-slate-300"></div></div><div class="bg-white p-4 rounded-lg shadow-md text-center border"><div class="font-bold text-slate-800">BigLake | Data and AI Governance</div><p class="text-xs text-slate-500">Security, Price-Performance, Management</p></div><div class="flex justify-center items-center"><div class="w-px h-8 bg-slate-300"></div></div><div class="text-center"><div class="font-bold text-slate-700 mb-2">Unified Storage Layer</div><div class="grid grid-cols-1 md:grid-cols-3 gap-4"><div class="bg-sky-100 p-3 rounded-lg"><p class="font-semibold text-sky-800">Google Cloud</p><p class="text-xs text-sky-700">Cloud Storage, BQ Storage</p></div><div class="bg-red-100 p-3 rounded-lg"><p class="font-semibold text-red-800">Multi-Cloud</p><p class="text-xs text-red-700">AWS S3, Azure Storage</p></div><div class="bg-indigo-100 p-3 rounded-lg"><p class="font-semibold text-indigo-800">Open Formats</p><p class="text-xs text-indigo-700">Iceberg, Delta, Hudi</p></div></div></div></div>
+                    </div>
+                    <div class="p-4 bg-slate-100 rounded-lg space-y-2">
+                        <p class="font-semibold text-slate-700">
+                            <span class="lang lang-ko">실습 예제: GCS의 Iceberg 테이블을 BigLake 테이블로 생성하기</span>
+                            <span class="lang lang-en">Example: Creating a BigLake Table from an Iceberg Table in GCS</span>
+                        </p>
+                        <div class="code-container bg-slate-800 rounded-lg overflow-hidden relative" onclick="selectAndCopyCode(this)"><div class="flex justify-between items-center bg-slate-700 px-4 py-2 text-sm"><span class="text-slate-300 font-semibold">SQL: Create BigLake Table</span><span class="text-slate-400 text-xs flex items-center gap-1"><svg class="w-4 h-4" fill="currentColor" viewBox="0 0 16 16"><path d="M4 1.5H3a2 2 0 0 0-2 2V14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V3.5a2 2 0 0 0-2-2h-1v1h1a1 1 0 0 1 1 1V14a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1V3.5a1 1 0 0 1 1-1h1v-1z"/><path d="M9.5 1a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5h-3a.5.5 0 0 1-.5-.5v-1a.5.5 0 0 1 .5-.5h3zM-1 1.5A1.5 1.5 0 0 1 .5 0h3A1.5 1.5 0 0 1 5 1.5v1A1.5 1.5 0 0 1 3.5 4h-3A1.5 1.5 0 0 1-1 2.5v-1z"/></svg><span>Click to Copy</span></span></div><pre class="text-white p-4 text-base overflow-x-auto"><code>-- 1. Create a cloud resource connection
+CREATE CONNECTION `us-central1.my-gcs-connection`
+OPTIONS (
+  cloud_resource = 'gcs',
+  storage_account = '...'
+);
+
+-- 2. Create a BigLake table
+CREATE EXTERNAL TABLE mydataset.my_iceberg_table
+WITH CONNECTION `us-central1.my-gcs-connection`
+OPTIONS (
+  format = 'ICEBERG',
+  uris = ['gs://my-bucket/path/to/iceberg_metadata/']
+);</code></pre></div>
+                    </div>
+                </article>
+
+                <article id="section2-3" class="space-y-8">
+                    <h3 class="text-2xl font-semibold text-slate-800">
+                        <span class="lang lang-ko">2.3. Dataplex를 통한 통합 거버넌스</span>
+                        <span class="lang lang-en">2.3. Unified Governance with Dataplex</span>
+                    </h3>
+                    <p class="leading-loose">
+                        <span class="lang lang-ko">Dataplex는 분산된 데이터 자산을 위한 통합 데이터 거버넌스 솔루션입니다. 자동화된 데이터 검색 및 카탈로그화, 데이터 프로파일링, 품질 검사, 엔드투엔드 계보(lineage) 추적 기능을 제공하여 데이터에 대한 신뢰를 구축합니다. 특히 AI 기반의 시맨틱 검색, 자동 메타데이터 생성, 비즈니스 용어집(Glossary) 기능을 통해 조직의 모든 구성원이 데이터를 쉽게 찾고, 이해하며, 공유할 수 있도록 지원합니다.</span>
+                        <span class="lang lang-en">Dataplex is a unified data governance solution for distributed data assets. It builds trust in data by providing automated data discovery and cataloging, data profiling, quality checks, and end-to-end lineage tracking. In particular, its AI-powered semantic search, automatic metadata generation, and Business Glossary features help all members of an organization easily find, understand, and share data.</span>
+                    </p>
+                </article>
+
+                <article id="section2-4" class="space-y-8">
+                    <h3 class="text-2xl font-semibold text-slate-800">
+                        <span class="lang lang-ko">2.4. 확장 가능한 데이터 보안 구현</span>
+                        <span class="lang lang-en">2.4. Implementing Scalable Data Security</span>
+                    </h3>
+                    <p class="leading-loose">
+                        <span class="lang lang-ko">Dataplex와 BigQuery는 세분화된 접근 제어를 통해 데이터를 안전하게 보호합니다. 컬럼 수준 보안, 동적 데이터 마스킹, 행 수준 보안 정책을 중앙에서 관리하고 모든 데이터에 일관되게 적용할 수 있습니다.</span>
+                        <span class="lang lang-en">Dataplex and BigQuery protect data securely through fine-grained access control. You can centrally manage and consistently apply column-level security, dynamic data masking, and row-level security policies to all data.</span>
+                    </p>
+                    <div class="space-y-6">
+                        <div class="p-4 bg-slate-100 rounded-lg space-y-2">
+                            <p class="font-semibold text-slate-700">
+                                <span class="lang lang-ko">실습 예제 1: 커스텀 데이터 마스킹 함수 생성</span>
+                                <span class="lang lang-en">Example 1: Creating a Custom Data Masking Function</span>
+                            </p>
+                            <p class="text-sm text-slate-600">
+                                <span class="lang lang-ko">SQL UDF(사용자 정의 함수)를 사용하여 민감한 데이터를 특정 사용자 그룹에게 마스킹 처리하여 보여줄 수 있습니다.</span>
+                                <span class="lang lang-en">You can use a SQL UDF (User-Defined Function) to show masked sensitive data to specific user groups.</span>
+                            </p>
+                            <div class="code-container bg-slate-800 rounded-lg overflow-hidden relative" onclick="selectAndCopyCode(this)"><div class="flex justify-between items-center bg-slate-700 px-4 py-2 text-sm"><span class="text-slate-300 font-semibold">SQL: Data Masking</span><span class="text-slate-400 text-xs flex items-center gap-1"><svg class="w-4 h-4" fill="currentColor" viewBox="0 0 16 16"><path d="M4 1.5H3a2 2 0 0 0-2 2V14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V3.5a2 2 0 0 0-2-2h-1v1h1a1 1 0 0 1 1 1V14a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1V3.5a1 1 0 0 1 1-1h1v-1z"/><path d="M9.5 1a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5h-3a.5.5 0 0 1-.5-.5v-1a.5.5 0 0 1 .5-.5h3zM-1 1.5A1.5 1.5 0 0 1 .5 0h3A1.5 1.5 0 0 1 5 1.5v1A1.5 1.5 0 0 1 3.5 4h-3A1.5 1.5 0 0 1-1 2.5v-1z"/></svg><span>Click to Copy</span></span></div><pre class="text-white p-4 text-base overflow-x-auto"><code>-- Create a function to mask social security numbers with 'X'
+CREATE OR REPLACE FUNCTION mydataset.mask_ssn(ssn STRING)
+RETURNS STRING
+OPTIONS (data_governance_type = 'DATA_MASKING')
+AS (
+  SAFE.REGEXP_REPLACE(ssn, r'\d', 'X')
+);</code></pre></div>
+                        </div>
+                        <div class="p-4 bg-slate-100 rounded-lg space-y-2">
+                            <p class="font-semibold text-slate-700">
+                                <span class="lang lang-ko">실습 예제 2: 하위 쿼리를 이용한 동적 행 수준 보안</span>
+                                <span class="lang lang-en">Example 2: Dynamic Row-Level Security Using a Subquery</span>
+                            </p>
+                            <p class="text-sm text-slate-600">
+                                <span class="lang lang-ko">행 접근 정책에 하위 쿼리를 사용하여, 쿼리를 실행하는 사용자의 속성(예: 소속 지역)에 따라 접근 가능한 데이터를 동적으로 필터링할 수 있습니다.</span>
+                                <span class="lang lang-en">You can use a subquery in a row-access policy to dynamically filter accessible data based on the attributes of the user running the query (e.g., their region).</span>
+                            </p>
+                            <div class="code-container bg-slate-800 rounded-lg overflow-hidden relative" onclick="selectAndCopyCode(this)"><div class="flex justify-between items-center bg-slate-700 px-4 py-2 text-sm"><span class="text-slate-300 font-semibold">SQL: Row-Level Security</span><span class="text-slate-400 text-xs flex items-center gap-1"><svg class="w-4 h-4" fill="currentColor" viewBox="0 0 16 16"><path d="M4 1.5H3a2 2 0 0 0-2 2V14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V3.5a2 2 0 0 0-2-2h-1v1h1a1 1 0 0 1 1 1V14a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1V3.5a1 1 0 0 1 1-1h1v-1z"/><path d="M9.5 1a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5h-3a.5.5 0 0 1-.5-.5v-1a.5.5 0 0 1 .5-.5h3zM-1 1.5A1.5 1.5 0 0 1 .5 0h3A1.5 1.5 0 0 1 5 1.5v1A1.5 1.5 0 0 1 3.5 4h-3A1.5 1.5 0 0 1-1 2.5v-1z"/></svg><span>Click to Copy</span></span></div><pre class="text-white p-4 text-base overflow-x-auto"><code>-- Filter data to show only the user's own region by referencing the sales_rep table
+CREATE OR REPLACE ROW ACCESS POLICY sales_region_filter
+ON mydataset.partner_spend
+GRANT TO ('group:sales@example.com')
+FILTER USING (
+  region IN (
+    SELECT sales_region
+    FROM mydataset.sales_rep_mapping
+    WHERE sales_rep_email = SESSION_USER()
+  )
+);</code></pre></div>
+                        </div>
+                    </div>
+                </article>
+            </section>
+
+            <section id="section3" class="card p-8 space-y-12">
+                <header>
+                    <h2 class="text-3xl font-bold text-slate-900 border-b-2 border-sky-500 pb-4">
+                        <span class="lang lang-ko">III. 인텔리전스의 민주화: BigQuery ML</span>
+                        <span class="lang lang-en">III. Democratization of Intelligence: BigQuery ML</span>
+                    </h2>
+                    <p class="mt-4 text-lg text-slate-600 leading-loose">
+                        <span class="lang lang-ko">데이터를 분석 환경으로 옮기는 대신, 분석 및 AI 기능을 데이터가 있는 곳으로 가져오는 '데이터베이스 내 분석(in-database analytics)'은 현대 데이터 플랫폼의 중요한 트렌드입니다. BigQuery ML(BQML)은 데이터 분석가와 SQL 사용자가 익숙한 SQL 구문만으로 머신러닝 모델을 구축하고 실행할 수 있게 함으로써, 고급 분석과 AI의 민주화를 실현합니다.</span>
+                        <span class="lang lang-en">Instead of moving data to an analytics environment, bringing analytics and AI capabilities to where the data resides—'in-database analytics'—is a key trend in modern data platforms. BigQuery ML (BQML) actualizes the democratization of advanced analytics and AI by enabling data analysts and SQL users to build and execute machine learning models using only familiar SQL syntax.</span>
+                    </p>
+                </header>
+                
+                <article id="section3-1" class="space-y-8">
+                    <h3 class="text-2xl font-semibold text-slate-800">
+                        <span class="lang lang-ko">3.1. BQML 프레임워크: SQL을 이용한 머신러닝</span>
+                        <span class="lang lang-en">3.1. BQML Framework: Machine Learning with SQL</span>
+                    </h3>
+                    <p class="leading-loose">
+                        <span class="lang lang-ko">BQML은 분류, 회귀, 시계열 예측, 추천 시스템 등 다양한 머신러닝 작업을 지원합니다. `CREATE MODEL` 구문을 사용하여 모델을 학습시키고, `ML.PREDICT` 함수로 예측을 수행하며, `ML.EVALUATE`로 모델 성능을 평가하는 등 전체 머신러닝 워크플로우를 SQL 안에서 완료할 수 있습니다.</span>
+                        <span class="lang lang-en">BQML supports a wide range of machine learning tasks, including classification, regression, time series forecasting, and recommendation systems. The entire machine learning workflow—from training a model using the `CREATE MODEL` syntax, making predictions with the `ML.PREDICT` function, to evaluating model performance with `ML.EVALUATE`—can be completed within SQL.</span>
+                    </p>
+                    <div class="my-4 p-6 bg-slate-100 rounded-xl border border-slate-200">
+                        <h5 class="text-xl font-bold text-center text-slate-800 mb-6">BigQuery ML Model Ecosystem</h5>
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 text-center">
+                            <div class="bg-white p-4 rounded-lg shadow"><h6 class="font-bold text-blue-600">Predict Values</h6><p class="text-xs text-slate-500 mb-2">Regression</p><span class="bg-blue-100 text-blue-800 text-xs font-semibold mr-2 px-2.5 py-0.5 rounded">Linear Regression</span><span class="bg-blue-100 text-blue-800 text-xs font-semibold mr-2 px-2.5 py-0.5 rounded">Boosted Trees</span></div>
+                            <div class="bg-white p-4 rounded-lg shadow"><h6 class="font-bold text-green-600">Predict Categories</h6><p class="text-xs text-slate-500 mb-2">Classification</p><span class="bg-green-100 text-green-800 text-xs font-semibold mr-2 px-2.5 py-0.5 rounded">Logistic Regression</span><span class="bg-green-100 text-green-800 text-xs font-semibold mr-2 px-2.5 py-0.5 rounded">DNN Classifier</span></div>
+                            <div class="bg-white p-4 rounded-lg shadow"><h6 class="font-bold text-purple-600">Time-series</h6><p class="text-xs text-slate-500 mb-2">Forecasting</p><span class="bg-purple-100 text-purple-800 text-xs font-semibold mr-2 px-2.5 py-0.5 rounded">ARIMA_PLUS</span></div>
+                            <div class="bg-white p-4 rounded-lg shadow"><h6 class="font-bold text-red-600">Recommendations</h6><p class="text-xs text-slate-500 mb-2">Recommendation</p><span class="bg-red-100 text-red-800 text-xs font-semibold mr-2 px-2.5 py-0.5 rounded">Matrix Factorization</span></div>
+                            <div class="bg-white p-4 rounded-lg shadow"><h6 class="font-bold text-yellow-600">Clustering</h6><p class="text-xs text-slate-500 mb-2">Clustering</p><span class="bg-yellow-100 text-yellow-800 text-xs font-semibold mr-2 px-2.5 py-0.5 rounded">K-Means</span></div>
+                            <div class="bg-white p-4 rounded-lg shadow"><h6 class="font-bold text-indigo-600">Anomaly Detection</h6><p class="text-xs text-slate-500 mb-2">Anomaly Detection</p><span class="bg-indigo-100 text-indigo-800 text-xs font-semibold mr-2 px-2.5 py-0.5 rounded">Autoencoder</span></div>
+                        </div>
+                    </div>
+                    <div class="p-4 bg-slate-100 rounded-lg space-y-2">
+                        <p class="font-semibold text-slate-700">
+                            <span class="lang lang-ko">실습 예제: 고객 이탈 예측 모델 생성 및 예측</span>
+                            <span class="lang lang-en">Example: Creating and Using a Customer Churn Prediction Model</span>
+                        </p>
+                        <div class="code-container bg-slate-800 rounded-lg overflow-hidden relative" onclick="selectAndCopyCode(this)"><div class="flex justify-between items-center bg-slate-700 px-4 py-2 text-sm"><span class="text-slate-300 font-semibold">SQL: BQML Model Creation & Prediction</span><span class="text-slate-400 text-xs flex items-center gap-1"><svg class="w-4 h-4" fill="currentColor" viewBox="0 0 16 16"><path d="M4 1.5H3a2 2 0 0 0-2 2V14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V3.5a2 2 0 0 0-2-2h-1v1h1a1 1 0 0 1 1 1V14a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1V3.5a1 1 0 0 1 1-1h1v-1z"/><path d="M9.5 1a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5h-3a.5.5 0 0 1-.5-.5v-1a.5.5 0 0 1 .5-.5h3zM-1 1.5A1.5 1.5 0 0 1 .5 0h3A1.5 1.5 0 0 1 5 1.5v1A1.5 1.5 0 0 1 3.5 4h-3A1.5 1.5 0 0 1-1 2.5v-1z"/></svg><span>Click to Copy</span></span></div><pre class="text-white p-4 text-base overflow-x-auto"><code>-- 1. Create a logistic regression model
+CREATE OR REPLACE MODEL mydataset.churn_prediction_model
+OPTIONS(model_type='LOGISTIC_REG') AS
+SELECT
+  has_churned,
+  avg_monthly_spend,
+  tenure_months,
+  support_tickets
+FROM
+  mydataset.customer_data;
+
+-- 2. Predict churn probability for new customer data
+SELECT
+  customer_id,
+  predicted_has_churned
+FROM
+  ML.PREDICT(MODEL mydataset.churn_prediction_model,
+    (SELECT 12345 AS customer_id, 85.50 AS avg_monthly_spend, 6 AS tenure_months, 5 AS support_tickets)
+  );</code></pre></div>
+                    </div>
+                </article>
+
+                <article id="section3-2" class="space-y-8">
+                    <h3 class="text-2xl font-semibold text-slate-800">
+                        <span class="lang lang-ko">3.2. BQML의 MLOps 및 설명 가능성</span>
+                        <span class="lang lang-en">3.2. MLOps and Explainability in BQML</span>
+                    </h3>
+                    <p class="leading-loose">
+                        <span class="lang lang-ko">BQML은 Vertex AI와의 통합을 통해 모델 버전 관리, 모니터링, 파이프라인 자동화 등 MLOps(Machine Learning Operations) 기능을 지원합니다. 또한, <strong>설명 가능한 AI (Explainable AI)</strong> 기능을 내장하여 모델의 예측이 특정 입력 피처에 의해 어떻게 영향을 받았는지 이해할 수 있도록 돕습니다. `ML.EXPLAIN_PREDICT` 함수는 예측 결과와 함께 각 피처의 기여도를 제공하여 모델의 투명성을 높입니다.</span>
+                        <span class="lang lang-en">Through its integration with Vertex AI, BQML supports MLOps (Machine Learning Operations) features such as model versioning, monitoring, and pipeline automation. It also has built-in <strong>Explainable AI</strong> capabilities to help understand how a model's prediction was influenced by specific input features. The `ML.EXPLAIN_PREDICT` function provides the prediction result along with the contribution of each feature, enhancing model transparency.</span>
+                    </p>
+                </article>
+
+                 <article id="section3-3" class="space-y-8">
+                    <h3 class="text-2xl font-semibold text-slate-800">
+                        <span class="lang lang-ko">3.3. BigQuery의 생성형 AI: 새로운 지평</span>
+                        <span class="lang lang-en">3.3. Generative AI in BigQuery: A New Horizon</span>
+                    </h3>
+                    <p class="leading-loose">
+                        <span class="lang lang-ko">BQML은 Gemini와 같은 강력한 생성형 AI 모델을 SQL에서 직접 호출할 수 있는 기능을 제공합니다. 이를 통해 텍스트 생성, 요약, 번역, 감성 분석 등 비정형 데이터에 대한 복잡한 작업을 간단한 SQL 쿼리로 처리할 수 있습니다.</span>
+                        <span class="lang lang-en">BQML provides the ability to call powerful generative AI models like Gemini directly from SQL. This allows complex tasks on unstructured data, such as text generation, summarization, translation, and sentiment analysis, to be handled with simple SQL queries.</span>
+                    </p>
+                    <div class="space-y-6">
+                        <div class="p-4 bg-slate-100 rounded-lg space-y-2">
+                            <p class="font-semibold text-slate-700">
+                                <span class="lang lang-ko">실습 예제 1: `ML.GENERATE_TEXT`로 텍스트 생성하기</span>
+                                <span class="lang lang-en">Example 1: Generating Text with `ML.GENERATE_TEXT`</span>
+                            </p>
+                            <p class="text-sm text-slate-600">
+                                <span class="lang lang-ko">Vertex AI의 Gemini 모델에 프롬프트를 보내고, 그 결과를 SQL 쿼리 내에서 직접 받을 수 있습니다.</span>
+                                <span class="lang lang-en">You can send a prompt to Vertex AI's Gemini model and receive the result directly within a SQL query.</span>
+                            </p>
+                            <div class="code-container bg-slate-800 rounded-lg overflow-hidden relative" onclick="selectAndCopyCode(this)"><div class="flex justify-between items-center bg-slate-700 px-4 py-2 text-sm"><span class="text-slate-300 font-semibold">SQL: Generative AI Text Generation</span><span class="text-slate-400 text-xs flex items-center gap-1"><svg class="w-4 h-4" fill="currentColor" viewBox="0 0 16 16"><path d="M4 1.5H3a2 2 0 0 0-2 2V14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V3.5a2 2 0 0 0-2-2h-1v1h1a1 1 0 0 1 1 1V14a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1V3.5a1 1 0 0 1 1-1h1v-1z"/><path d="M9.5 1a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5h-3a.5.5 0 0 1-.5-.5v-1a.5.5 0 0 1 .5-.5h3zM-1 1.5A1.5 1.5 0 0 1 .5 0h3A1.5 1.5 0 0 1 5 1.5v1A1.5 1.5 0 0 1 3.5 4h-3A1.5 1.5 0 0 1-1 2.5v-1z"/></svg><span>Click to Copy</span></span></div><pre class="text-white p-4 text-base overflow-x-auto"><code>SELECT
+  product_name,
+  ml_generate_text_result AS marketing_copy
+FROM
+  ML.GENERATE_TEXT(
+    MODEL `mydataset.gemini_pro_model`,
+    (SELECT 'Generate an exciting marketing slogan under 30 characters for this product: ' || product_name AS prompt, * FROM mydataset.products),
+    STRUCT(0.8 AS temperature, 50 AS max_output_tokens)
+  );</code></pre></div>
+                        </div>
+                        <div class="p-4 bg-slate-100 rounded-lg space-y-2">
+                            <p class="font-semibold text-slate-700">
+                                <span class="lang lang-ko">실습 예제 2: `AI.GENERATE_TABLE`로 비정형 텍스트에서 정보 추출하기</span>
+                                <span class="lang lang-en">Example 2: Extracting Information from Unstructured Text with `AI.GENERATE_TABLE`</span>
+                            </p>
+                            <p class="text-sm text-slate-600">
+                                <span class="lang lang-ko">자유 형식의 텍스트 프롬프트에서 원하는 스키마를 가진 구조화된 테이블을 생성할 수 있습니다. 이는 로그 분석, 고객 리뷰 처리 등에서 매우 유용합니다.</span>
+                                <span class="lang lang-en">You can generate a structured table with a desired schema from a free-form text prompt. This is very useful for tasks like log analysis and customer review processing.</span>
+                            </p>
+                            <div class="code-container bg-slate-800 rounded-lg overflow-hidden relative" onclick="selectAndCopyCode(this)"><div class="flex justify-between items-center bg-slate-700 px-4 py-2 text-sm"><span class="text-slate-300 font-semibold">SQL: Generative AI Table Creation</span><span class="text-slate-400 text-xs flex items-center gap-1"><svg class="w-4 h-4" fill="currentColor" viewBox="0 0 16 16"><path d="M4 1.5H3a2 2 0 0 0-2 2V14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V3.5a2 2 0 0 0-2-2h-1v1h1a1 1 0 0 1 1 1V14a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1V3.5a1 1 0 0 1 1-1h1v-1z"/><path d="M9.5 1a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5h-3a.5.5 0 0 1-.5-.5v-1a.5.5 0 0 1 .5-.5h3zM-1 1.5A1.5 1.5 0 0 1 .5 0h3A1.5 1.5 0 0 1 5 1.5v1A1.5 1.5 0 0 1 3.5 4h-3A1.5 1.5 0 0 1-1 2.5v-1z"/></svg><span>Click to Copy</span></span></div><pre class="text-white p-4 text-base overflow-x-auto"><code>SELECT *
+FROM
+  AI.GENERATE_TABLE(MODEL `mydataset.gemini_model`,
+    (
+      SELECT
+        'John Smith is a 20-year-old unmarried male residing at 1234 NW 45th St, Kirkland WA, 98033. He has two phone numbers, 123-123-1234 and 234-234-2345, and weighs 200.5 pounds.' AS prompt
+    ),
+    STRUCT('address STRING, age INT64, is_married BOOL, name STRING, phone_number ARRAY<STRING>, weight_in_pounds FLOAT64' AS output_schema)
+  );</code></pre></div>
+                        </div>
+                    </div>
+                </article>
+            </section>
+
+            <section id="section4" class="card p-8 space-y-12">
+                <header>
+                    <h2 class="text-3xl font-bold text-slate-900 border-b-2 border-sky-500 pb-4">
+                        <span class="lang lang-ko">IV. 데이터 분석의 에이전트적 미래: Gemini 데이터 에이전트와 ADK</span>
+                        <span class="lang lang-en">IV. The Agentic Future of Data Analytics: Gemini Data Agent and ADK</span>
+                    </h2>
+                    <p class="mt-4 text-lg text-slate-600 leading-loose">
+                        <span class="lang lang-ko">데이터 분석의 미래는 인간이 시스템에 질문하는 단계를 넘어, 지능형 에이전트가 데이터 전문가와 협력하여 자율적으로 작업을 수행하는 '에이전틱(Agentic)' 패러다임으로 나아가고 있습니다. Google Cloud는 Gemini 모델을 기반으로 한 데이터 에이전트와 이를 구축하기 위한 개발 키트를 통해 이러한 미래를 선도하고 있습니다.</span>
+                        <span class="lang lang-en">The future of data analytics is moving beyond the stage of humans asking questions to a system, toward an 'Agentic' paradigm where intelligent agents collaborate with data experts to perform tasks autonomously. Google Cloud is leading this future with data agents based on the Gemini model and a development kit for building them.</span>
+                    </p>
+                </header>
+                
+                <article id="section4-1" class="space-y-8">
+                    <h3 class="text-2xl font-semibold text-slate-800">
+                        <span class="lang lang-ko">4.1. Gemini 데이터 에이전트 비전</span>
+                        <span class="lang lang-en">4.1. Gemini Data Agent Vision</span>
+                    </h3>
+                    <p class="leading-loose">
+                        <span class="lang lang-ko">Google은 데이터 수집, 정제, 거버넌스, 분석, 시각화 등 데이터 라이프사이클 전반에 걸쳐 전문화된 AI 에이전트를 구상하고 있습니다. 예를 들어, <strong>데이터 엔지니어링 에이전트</strong>는 데이터 준비 및 수집을 자동화하고, <strong>데이터 거버넌스 에이전트</strong>는 데이터 모델링과 메타데이터 생성을 지원하며, <strong>데이터 사이언스 에이전트</strong>는 탐색적 데이터 분석(EDA)과 예측 모델링을 돕습니다. 이러한 에이전트들은 서로 협력하여 복잡한 데이터 작업을 자율적으로 처리하게 될 것입니다.</span>
+                        <span class="lang lang-en">Google envisions specialized AI agents across the entire data lifecycle, including data ingestion, cleansing, governance, analysis, and visualization. For example, a <strong>Data Engineering Agent</strong> would automate data preparation and collection, a <strong>Data Governance Agent</strong> would assist with data modeling and metadata generation, and a <strong>Data Science Agent</strong> would help with exploratory data analysis (EDA) and predictive modeling. These agents will collaborate to handle complex data tasks autonomously.</span>
+                    </p>
+                    <div class="my-4 p-6 bg-slate-100 rounded-xl border border-slate-200">
+                        <h5 class="text-xl font-bold text-center text-slate-800 mb-6">Gemini Data Agents Ecosystem</h5>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div class="bg-white p-4 rounded-lg shadow-md flex items-start space-x-4"><div class="flex-shrink-0 h-12 w-12 rounded-full bg-blue-100 flex items-center justify-center"><svg class="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 9l4-4 4 4m0 6l-4 4-4-4"></path></svg></div><div><h6 class="font-bold text-slate-800">Data Engineering Agent</h6><p class="text-sm text-slate-600">Data prep, data ingest, data cleaning</p></div></div>
+                            <div class="bg-white p-4 rounded-lg shadow-md flex items-start space-x-4"><div class="flex-shrink-0 h-12 w-12 rounded-full bg-green-100 flex items-center justify-center"><svg class="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"></path></svg></div><div><h6 class="font-bold text-slate-800">Data Governance Agent</h6><p class="text-sm text-slate-600">Data modeling, metric definition, metadata generation</p></div></div>
+                            <div class="bg-white p-4 rounded-lg shadow-md flex items-start space-x-4"><div class="flex-shrink-0 h-12 w-12 rounded-full bg-purple-100 flex items-center justify-center"><svg class="w-6 h-6 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z"></path></svg></div><div><h6 class="font-bold text-slate-800">Data Science Agent</h6><p class="text-sm text-slate-600">EDA, data visualization, predictive modeling</p></div></div>
+                            <div class="bg-white p-4 rounded-lg shadow-md flex items-start space-x-4"><div class="flex-shrink-0 h-12 w-12 rounded-full bg-yellow-100 flex items-center justify-center"><svg class="w-6 h-6 text-yellow-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 8h10M7 12h4m1 8l-4-4H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-3l-4 4z"></path></svg></div><div><h6 class="font-bold text-slate-800">Conversational Analytics Agent</h6><p class="text-sm text-slate-600">Data QnA, forecasting, multimodal search</p></div></div>
+                        </div>
+                    </div>
+                </article>
+
+                <article id="section4-2" class="space-y-8">
+                    <h3 class="text-2xl font-semibold text-slate-800">
+                        <span class="lang lang-ko">4.2. Agent Development Kit (ADK): 에이전트 구축 프레임워크</span>
+                        <span class="lang lang-en">4.2. Agent Development Kit (ADK): A Framework for Building Agents</span>
+                    </h3>
+                    <p class="leading-loose">
+                        <span class="lang lang-ko">ADK는 개발자가 강력한 데이터 에이전트 및 다중 에이전트 시스템을 쉽게 구축할 수 있도록 지원하는 오픈 소스 풀스택 개발 키트입니다. ADK는 결정론적(deterministic) 로직과 생성형 AI의 유연성을 결합하여, 신뢰할 수 있고 사용자 정의 가능한 에이전트를 만들 수 있도록 설계되었습니다. 풍부한 도구(API 및 데이터) 생태계, 스트리밍 지원, 다중 에이전트 설계를 기본으로 지원하는 것이 특징입니다.</span>
+                        <span class="lang lang-en">The ADK is an open-source, full-stack development kit that helps developers easily build powerful data agents and multi-agent systems. It is designed to create reliable and customizable agents by combining deterministic logic with the flexibility of generative AI. Its key features include a rich tool ecosystem (APIs and data), native streaming support, and multi-agent design by default.</span>
+                    </p>
+                    <div class="p-4 bg-slate-100 rounded-lg space-y-2">
+                        <p class="font-semibold text-slate-700">
+                            <span class="lang lang-ko">ADK의 주요 특징</span>
+                            <span class="lang lang-en">Key Features of ADK</span>
+                        </p>
+                        <ul class="list-disc list-inside text-base text-slate-600 mt-2 space-y-2 leading-loose">
+                            <li><strong><span class="lang lang-ko">Multi-Agent by design:</span><span class="lang lang-en">Multi-Agent by design:</span></strong> <span class="lang lang-ko">여러 에이전트가 협력하는 복잡한 시스템을 쉽게 설계할 수 있습니다.</span><span class="lang lang-en">Easily design complex systems where multiple agents collaborate.</span></li>
+                            <li><strong><span class="lang lang-ko">Rich tool ecosystem:</span><span class="lang lang-en">Rich tool ecosystem:</span></strong> <span class="lang lang-ko">Google Cloud의 다양한 서비스와 외부 API를 도구로 쉽게 통합할 수 있습니다.</span><span class="lang lang-en">Easily integrate various Google Cloud services and external APIs as tools.</span></li>
+                            <li><strong><span class="lang lang-ko">Built-in streaming:</span><span class="lang lang-en">Built-in streaming:</span></strong> <span class="lang lang-ko">실시간 데이터 처리가 필요한 에이전트를 위해 스트리밍을 기본적으로 지원합니다.</span><span class="lang lang-en">Native support for streaming for agents that require real-time data processing.</span></li>
+                            <li><strong><span class="lang lang-ko">Agentic evaluation:</span><span class="lang lang-en">Agentic evaluation:</span></strong> <span class="lang lang-ko">에이전트의 성능을 평가하고 개선하기 위한 프레임워크를 제공합니다.</span><span class="lang lang-en">Provides a framework for evaluating and improving agent performance.</span></li>
+                        </ul>
+                    </div>
+                </article>
+
+                <article id="section4-3" class="space-y-8">
+                    <h3 class="text-2xl font-semibold text-slate-800">
+                        <span class="lang lang-ko">4.3. 배포 및 오케스트레이션</span>
+                        <span class="lang lang-en">4.3. Deployment and Orchestration</span>
+                    </h3>
+                    <p class="leading-loose">
+                        <span class="lang lang-ko">ADK로 개발된 에이전트는 Vertex AI Agent Engine을 통해 쉽게 배포하고 운영할 수 있습니다. Vertex AI는 자동 확장(autoscaling), 에이전트 운영(Agent Ops), 모니터링 등 프로덕션 환경에 필요한 서비스를 제공하여 개발자가 에이전트의 핵심 로직에만 집중할 수 있도록 돕습니다. 또한, LangGraph, CrewAI 등 널리 사용되는 다른 오픈소스 프레임워크로 만든 에이전트도 Vertex AI Agent Engine에 등록하여 통합 관리할 수 있습니다.</span>
+                        <span class="lang lang-en">Agents developed with ADK can be easily deployed and operated via the Vertex AI Agent Engine. Vertex AI provides essential services for production environments, such as autoscaling, Agent Ops, and monitoring, allowing developers to focus solely on the agent's core logic. Furthermore, agents created with other popular open-source frameworks like LangGraph and CrewAI can also be registered and managed centrally in the Vertex AI Agent Engine.</span>
+                    </p>
+                </article>
+            </section>
+
+            <section id="section5" class="card p-8 space-y-6">
+                <h2 class="text-3xl font-bold text-slate-900 border-b-2 border-sky-500 pb-4">
+                    <span class="lang lang-ko">V. 종합 및 전략적 권장 사항</span>
+                    <span class="lang lang-en">V. Summary and Strategic Recommendations</span>
+                </h2>
+                <p class="text-lg text-slate-600 leading-loose">
+                    <span class="lang lang-ko">본 가이드에서 분석한 Google Cloud 데이터 분석 플랫폼의 다양한 기술들은 개별적으로도 강력하지만, 이들을 종합적으로 이해할 때 비로소 그 진정한 가치와 전략적 방향성이 드러납니다.</span>
+                    <span class="lang lang-en">The various technologies of the Google Cloud Data Analytics Platform analyzed in this guide are powerful individually, but their true value and strategic direction become apparent only when understood comprehensively.</span>
+                </p>
+                <div class="space-y-4">
+                    <h3 class="text-2xl font-semibold text-slate-700">
+                        <span class="lang lang-ko">단계별 도입 로드맵</span>
+                        <span class="lang lang-en">Step-by-Step Adoption Roadmap</span>
+                    </h3>
+                    <ol class="list-decimal list-inside space-y-3 text-lg leading-loose">
+                        <li><strong><span class="lang lang-ko">1단계 (기반 구축):</span><span class="lang lang-en">Step 1 (Foundation Building):</span></strong> <span class="lang lang-ko">BigQuery 스토리지 및 쿼리 최적화 기법을 적용하여 성능의 기초를 마스터합니다.</span><span class="lang lang-en">Master the basics of performance by applying BigQuery storage and query optimization techniques.</span></li>
+                        <li><strong><span class="lang lang-ko">2단계 (거버넌스 확립):</span><span class="lang lang-en">Step 2 (Establishing Governance):</span></strong> <span class="lang lang-ko">BigLake와 Dataplex를 배포하여 분산된 데이터의 통합 거버넌스 체계를 확립합니다.</span><span class="lang lang-en">Deploy BigLake and Dataplex to establish a unified governance framework for distributed data.</span></li>
+                        <li><strong><span class="lang lang-ko">3단계 (AI 활성화):</span><span class="lang lang-en">Step 3 (Enabling AI):</span></strong> <span class="lang lang-ko">BigQueryML을 활용하여 SQL기반의 예측 분석 및 생성형 AI 기능을 비즈니스에 도입하기 시작.</span><span class="lang lang-en">Start introducing SQL-based predictive analytics and generative AI capabilities into the business using BigQuery ML.</span></li>
+                        <li><strong><span class="lang lang-ko">4단계 (에이전트로 자동화):</span><span class="lang lang-en">Step 4 (Automation with Agents):</span></strong> <span class="lang lang-ko">ADK를 통한 프로토타이핑으로 데이터 분석 및 관리 프로세스를 자동화하는 에이전트 도입을 실험합니다.</span><span class="lang lang-en">Experiment with adopting agents that automate data analysis and management processes by prototyping with the ADK.</span></li>
+                    </ol>
+                </div>
+            </section>
+
+        </main>
+        
+        <footer class="text-center mt-16 text-gray-500">
+            <p>&copy; 2025 Professional Code Manual. All rights reserved.</p>
+        </footer>
+
+    </div>
+
+    <script>
+        function switchLang(lang) {
+            document.documentElement.lang = lang;
+            document.documentElement.classList.remove('lang-ko', 'lang-en');
+            document.documentElement.classList.add(`lang-${lang}`);
+            localStorage.setItem('language', lang);
+
+            document.querySelectorAll('.lang-btn').forEach(btn => {
+                if (btn.id.includes(lang)) {
+                    btn.classList.add('active');
+                } else {
+                    btn.classList.remove('active');
+                }
+            });
+        }
+
+        function selectAndCopyCode(container) {
+            const codeElement = container.querySelector('code');
+            if (!codeElement) return;
+
+            const range = document.createRange();
+            range.selectNode(codeElement);
+            window.getSelection().removeAllRanges();
+            window.getSelection().addRange(range);
+
+            try {
+                navigator.clipboard.writeText(codeElement.innerText).then(() => {
+                    let feedback = container.querySelector('.copy-feedback');
+                    if (!feedback) {
+                        feedback = document.createElement('div');
+                        feedback.className = 'copy-feedback';
+                        feedback.textContent = 'Copied!';
+                        container.appendChild(feedback);
+                    }
+                    
+                    feedback.classList.add('show');
+                    setTimeout(() => {
+                        feedback.classList.remove('show');
+                    }, 1500);
+                });
+            } catch (err) {
+                console.error('Failed to copy text: ', err);
+            }
+            window.getSelection().removeAllRanges();
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            // --- Initialize Language ---
+            const langFromStorage = localStorage.getItem('language');
+            const browserLang = (navigator.language || navigator.userLanguage).startsWith('en') ? 'en' : 'ko';
+            const initialLang = langFromStorage || browserLang;
+            switchLang(initialLang);
+
+            // --- Code Block Highlighting ---
+            hljs.highlightAll();
+
+            // --- Top Nav Active Link on Scroll ---
+            const sections = document.querySelectorAll('section[id]');
+            const allLinks = document.querySelectorAll('.top-nav .menu a');
+
+            const observer = new IntersectionObserver((entries) => {
+                let activeSectionId = '';
+                
+                const visibleSections = entries
+                    .filter(entry => entry.isIntersecting)
+                    .sort((a, b) => a.boundingClientRect.top - b.boundingClientRect.top);
+
+                if (visibleSections.length > 0) {
+                    activeSectionId = visibleSections[0].target.id;
+                }
+
+                allLinks.forEach(link => {
+                    link.classList.remove('active');
+                });
+
+                if (activeSectionId) {
+                    const activeLink = document.querySelector(`.top-nav .menu a[href="#${activeSectionId}"]`);
+                    if (activeLink) {
+                        activeLink.classList.add('active');
+                        const parentMenuLink = activeLink.closest('.submenu')?.parentElement.querySelector('a');
+                        if (parentMenuLink) {
+                            parentMenuLink.classList.add('active');
+                        }
+                    }
+                }
+            }, {
+                threshold: 0,
+                rootMargin: '-100px 0px -65% 0px'
+            });
+
+            sections.forEach(section => {
+                observer.observe(section);
+            });
+        });
+    </script>
+</body>
+</html>
