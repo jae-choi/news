@@ -144,8 +144,8 @@
                         <span class="lang lang-en">Creating a Basic LangGraph Sample</span>
                     </h2>
                     <p class="mt-6">
-                        <span class="lang lang-ko">간단한 '연구 & 글쓰기' 에이전트를 만들고, **Langfuse**를 이용해 로컬에서 실시간으로 시각화하는 방법을 안내합니다. 이 가이드를 통해 LangGraph의 기본 개념인 상태(State), 노드(Node), 엣지(Edge)를 이해하고 실제 코드로 구현해볼 수 있습니다.</span>
-                        <span class="lang lang-en">This guide shows how to create a simple 'Research & Write' agent and visualize it in real-time locally using **Langfuse**. Through this guide, you will understand the basic concepts of LangGraph—State, Node, and Edge—and implement them in actual code.</span>
+                        <span class="lang lang-ko">간단한 '연구 & 글쓰기' 에이전트를 만들고, <a href="LangfuseVs.html" class="text-blue-400 hover:underline">Langfuse</a>를 이용해 로컬에서 실시간으로 시각화하는 방법을 안내합니다. 이 가이드를 통해 LangGraph의 기본 개념인 상태(State), 노드(Node), 엣지(Edge)를 이해하고 실제 코드로 구현해볼 수 있습니다.</span>
+                        <span class="lang lang-en">This guide shows how to create a simple 'Research & Write' agent and visualize it in real-time locally using <a href="LangfuseVs.html" class="text-blue-400 hover:underline">**Langfuse**</a>. Through this guide, you will understand the basic concepts of LangGraph—State, Node, and Edge—and implement them in actual code.</span>
                     </p>
                 </section>
 
@@ -295,25 +295,25 @@ print(<span class="token.string">"<span class="lang lang-ko">완료! 대시보�
                 <!-- 4. 로컬 시각화 -->
                 <section id="visualization" class="mt-16">
                     <h3 class="text-2xl font-bold border-b border-gray-700 pb-2">
-                        <span class="lang lang-ko">4. 로컬에서 실시간 시각화하기 (Langfuse)</span>
-                        <span class="lang lang-en">4. Real-time Local Visualization (Langfuse)</span>
+                        <span class="lang lang-ko">4. 로컬에서 실시간 시각화하기 (<a href="LangfuseVs.html" class="text-blue-400 hover:underline">Langfuse</a>)</span>
+                        <span class="lang lang-en">4. Real-time Local Visualization (<a href="LangfuseVs.html" class="text-blue-400 hover:underline">Langfuse</a>)</span>
                     </h3>
                     <div class="space-y-6 mt-6">
                         <div>
                             <h4 class="text-xl font-semibold">
-                                <span class="lang lang-ko">단계 1: Langfuse Docker 컨테이너 실행</span>
-                                <span class="lang lang-en">Step 1: Run the Langfuse Docker Container</span>
+                                <span class="lang lang-ko">단계 1: <a href="LangfuseVs.html" class="text-blue-400 hover:underline">Langfuse</a> Docker 컨테이너 실행</span>
+                                <span class="lang lang-en">Step 1: Run the <a href="LangfuseVs.html" class="text-blue-400 hover:underline">Langfuse</a> Docker Container</span>
                             </h4>
                             <p class="mt-4">
-                                <span class="lang lang-ko">Langfuse를 로컬에서 사용하려면 Docker가 필요합니다. 터미널을 열고 아래 명령어를 실행하여 공식 `docker-compose.yml` 파일을 다운로드하세요.</span>
-                                <span class="lang lang-en">To use Langfuse locally, you need Docker. Open a terminal and run the command below to download the official `docker-compose.yml` file.</span>
+                                <span class="lang lang-ko"><a href="LangfuseVs.html" class="text-blue-400 hover:underline">Langfuse</a>를 로컬에서 사용하려면 Docker가 필요합니다. 터미널을 열고 아래 명령어를 실행하여 공식 `docker-compose.yml` 파일을 다운로드하세요.</span>
+                                <span class="lang lang-en">To use <a href="LangfuseVs.html" class="text-blue-400 hover:underline">Langfuse</a> locally, you need Docker. Open a terminal and run the command below to download the official `docker-compose.yml` file.</span>
                             </p>
                             <div class="code-block" onclick="selectCodeBlock(this)" title="클릭하여 코드 선택">
                                 <pre><code>curl -o docker-compose.yml https://raw.githubusercontent.com/langfuse/langfuse/main/docker-compose.yml</code></pre>
                             </div>
                              <p class="mt-4">
-                                <span class="lang lang-ko">다운로드가 완료되면, 아래 명령어로 Langfuse 서버를 백그라운드에서 실행시킵니다.</span>
-                                <span class="lang lang-en">Once the download is complete, run the following command to start the Langfuse server in the background.</span>
+                                <span class="lang lang-ko">다운로드가 완료되면, 아래 명령어로 <a href="LangfuseVs.html" class="text-blue-400 hover:underline">Langfuse</a> 서버를 백그라운드에서 실행시킵니다.</span>
+                                <span class="lang lang-en">Once the download is complete, run the following command to start the <a href="LangfuseVs.html" class="text-blue-400 hover:underline">Langfuse</a> server in the background.</span>
                             </p>
                              <div class="code-block" onclick="selectCodeBlock(this)" title="클릭하여 코드 선택">
                                 <pre><code>docker compose up -d</code></pre>
@@ -322,8 +322,8 @@ print(<span class="token.string">"<span class="lang lang-ko">완료! 대시보�
 
                         <div>
                             <h4 class="text-xl font-semibold">
-                                <span class="lang lang-ko">단계 2: Langfuse UI 접속 및 API 키 발급</span>
-                                <span class="lang lang-en">Step 2: Access Langfuse UI and Get API Keys</span>
+                                <span class="lang lang-ko">단계 2: <a href="LangfuseVs.html" class="text-blue-400 hover:underline">Langfuse</a> UI 접속 및 API 키 발급</span>
+                                <span class="lang lang-en">Step 2: Access <a href="LangfuseVs.html" class="text-blue-400 hover:underline">Langfuse</a> UI and Get API Keys</span>
                             </h4>
                             <p class="mt-4">
                                 <span class="lang lang-ko">웹 브라우저에서 <a href="http://localhost:3000" target="_blank" class="text-blue-400 hover:underline">http://localhost:3000</a> 주소로 접속하세요. 처음 접속 시 계정을 생성하고 로그인한 뒤, 새로운 프로젝트를 만듭니다. 그 다음, 프로젝트의 <strong>Settings > API Keys</strong> 메뉴로 이동하여 `Secret Key`와 `Public Key`를 복사합니다.</span>
@@ -364,8 +364,8 @@ LANGFUSE_HOST<span class="token.operator">=</span><span class="token.string">"ht
                                 <pre><code>python run_agent.py</code></pre>
                             </div>
                             <p class="mt-4">
-                                <span class="lang lang-ko">스크립트 실행이 완료된 후, 다시 <a href="http://localhost:3000" target="_blank" class="text-blue-400 hover:underline">http://localhost:3000</a>의 Langfuse 대시보드를 확인하세요. 아래와 같이 에이전트의 실행 과정(Trace)이 생성된 것을 시각적으로 추적할 수 있습니다.</span>
-                                <span class="lang lang-en">After the script finishes, check the Langfuse dashboard at <a href="http://localhost:3000" target="_blank" class="text-blue-400 hover:underline">http://localhost:3000</a> again. You will be able to visually track the agent's execution process (Trace) as shown below.</span>
+                                <span class="lang lang-ko">스크립트 실행이 완료된 후, 다시 <a href="http://localhost:3000" target="_blank" class="text-blue-400 hover:underline">http://localhost:3000</a>의 <a href="LangfuseVs.html" class="text-blue-400 hover:underline">Langfuse</a> 대시보드를 확인하세요. 아래와 같이 에이전트의 실행 과정(Trace)이 생성된 것을 시각적으로 추적할 수 있습니다.</span>
+                                <span class="lang lang-en">After the script finishes, check the <a href="LangfuseVs.html" class="text-blue-400 hover:underline"></a>Langfuse</a> dashboard at <a href="http://localhost:3000" target="_blank" class="text-blue-400 hover:underline">http://localhost:3000</a> again. You will be able to visually track the agent's execution process (Trace) as shown below.</span>
                             </p>
                             
                             <!-- Langfuse UI Infographic -->
