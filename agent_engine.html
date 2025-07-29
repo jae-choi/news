@@ -8,20 +8,21 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700&family=Roboto:wght@400;500;700&display=swap">
     <style>
-        /* Reddish-brown color palette */
+        /* Professional & Readable Color Palette */
         :root {
-            --bg-main: #F9F5F2; /* A warm, light beige */
-            --text-primary: #4E342E; /* Brown 800 */
-            --text-secondary: #6D4C41; /* Brown 600 */
-            --accent-primary: #8D6E63; /* Brown 400 */
-            --accent-secondary: #A1887F; /* Brown 300 */
+            --bg-main: #f8f9fa; /* Light Gray */
+            --text-primary: #2d3748; /* Dark Gray-Blue */
+            --text-secondary: #4a5568; /* Medium Gray-Blue */
+            --accent-primary: #2563eb; /* Strong Blue */
+            --accent-secondary: #dbeafe; /* Light Blue */
             --card-bg: #FFFFFF;
-            --border-color: #D7CCC8; /* Brown 100 */
+            --border-color: #e2e8f0; /* Light Gray Border */
         }
 
         body {
             background-color: var(--bg-main);
             color: var(--text-secondary);
+            line-height: 1.65;
         }
         body.ko { font-family: 'Noto Sans KR', sans-serif; }
         body.en { font-family: 'Roboto', sans-serif; }
@@ -33,8 +34,8 @@
 
         .card {
             background-color: var(--card-bg);
-            border-radius: 1rem;
-            box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05), 0 2px 4px -1px rgba(0,0,0,0.03);
+            border-radius: 0.75rem; /* Slightly reduced radius */
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.1); /* Enhanced shadow */
             border: 1px solid var(--border-color);
         }
         .lang-ko .lang-en,
@@ -57,9 +58,17 @@
             background-color: transparent;
         }
         .gradient-text {
-            background: linear-gradient(90deg, var(--text-primary), var(--accent-primary));
+            background: linear-gradient(90deg, var(--accent-primary), var(--text-primary));
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
+        }
+        h1, h2, h3 {
+            color: var(--text-primary);
+            letter-spacing: -0.025em;
+        }
+        strong {
+            color: var(--text-primary);
+            font-weight: 600;
         }
     </style>
 </head>
@@ -77,81 +86,91 @@
 
         <header class="text-center mb-12 md:mb-16">
             <h1 class="text-4xl md:text-5xl font-black text-primary mb-4">
-                <span class="lang lang-ko">ADK & Agent Engine</span>
-                <span class="lang lang-en" style="display:none;">ADK & Agent Engine</span>
+                <span class="lang lang-ko">AI 에이전트, 개발과 운영의 균형 맞추기</span>
+                <span class="lang lang-en" style="display:none;">AI Agents: Balancing Development and Operations</span>
             </h1>
-            <p class="lang lang-ko text-xl md:text-2xl font-light text-secondary">확장 가능하고 안정적인 AI 에이전트 워크플로우 가이드</p>
-            <p class="lang lang-en text-xl md:text-2xl font-light text-secondary" style="display:none;">A Guide to Scalable and Stable AI Agent Workflows</p>
+            <p class="lang lang-ko text-xl md:text-2xl font-light text-secondary">관리형 플랫폼을 활용한 개발 및 운영 효율화 방안</p>
+            <p class="lang lang-en text-xl md:text-2xl font-light text-secondary" style="display:none;">Optimizing Development and Operations with Managed Platforms</p>
         </header>
 
         <main class="space-y-16">
 
-            <!-- Introduction -->
-            <section class="card p-6 md:p-10 text-center">
-                <h2 class="lang lang-ko text-2xl md:text-3xl font-bold text-primary mb-4">왜 Agent Engine을 사용하는가?</h2>
-                <h2 class="lang lang-en text-2xl md:text-3xl font-bold text-primary mb-4" style="display:none;">Why Use Agent Engine?</h2>
-                <p class="lang lang-ko max-w-3xl mx-auto">AI 에이전트의 중요성이 커지면서, Google Cloud의 ADK(Agent Development Kit)와 Vertex AI Agent Engine은 개발과 운영의 복잡성을 해결합니다. Agent Engine은 완전 관리형 서비스로서, 개발자가 인프라 걱정 없이 <strong>핵심 비즈니스 로직에만 집중</strong>하도록 돕습니다.</p>
-                <p class="lang lang-en max-w-3xl mx-auto" style="display:none;">As AI agents become more critical, Google Cloud's ADK and Vertex AI Agent Engine solve the complexities of development and operations. As a fully managed service, Agent Engine allows developers to focus solely on <strong>core business logic</strong> without worrying about infrastructure.</p>
-            </section>
-
-            <!-- Architecture Diagram Section -->
+            <!-- 1. Hook -->
             <section class="card p-6 md:p-10">
-                <h2 class="lang lang-ko text-2xl md:text-3xl font-bold text-primary mb-6 text-center">전체 아키텍처</h2>
-                <h2 class="lang lang-en text-2xl md:text-3xl font-bold text-primary mb-6 text-center" style="display:none;">Overall Architecture</h2>
-                <figure>
-                    <img class="w-full rounded-lg shadow-md border border-[var(--border-color)]" src="https://cloud.google.com/static/vertex-ai/generative-ai/docs/agent-engine/images/agent-engine.png?hl=ko" alt="ADK와 Agent Engine을 포함한 전체 에이전트 아키텍처 다이어그램" onerror="this.onerror=null;this.src='https://placehold.co/1200x600/f0f0f0/333333?text=Architecture+Diagram';">
-                    <figcaption class="text-center text-sm text-secondary mt-4">
-                         <span class="lang lang-ko">Agent Engine은 다양한 에이전트 프레임워크, 도구, 모델을 통합하여 확장 가능한 워크플로우를 구성합니다.</span>
-                         <span class="lang lang-en" style="display:none;">Agent Engine integrates various agent frameworks, tools, and models to build scalable workflows.</span>
-                    </figcaption>
-                </figure>
+                <h2 class="text-2xl md:text-3xl font-bold text-primary mb-4 text-center">
+                    <span class="lang lang-ko">개발 복잡성과 운영의 장벽</span>
+                    <span class="lang lang-en" style="display:none;">The Barrier of Development and Operational Complexity</span>
+                </h2>
+                <p class="lang lang-ko">효과적인 AI 에이전트를 구축하는 과정은 핵심 비즈니스 로직 구현을 넘어서는, 복잡한 운영 및 배포 문제를 동반합니다. 이는 개발 리소스 분산과 프로젝트 지연의 주된 원인이 되기도 합니다. 따라서 안정적인 인프라 위에서 <strong>핵심 비즈니스 로직에만 집중</strong>할 수 있는 환경을 확보하는 것이 중요합니다.</p>
+                <p class="lang lang-en" style="display:none;">Building effective AI agents involves complex operational and deployment challenges that go beyond core business logic implementation. This often leads to diverted development resources and project delays. Therefore, it is crucial to secure an environment that allows focus solely on <strong>core business logic</strong> atop a stable infrastructure.</p>
             </section>
 
-            <!-- Agent Development & Deployment Lifecycle -->
+            <!-- 2. Case -->
             <section>
-                <h2 class="lang lang-ko text-3xl md:text-4xl font-bold text-center text-primary mb-10">에이전트 개발 및 배포 생명주기</h2>
-                <h2 class="lang lang-en text-3xl md:text-4xl font-bold text-center text-primary mb-10" style="display:none;">Agent Development and Deployment Lifecycle</h2>
+                <h2 class="text-3xl md:text-4xl font-bold text-center text-primary mb-10">
+                    <span class="lang lang-ko">관리형 플랫폼 기반 워크플로우</span>
+                    <span class="lang lang-en" style="display:none;">A Workflow Based on a Managed Platform</span>
+                </h2>
+                
+                <div class="card p-6 md:p-10 mb-8">
+                    <h3 class="text-2xl font-bold text-primary mb-6 text-center">
+                        <span class="lang lang-ko">Agent Engine 아키텍처</span>
+                        <span class="lang lang-en" style="display:none;">Agent Engine Architecture</span>
+                    </h3>
+                    <figure>
+                        <img class="w-full rounded-lg shadow-md border border-[var(--border-color)]" src="https://cloud.google.com/static/vertex-ai/generative-ai/docs/agent-engine/images/agent-engine.png?hl=ko" alt="ADK와 Agent Engine을 포함한 전체 에이전트 아키텍처 다이어그램" onerror="this.onerror=null;this.src='https://placehold.co/1200x600/f0f0f0/333333?text=Architecture+Diagram';">
+                        <figcaption class="text-center text-sm text-secondary mt-4">
+                             <span class="lang lang-ko">GCP에서 제공하는 다양한 프레임워크, 도구, 모델을 통합하여 확장성 높은 워크플로우 구성이 가능합니다.</span>
+                             <span class="lang lang-en" style="display:none;">A highly scalable workflow can be configured by integrating various frameworks, tools, and models provided by GCP.</span>
+                        </figcaption>
+                    </figure>
+                </div>
+
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
                     <div class="card p-6">
                         <h3 class="font-bold text-xl text-primary mb-2">
-                            <span class="lang lang-ko">1. 로컬 개발 및 테스트</span>
-                            <span class="lang lang-en" style="display:none;">1. Local Development & Testing</span>
+                            <span class="lang lang-ko">1. 로컬 개발 및 단위 테스트</span>
+                            <span class="lang lang-en" style="display:none;">1. Local Development & Unit Testing</span>
                         </h3>
-                        <p class="lang lang-ko">ADK를 사용하여 로컬 환경에서 에이전트 로직을 정의하고 충분히 테스트하여 품질을 보장합니다.</p>
-                        <p class="lang lang-en" style="display:none;">Use ADK to define and thoroughly test agent logic in a local environment to ensure quality.</p>
+                        <p class="lang lang-ko">ADK(Agent Development Kit)를 사용하여 로컬 환경에서 에이전트 로직을 개발하고, 단위 테스트를 통해 초기 품질을 확보합니다.</p>
+                        <p class="lang lang-en" style="display:none;">Develop agent logic in a local environment using the ADK (Agent Development Kit) and ensure initial quality through unit testing.</p>
                     </div>
                     <div class="card p-6">
                         <h3 class="font-bold text-xl text-primary mb-2">
-                            <span class="lang lang-ko">2. 패키징 및 배포</span>
-                            <span class="lang lang-en" style="display:none;">2. Packaging & Deployment</span>
+                            <span class="lang lang-ko">2. 패키징 및 서버리스 배포</span>
+                            <span class="lang lang-en" style="display:none;">2. Packaging & Serverless Deployment</span>
                         </h3>
-                        <p class="lang lang-ko">테스트 완료 후 에이전트를 패키징하여 Agent Engine에 배포하면, 자동으로 API 엔드포인트가 생성됩니다.</p>
-                        <p class="lang lang-en" style="display:none;">After testing, package and deploy the agent to Agent Engine, which automatically creates an API endpoint.</p>
+                        <p class="lang lang-ko">테스트가 완료된 코드는 Agent Engine에 배포하여, 별도의 인프라 관리 없이 API 엔드포인트를 자동 생성합니다.</p>
+                        <p class="lang lang-en" style="display:none;">The tested code is deployed to Agent Engine, automatically creating an API endpoint without separate infrastructure management.</p>
                     </div>
                     <div class="card p-6">
                         <h3 class="font-bold text-xl text-primary mb-2">
-                            <span class="lang lang-ko">3. 쿼리 및 상호작용</span>
-                            <span class="lang lang-en" style="display:none;">3. Querying & Interaction</span>
+                            <span class="lang lang-ko">3. 애플리케이션 통합 및 쿼리</span>
+                            <span class="lang lang-en" style="display:none;">3. Application Integration & Querying</span>
                         </h3>
-                        <p class="lang lang-ko">생성된 엔드포인트를 통해 애플리케이션에서 에이전트에게 작업을 요청하고 실시간으로 응답을 받습니다.</p>
-                        <p class="lang lang-en" style="display:none;">Applications can request tasks and receive real-time responses from the agent via the created endpoint.</p>
+                        <p class="lang lang-ko">생성된 엔드포인트를 통해 외부 애플리케이션에서 에이전트의 기능을 실시간으로 호출하고 상호작용합니다.</p>
+                        <p class="lang lang-en" style="display:none;">The created endpoint allows external applications to invoke and interact with the agent's functions in real-time.</p>
                     </div>
                     <div class="card p-6">
                         <h3 class="font-bold text-xl text-primary mb-2">
-                            <span class="lang lang-ko">4. 모니터링 및 관리</span>
-                            <span class="lang lang-en" style="display:none;">4. Monitoring & Management</span>
+                            <span class="lang lang-ko">4. 성능 모니터링 및 운영</span>
+                            <span class="lang lang-en" style="display:none;">4. Performance Monitoring & Operations</span>
                         </h3>
-                        <p class="lang lang-ko">Cloud 콘솔 또는 SDK를 사용하여 배포된 에이전트의 성능을 모니터링하고 관리합니다.</p>
-                        <p class="lang lang-en" style="display:none;">Monitor and manage the performance of deployed agents using the Cloud Console or SDK.</p>
+                        <p class="lang lang-ko">배포된 에이전트의 성능 지표는 통합된 콘솔을 통해 중앙에서 모니터링하고 관리합니다.</p>
+                        <p class="lang lang-en" style="display:none;">Performance metrics of the deployed agent are centrally monitored and managed through an integrated console.</p>
                     </div>
                 </div>
             </section>
             
-            <!-- Key Benefits & Conclusion -->
+            <!-- 3. Insight -->
             <section class="grid grid-cols-1 lg:grid-cols-2 gap-8">
                 <div class="card p-6 md:p-8">
-                    <h3 class="lang lang-ko text-xl font-bold text-primary mb-4">핵심 장점</h3>
-                    <h3 class="lang lang-en text-xl font-bold text-primary mb-4" style="display:none;">Key Advantages</h3>
+                    <h3 class="text-xl font-bold text-primary mb-4">
+                        <span class="lang lang-ko">인프라 추상화의 가치</span>
+                        <span class="lang lang-en" style="display:none;">The Value of Infrastructure Abstraction</span>
+                    </h3>
+                    <p class="lang lang-ko mb-4">이러한 경험은 중요한 통찰을 제공합니다. 관리형 서비스를 통해 인프라 운영을 추상화함으로써, 개발 조직은 비로소 핵심 비즈니스 가치 창출에 온전히 집중할 수 있는 환경을 확보하게 됩니다.</p>
+                    <p class="lang lang-en mb-4" style="display:none;">This experience offers a key insight. By abstracting infrastructure operations through a managed service, development organizations can finally secure an environment where they can fully focus on creating core business value.</p>
                     <ul class="space-y-3">
                         <li class="flex items-start"><span class="bg-accent-primary text-white rounded-full w-6 h-6 text-sm flex items-center justify-center mr-3 mt-1 flex-shrink-0">✓</span><span class="lang lang-ko"><strong>인프라 추상화:</strong> 코드 배포에만 집중</span><span class="lang lang-en" style="display:none;"><strong>Infrastructure Abstraction:</strong> Focus only on code deployment</span></li>
                         <li class="flex items-start"><span class="bg-accent-primary text-white rounded-full w-6 h-6 text-sm flex items-center justify-center mr-3 mt-1 flex-shrink-0">✓</span><span class="lang lang-ko"><strong>자동 확장성:</strong> 트래픽에 따른 자동 리소스 조절</span><span class="lang lang-en" style="display:none;"><strong>Automatic Scalability:</strong> Auto-adjusts resources based on traffic</span></li>
@@ -159,10 +178,12 @@
                     </ul>
                 </div>
                  <div class="card p-6 md:p-8">
-                    <h3 class="lang lang-ko text-xl font-bold text-primary mb-4">결론 및 다음 단계</h3>
-                    <h3 class="lang lang-en text-xl font-bold text-primary mb-4" style="display:none;">Conclusion & Next Steps</h3>
-                    <p class="lang lang-ko">ADK와 Agent Engine은 혁신적인 AI 애플리케이션 개발을 가속화하는 강력한 조합입니다. 다음 단계로 외부 도구를 연동하거나 멀티 에이전트 시스템을 구축하여 에이전트의 능력을 확장해 보세요.</p>
-                    <p class="lang lang-en" style="display:none;">ADK and Agent Engine are a powerful combination for accelerating innovative AI application development. As a next step, expand your agent's capabilities by integrating external tools or building a multi-agent system.</p>
+                    <h3 class="text-xl font-bold text-primary mb-4">
+                        <span class="lang lang-ko">결론</span>
+                        <span class="lang lang-en" style="display:none;">Conclusion</span>
+                    </h3>
+                    <p class="lang lang-ko">AI 에이전트 개발 시, 비즈니스 로직 외적인 운영 부담이 크다면 관리형 플랫폼 도입은 효과적인 전략이 될 수 있습니다. 개발 프로세스를 가속화하고, 확보된 리소스를 활용해 외부 도구 연동이나 멀티 에이전트 시스템 구축 등 더 높은 가치를 창출하는 활동에 집중하는 것을 권장합니다.</p>
+                    <p class="lang lang-en" style="display:none;">When developing AI agents, if the operational overhead outside of business logic is significant, adopting a managed platform can be an effective strategy. It is recommended to accelerate the development process and use the secured resources to focus on higher-value activities such as integrating external tools or building multi-agent systems.</p>
                 </div>
             </section>
         </main>
