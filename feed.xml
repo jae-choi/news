@@ -8,13 +8,19 @@
 
   <!-- ✨ 각 HTML 파일마다 <entry> 블록 하나 -->
   <entry>
-    <title>ADK vs. LangFuse – 비교 정리</title>
-    <link href="https://jae-choi.github.io/news/ADKvs.html"/>
-    <id>https://jae-choi.github.io/news/ADKvs.html</id>
-    <updated>2025-07-23T09:00:00Z</updated>
-    <summary type="html">
-      &lt;p&gt;멀티‑에이전트 운영툴 ADK와 LangFuse를 실무 관점으로 비교…&lt;/p&gt;
-    </summary>
-  </entry>
+  <title>ADK vs. LangFuse – 비교 정리</title>
+
+  <!-- 반드시 rel="alternate" 포함 -->
+  <link rel="alternate" type="text/html"
+        href="https://jae-choi.github.io/news/ADKvs.html"/>
+
+  <id>https://jae-choi.github.io/news/ADKvs.html</id>
+  <updated>2025-07-23T09:00:00Z</updated>
+
+  <summary type="html">
+    <![CDATA[<p>멀티‑에이전트 운영툴 ADK와 LangFuse를 실무 관점으로 비교…</p>]]>
+  </summary>
+</entry>
+
   <!-- 새 글이 생길 때마다 복붙·수정 -->
 </feed>
