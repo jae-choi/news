@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="ko" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" href="https://avatars.githubusercontent.com/u/35217573?v=4" type="image/x-icon">
+    <title>Prototypes | Peter Choi</title>
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Noto+Sans+KR:wght@300;400;500;700&family=Playfair+Display:wght@700;800&display=swap" rel="stylesheet">
+    
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+
+    <style>
+        :root {
+            --bg-color: #0f172a; /* bg-slate-900 */
+            --sidebar-bg-color: #0f172a; /* bg-slate-900 */
+            --card-bg-color: #1e293b; /* bg-slate-800 */
+            --text-primary: #f8fafc; /* text-slate-50 */
+            --text-secondary: #94a3b8; /* text-slate-400 */
+            --accent-color: #2dd4bf; /* teal-400 */
+            --border-color: #334155; /* border-slate-700 */
+            --hover-bg-color: #334155; /* bg-slate-700 */
+        }
+        body {
+            font-family: 'Inter', 'Noto Sans KR', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-secondary);
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+        .font-serif {
+            font-family: 'Playfair Display', serif;
+        }
+        .lang-ko .lang-en,
+        .lang-en .lang-ko {
+            display: none;
+        }
+        .lang-btn {
+            transition: all 0.2s ease-in-out;
+        }
+        .lang-btn.active {
+            font-weight: 600;
+            background-color: var(--accent-color);
+            color: #0f172a;
+        }
+        .lang-btn:not(.active) {
+            color: #94a3b8;
+            background-color: transparent;
+        }
+        .project-item-link {
+            display: block;
+            background-color: var(--card-bg-color);
+            border: 1px solid var(--border-color);
+            transition: background-color 0.3s ease, box-shadow 0.3s ease, transform 0.3s ease;
+            text-decoration: none;
+            border-radius: 0.75rem;
+        }
+        .project-item-link:hover {
+            background-color: var(--hover-bg-color);
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px -5px rgba(45, 212, 191, 0.1), 0 8px 10px -6px rgba(45, 212, 191, 0.1);
+        }
+        .tag {
+            display: inline-block;
+            background-color: #334155; /* bg-slate-700 */
+            color: #cbd5e1; /* text-slate-300 */
+            padding: 0.25rem 0.75rem;
+            border-radius: 9999px;
+            font-size: 0.875rem;
+            font-weight: 500;
+        }
+        .sidebar-link {
+            transition: all 0.2s ease-in-out;
+        }
+        .sidebar-link:hover, .sidebar-link.active {
+            background-color: var(--hover-bg-color);
+            color: var(--text-primary);
+            transform: translateX(4px);
+        }
+    </style>
+</head>
+<body class="antialiased">
+
+    <div class="flex min-h-screen">
+        <!-- Sidebar -->
+        <aside id="sidebar" class="w-64 bg-sidebar-bg-color p-6
+                                  fixed top-0 left-0 h-full z-50
+                                  transform -translate-x-full transition-transform duration-300 ease-in-out
+                                  lg:sticky lg:translate-x-0 lg:h-screen">
+            <div class="flex justify-between items-center mb-12">
+                <a href="index_deploy.html" class="text-2xl font-bold text-primary no-underline">Peter Choi</a>
+            </div>
+            <nav class="space-y-2">
+                <a href="index_deploy.html#intro" class="sidebar-link flex items-center px-4 py-2 rounded-lg text-secondary font-medium"><i data-lucide="home" class="w-4 h-4 mr-3"></i><span class="lang lang-ko">소개</span><span class="lang lang-en">Intro</span></a>
+                <a href="https://jae-choi.github.io/news/vertexAI.html" class="sidebar-link flex items-center px-4 py-2 rounded-lg text-secondary font-medium"><i data-lucide="brain-circuit" class="w-4 h-4 mr-3"></i><span class="lang lang-ko">VertexAI 소개</span><span class="lang lang-en">VertexAI Intro</span></a>
+                <a href="https://jae-choi.github.io/news/bigquery_tunning_latest.html" class="sidebar-link flex items-center px-4 py-2 rounded-lg text-secondary font-medium"><i data-lucide="database" class="w-4 h-4 mr-3"></i><span class="lang lang-ko">GCP 데이터 플랫폼</span><span class="lang lang-en">GCP Data Platform</span></a>
+                <a href="index_deploy.html#articles" class="sidebar-link flex items-center px-4 py-2 rounded-lg text-secondary font-medium"><i data-lucide="pen-square" class="w-4 h-4 mr-3"></i><span class="lang lang-ko">사유의 기록</span><span class="lang lang-en">Articles</span></a>
+                <a href="index_deploy.html#works" class="sidebar-link flex items-center px-4 py-2 rounded-lg text-secondary font-medium"><i data-lucide="code" class="w-4 h-4 mr-3"></i><span class="lang lang-ko">기술의 증명</span><span class="lang lang-en">Works</span></a>
+                <a href="prototype.html" class="sidebar-link active flex items-center px-4 py-2 rounded-lg text-secondary font-medium"><i data-lucide="flask-conical" class="w-4 h-4 mr-3"></i><span class="lang lang-ko">프로토타입</span><span class="lang lang-en">Prototype</span></a>
+                <a href="index_deploy.html#about" class="sidebar-link flex items-center px-4 py-2 rounded-lg text-secondary font-medium"><i data-lucide="user" class="w-4 h-4 mr-3"></i><span class="lang lang-ko">About Me</span><span class="lang lang-en">About Me</span></a>
+            </nav>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="flex-1 p-6 md:p-10 lg:pt-6 pt-24">
+            <div class="flex justify-end mb-8">
+                 <div class="flex items-center bg-gray-800 rounded-full p-1">
+                     <button id="btn-ko" class="lang-btn px-3 py-1 text-sm rounded-full" onclick="switchLang('ko')">KOR</button>
+                     <button id="btn-en" class="lang-btn px-3 py-1 text-sm rounded-full" onclick="switchLang('en')">ENG</button>
+                 </div>
+            </div>
+            <div class="max-w-5xl mx-auto">
+                <section id="prototypes" class="py-16">
+                    <h2 class="font-serif text-4xl md:text-5xl font-bold text-primary mb-12 text-center">
+                        <span class="lang lang-ko">프로토타입</span>
+                        <span class="lang lang-en">Prototypes</span>
+                    </h2>
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                        <!-- Card 1 -->
+                        <a href="observe-llm.html" class="project-item-link p-6">
+                            <h3 class="font-serif text-2xl font-bold mb-3 text-primary">
+                                <span class="lang lang-ko">운영 가능한 Self-Correcting AI Agent</span>
+                                <span class="lang lang-en">Production-Ready Self-Correcting AI Agent</span>
+                            </h3>
+                            <p class="text-secondary mb-4">
+                                <span class="lang lang-ko">Langfuse를 활용하여 완전한 관찰 가능성을 확보한 AI 에이전트입니다.</span>
+                                <span class="lang lang-en">An AI agent with full observability using Langfuse.</span>
+                            </p>
+                            <div class="flex flex-wrap gap-2">
+                                <span class="tag">LangGraph</span>
+                                <span class="tag">Langfuse</span>
+                                <span class="tag">Docker</span>
+                            </div>
+                        </a>
+                        
+                        <!-- Add more cards here in the future -->
+                        <div class="project-item-link p-6 opacity-50">
+                             <h3 class="font-serif text-2xl font-bold mb-3 text-primary">
+                                <span class="lang lang-ko">준비중</span>
+                                <span class="lang lang-en">Coming Soon</span>
+                            </h3>
+                            <p class="text-secondary mb-4">
+                                <span class="lang lang-ko">새로운 프로토타입이 곧 추가될 예정입니다.</span>
+                                <span class="lang lang-en">New prototypes will be added soon.</span>
+                            </p>
+                        </div>
+                         <div class="project-item-link p-6 opacity-50">
+                             <h3 class="font-serif text-2xl font-bold mb-3 text-primary">
+                                <span class="lang lang-ko">준비중</span>
+                                <span class="lang lang-en">Coming Soon</span>
+                            </h3>
+                            <p class="text-secondary mb-4">
+                                <span class="lang lang-ko">새로운 프로토타입이 곧 추가될 예정입니다.</span>
+                                <span class="lang lang-en">New prototypes will be added soon.</span>
+                            </p>
+                        </div>
+
+                    </div>
+                </section>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        lucide.createIcons();
+
+        function switchLang(lang) {
+            document.documentElement.lang = lang;
+            document.documentElement.className = `scroll-smooth lang-${lang}`;
+            localStorage.setItem('language', lang);
+            document.querySelectorAll('.lang-btn').forEach(btn => {
+                btn.classList.toggle('active', btn.id.includes(lang));
+            });
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const langFromStorage = localStorage.getItem('language');
+            const browserLang = (navigator.language || navigator.userLanguage).startsWith('en') ? 'en' : 'ko';
+            const initialLang = langFromStorage || browserLang;
+            switchLang(initialLang);
+        });
+    </script>
+
+</body>
+</html>
