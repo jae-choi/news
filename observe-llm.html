@@ -41,6 +41,17 @@
             background-color: #4f46e5;
             color: white;
         }
+        /* ▼ 추가: 클릭 시에만 iframe 생성용 썸네일 카드 */
+        .yt-card { position: relative; padding-top: 56.25%; background: #000; cursor: pointer; }
+        .yt-card img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+        .yt-card button { position: absolute; inset: 0; display: grid; place-items: center; background: transparent; border: 0; }
+        .yt-card .play-badge {
+            width: 68px; height: 48px; border-radius: 14px; background: rgba(0,0,0,.6);
+            display: grid; place-items: center; transition: transform .2s ease, background .2s ease;
+        }
+        .yt-card .play-badge svg { width: 22px; height: 22px; fill: #fff; margin-left: 2px; }
+        .yt-card:hover .play-badge { transform: scale(1.05); background: rgba(0,0,0,.7); }
+        /* ▲ 추가 끝 */
     </style>
 </head>
 <body class="text-slate-800">
@@ -105,16 +116,27 @@
                     </section>
                 </div>
 
-                <div class="w-full my-8 rounded-lg overflow-hidden shadow-lg">
-                    <div class="relative" style="padding-top: 56.25%;">
-                      <iframe src="https://www.youtube.com/embed/fX91kQH7zpI?autoplay=1&loop=1&mute=1&playlist=fX91kQH7zpI&controls=0&showinfo=0&autohide=1" 
-                        frameborder="0" 
-                        allow="autoplay; encrypted-media" 
-                        allowfullscreen
-                        class="absolute top-0 left-0 w-full h-full">
-                      </iframe>
-                    </div>
-                </div>
+                <!-- ▼ 변경: 초기 DOM에 iframe이 0개, 클릭 시에만 생성 -->
+                <figure class="w-full my-8 rounded-lg overflow-hidden shadow-lg bg-white">
+                  <div class="yt-card" data-video-id="1kSrzl0eaN4" aria-label="observe-llm 소개 영상" role="button" tabindex="0">
+                    <img src="https://img.youtube.com/vi/1kSrzl0eaN4/maxresdefault.jpg" alt="observe-llm 소개 영상 썸네일" loading="lazy">
+                    <button aria-label="Play Video">
+                      <span class="play-badge">
+                        <!-- YouTube play icon -->
+                        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5v14l11-7z"></path></svg>
+                      </span>
+                    </button>
+                  </div>
+                  <figcaption class="p-3 text-sm text-slate-500">
+                    교육 목적의 설명 영상입니다. 클릭 시 플레이어가 로드됩니다.
+                  </figcaption>
+                  <noscript>
+                    <p class="p-3 text-sm text-slate-500">
+                      자바스크립트를 사용하지 않는 경우 <a href="https://www.youtube.com/watch?v=1kSrzl0eaN4" rel="noopener nofollow ugc" target="_blank">유튜브에서 시청</a>하세요.
+                    </p>
+                  </noscript>
+                </figure>
+                <!-- ▲ 변경 끝 -->
 
                 <div class="prose">
                     <section id="architecture">
@@ -203,7 +225,7 @@
                     </section>
 
                     <section id="future-work">
-                        <h2 data-ko="5. 향후 방향 및 고도화" data-en="5. Future Directions & Enhancements">5. 향후 방향 및 고도화</h2>
+                        <h2 data-ko="5. 향후 방향 및 고도화" data-en="5. 향후 방향 및 고도화">5. 향후 방향 및 고도화</h2>
                         <p data-ko="`observe-llm`은 견고한 기반을 제공하지만, 확장할 수 있는 흥미로운 방법이 많이 있습니다:" data-en="`observe-llm` provides a solid foundation, but there are many exciting ways it could be extended:">
                             `observe-llm`은 견고한 기반을 제공하지만, 확장할 수 있는 흥미로운 방법이 많이 있습니다:
                         </p>
@@ -252,6 +274,44 @@
         }
         // Set initial language
         switchLanguage('ko');
+
+        /* ▼ 추가: 클릭 시에만 iframe 생성 */
+        function mountYouTubeIframe(container, videoId) {
+            const iframe = document.createElement('iframe');
+            iframe.src = `https://www.youtube-nocookie.com/embed/${encodeURIComponent(videoId)}`;
+            iframe.title = 'YouTube video player';
+            iframe.loading = 'lazy';
+            iframe.className = 'absolute top-0 left-0 w-full h-full';
+            iframe.frameBorder = '0';
+            iframe.referrerPolicy = 'strict-origin-when-cross-origin';
+            iframe.allow = 'accelerometer; clipboard-write; encrypted-media; picture-in-picture; web-share';
+            iframe.sandbox = 'allow-same-origin allow-scripts allow-popups allow-presentation';
+            container.innerHTML = '';
+            container.appendChild(iframe);
+        }
+
+        function setupLiteYouTube() {
+            const cards = document.querySelectorAll('.yt-card');
+            cards.forEach(card => {
+                const videoId = card.getAttribute('data-video-id');
+                const activate = () => mountYouTubeIframe(card, videoId);
+                // 클릭 1회만 활성화, 키보드 접근성 포함
+                card.addEventListener('click', activate, { once: true });
+                card.addEventListener('keydown', (e) => {
+                    if (e.key === 'Enter' || e.key === ' ') {
+                        e.preventDefault();
+                        activate();
+                    }
+                }, { once: true });
+            });
+        }
+
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', setupLiteYouTube);
+        } else {
+            setupLiteYouTube();
+        }
+        /* ▲ 추가 끝 */
     </script>
 
 </body>
