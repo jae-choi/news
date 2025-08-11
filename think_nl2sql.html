@@ -4,44 +4,59 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="icon" href="https://avatars.githubusercontent.com/u/35217573?v=4" type="image/x-icon">
-    <title data-ko="observe-llm: 운영 가능한 Self-Correcting AI Agent" data-en="observe-llm: A Production-Ready, Self-Correcting AI Agent">observe-llm: 운영 가능한 Self-Correcting AI Agent</title>
+    <title>자연어와 데이터 사이의 간극 | Peter Choi</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Noto+Sans+KR:wght@400;500;700&display=swap" rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700&family=Roboto:wght@300;400;500;700&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
     <style>
         body {
-            font-family: 'Inter', 'Noto Sans KR', sans-serif;
-            background-color: #f8fafc; /* slate-50 */
+            font-family: 'Noto Sans KR', sans-serif;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
         }
-        .code-block {
-            background-color: #1e293b; /* slate-800 */
-            color: #e2e8f0; /* slate-200 */
-            border-radius: 0.5rem;
-            padding: 1rem;
-            position: relative;
-            overflow-x: auto;
-            font-family: 'Courier New', Courier, monospace;
-            font-size: 0.9rem;
-            cursor: pointer;
+        .en body {
+            font-family: 'Roboto', sans-serif;
         }
-        .code-block pre { margin: 0; }
-        .section-title-icon {
-            width: 2.5rem; height: 2.5rem; margin-right: 1rem; color: #4f46e5; /* indigo-600 */
+        .prose h1, .prose h2, .prose h3, .prose strong {
+            color: #1f2937;
         }
-        html { scroll-behavior: smooth; }
-        section { scroll-margin-top: 5rem; }
-        .prose section:not(:first-child) { margin-top: 5rem; }
-        .mermaid { display: flex; justify-content: center; }
-        .prose h2 { font-size: 1.875rem; font-weight: 700; margin-bottom: 1.5rem; }
-        .prose h3 { font-size: 1.5rem; font-weight: 600; margin-top: 2rem; margin-bottom: 1rem; }
-        .prose p, .prose ul, .prose li { color: #475569; line-height: 1.8; }
-        .prose a { color: #4f46e5; text-decoration: none; }
-        .prose a:hover { text-decoration: underline; }
-        .prose strong { color: #1e293b; }
-        .lang-toggle button.active {
-            background-color: #4f46e5;
-            color: white;
+        .prose p, .prose li, .prose th, .prose td {
+            color: #4b5563;
         }
-        /* ▼ 추가: 클릭 시에만 iframe 생성용 썸네일 카드 */
+        .quote-block {
+            border-left: 4px solid #93c5fd;
+            padding-left: 1rem;
+            font-style: italic;
+            color: #374151;
+        }
+        .lang-ko .lang-en,
+        .lang-en .lang-ko {
+            display: none;
+        }
+        .lang-btn {
+            transition: all 0.2s ease-in-out;
+            border-radius: 9999px;
+            padding: 0.25rem 0.75rem;
+            font-size: 0.875rem;
+        }
+        .lang-btn.active {
+            font-weight: 600;
+            background-color: #2dd4bf;
+            color: #0f172a;
+        }
+        .lang-btn:not(.active) {
+            color: #94a3b8;
+            background-color: transparent;
+        }
+        .prose code {
+            background-color: #e9ecef;
+            color: #c7254e;
+            padding: 0.2em 0.4em;
+            margin: 0;
+            font-size: 85%;
+            border-radius: 6px;
+        }
         .yt-card { position: relative; padding-top: 56.25%; background: #000; cursor: pointer; }
         .yt-card img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
         .yt-card button { position: absolute; inset: 0; display: grid; place-items: center; background: transparent; border: 0; }
@@ -51,240 +66,180 @@
         }
         .yt-card .play-badge svg { width: 22px; height: 22px; fill: #fff; margin-left: 2px; }
         .yt-card:hover .play-badge { transform: scale(1.05); background: rgba(0,0,0,.7); }
-        /* ▲ 추가 끝 */
     </style>
 </head>
-<body class="text-slate-800">
-
-    <!-- Language Toggle -->
-    <div class="fixed top-4 right-4 z-50 lang-toggle bg-white shadow-lg rounded-full p-1 flex space-x-1">
-        <button id="btn-ko" class="px-3 py-1 text-sm font-semibold rounded-full transition-colors duration-200 active" onclick="switchLanguage('ko')">한국어</button>
-        <button id="btn-en" class="px-3 py-1 text-sm font-semibold rounded-full transition-colors duration-200" onclick="switchLanguage('en')">English</button>
-    </div>
-
-    <div class="container mx-auto px-4 py-12 md:py-16 max-w-5xl">
-        <!-- Header -->
-        <header class="text-center mb-12 md:mb-20">
-            <h1 class="text-4xl md:text-6xl font-bold text-slate-900 mb-4">observe-llm</h1>
-            <p class="text-xl text-slate-600 max-w-3xl mx-auto" data-ko="운영 환경을 고려한 Self-Correcting AI Agent와 완전한 관찰 가능성" data-en="A Production-Ready, Self-Correcting AI Agent with Full Observability">
-                운영 환경을 고려한 Self-Correcting AI Agent와 완전한 관찰 가능성
-            </p>
-        </header>
-
-        <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
-            <!-- Sidebar Navigation -->
-            <aside class="lg:col-span-3 lg:sticky top-8 self-start">
-                <nav class="bg-white p-4 rounded-lg shadow-sm">
-                    <h3 class="font-bold text-lg mb-4 text-slate-900" data-ko="목차" data-en="Table of Contents">목차</h3>
-                    <ul class="space-y-2">
-                        <li><a href="#introduction" class="text-slate-600 hover:text-indigo-600 block" data-ko="1. 프로젝트 소개" data-en="1. Introduction">1. 프로젝트 소개</a></li>
-                        <li><a href="#architecture" class="text-slate-600 hover:text-indigo-600 block" data-ko="2. 시스템 아키텍처" data-en="2. System Architecture">2. 시스템 아키텍처</a></li>
-                        <li><a href="#deep-dive" class="text-slate-600 hover:text-indigo-600 block" data-ko="3. 코드 분석" data-en="3. Code Deep Dive">3. 코드 분석</a></li>
-                        <li><a href="#deployment-ops" class="text-slate-600 hover:text-indigo-600 block" data-ko="4. 배포 및 운영 전략" data-en="4. Deployment & Ops">4. 배포 및 운영 전략</a></li>
-                        <li><a href="#future-work" class="text-slate-600 hover:text-indigo-600 block" data-ko="5. 향후 방향" data-en="5. Future Work">5. 향후 방향</a></li>
-                    </ul>
-                </nav>
-            </aside>
-
-            <!-- Main Content -->
-            <main class="lg:col-span-9 space-y-20">
-                
-                <div class="prose">
-                    <section id="introduction">
-                        <h2 data-ko="1. 소개: 프로토타입을 넘어서" data-en="1. Introduction: Beyond the Prototype">1. 소개: 프로토타입을 넘어서</h2>
-                        <p data-ko="많은 AI 에이전트 프로젝트는 개념 증명(PoC) 단계에 머물러 있습니다. 핵심 기능은 보여주지만, 배포, 모니터링, 확장성이라는 중요한 측면을 간과하는 경우가 많습니다. <a href='https://github.com/jae-choi/observe-llm' target='_blank' rel='noopener noreferrer'>`observe-llm`</a>은 이 간극을 메우기 위해 만들어졌습니다. 단순한 스크립트를 넘어, 견고하고 운영 가능한(production-ready) AI 에이전트 시스템을 구축하는 방법을 보여주는 실용적인 오픈소스 예제입니다." data-en="Many AI agent projects remain at the proof-of-concept stage. They demonstrate a core capability but often overlook the crucial aspects of deployment, monitoring, and scalability. <a href='https://github.com/jae-choi/observe-llm' target='_blank' rel='noopener noreferrer'>`observe-llm`</a> was created to bridge this gap. It's a practical, open-source example that goes beyond a simple script to showcase how to build a robust, production-ready AI agent system.">
-                            많은 AI 에이전트 프로젝트는 개념 증명(PoC) 단계에 머물러 있습니다. 핵심 기능은 보여주지만, 배포, 모니터링, 확장성이라는 중요한 측면을 간과하는 경우가 많습니다. <a href="https://github.com/jae-choi/observe-llm" target="_blank" rel="noopener noreferrer">`observe-llm`</a>은 이 간극을 메우기 위해 만들어졌습니다. 단순한 스크립트를 넘어, 견고하고 운영 가능한(production-ready) AI 에이전트 시스템을 구축하는 방법을 보여주는 실용적인 오픈소스 예제입니다.
-                        </p>
-                        <h3 data-ko="왜 Langfuse가 필수적인가?" data-en="Why is Langfuse Essential?">왜 Langfuse가 필수적인가?</h3>
-                        <p data-ko="단순한 LLM 체인은 디버깅하기 쉽지만, 순환적인 Self-Correcting 루프를 가진 에이전트는 '블랙박스'가 될 수 있습니다. Langfuse는 에이전트의 모든 생각과 행동에 대한 깊은 통찰력을 제공하여, 복잡한 AI 워크플로우의 <strong>관찰 가능성(observability)</strong> 문제를 해결합니다." data-en="While simple LLM chains are easy to debug, agents with cyclical, self-correcting loops can become 'black boxes.' Langfuse solves the challenge of <strong>observability in complex AI workflows</strong> by providing deep insights into every thought and action of the agent.">
-                            단순한 LLM 체인은 디버깅하기 쉽지만, 순환적인 Self-Correcting 루프를 가진 에이전트는 '블랙박스'가 될 수 있습니다. Langfuse는 에이전트의 모든 생각과 행동에 대한 깊은 통찰력을 제공하여, 복잡한 AI 워크플로우의 <strong>관찰 가능성(observability)</strong>문제를 해결합니다.
-                        </p>
-                         <ul>
-                            <li data-ko="<strong>사용자별 비용 추적:</strong> `user_id`를 기준으로 각 API 호출의 비용을 정확하게 추적하여 사용자별 과금의 기반을 마련할 수 있습니다." data-en="<strong>Cost Tracking per User:</strong> Accurately track the cost of each API call on a per-user basis, laying the groundwork for user-based billing.">
-                                <strong>사용자별 비용 추적:</strong> `user_id`를 기준으로 각 API 호출의 비용을 정확하게 추적하여 사용자별 과금의 기반을 마련할 수 있습니다.
-                            </li>
-                            <li data-ko="<strong>성능 병목 분석:</strong> LLM 모델별, 에이전트의 각 노드(단계)별 평균 지연 시간(latency)과 토큰 사용량을 분석하여 어느 부분에서 시간이 오래 걸리는지, 어떤 모델이 비효율적인지 쉽게 파악할 수 있습니다." data-en="<strong>Performance Bottleneck Analysis:</strong> Analyze average latency and token usage per LLM model and per agent node (step) to easily identify bottlenecks and inefficient models.">
-                                <strong>성능 병목 분석:</strong> LLM 모델별, 에이전트의 각 노드(단계)별 평균 지연 시간(latency)과 토큰 사용량을 분석하여 어느 부분에서 시간이 오래 걸리는지, 어떤 모델이 비효율적인지 쉽게 파악할 수 있습니다.
-                            </li>
-                            <li data-ko="<strong>품질 평가:</strong> 프롬프트의 버전을 관리하고, 동일한 입력에 대해 다른 프롬프트나 모델 버전이 어떻게 다른 결과물을 내놓는지 A/B 테스트하며, 사용자 피드백을 수집하여 에이전트의 응답 품질을 정량적으로 평가할 수 있습니다." data-en="<strong>Quality Evaluation:</strong> Manage prompt versions, A/B test different prompts or models on the same input, and collect user feedback to quantitatively assess the quality of the agent's responses.">
-                                <strong>품질 평가:</strong> 프롬프트의 버전을 관리하고, 동일한 입력에 대해 다른 프롬프트나 모델 버전이 어떻게 다른 결과물을 내놓는지 A/B 테스트하며, 사용자 피드백을 수집하여 에이전트의 응답 품질을 정량적으로 평가할 수 있습니다.
-                            </li>
-                            <li data-ko="<strong>신속한 디버깅:</strong> 복잡한 에이전트의 실행 흐름 전체를 시각적인 트레이스로 한눈에 파악하여, 어느 단계에서 문제가 발생했는지 신속하게 디버깅할 수 있습니다." data-en="<strong>Rapid Debugging:</strong> Gain a clear, visual trace of the entire complex agent workflow, allowing for quick identification and debugging of issues at any step.">
-                                <strong>신속한 디버깅:</strong> 복잡한 에이전트의 실행 흐름 전체를 시각적인 트레이스로 한눈에 파악하여, 어느 단계에서 문제가 발생했는지 신속하게 디버깅할 수 있습니다.
-                            </li>
-                        </ul>
-                    </section>
-                </div>
-
-                <!-- ▼ 변경: 초기 DOM에 iframe이 0개, 클릭 시에만 생성 -->
-                <figure class="w-full my-8 rounded-lg overflow-hidden shadow-lg bg-white">
-                  <div class="yt-card" data-video-id="fX91kQH7zpI" aria-label="observe-llm 소개 영상" role="button" tabindex="0">
-                    <img src="https://img.youtube.com/vi/fX91kQH7zpI/maxresdefault.jpg" alt="observe-llm 소개 영상 썸네일" loading="lazy">
-                    <button aria-label="Play Video">
-                      <span class="play-badge">
-                        <!-- YouTube play icon -->
-                        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5v14l11-7z"></path></svg>
-                      </span>
-                    </button>
-                  </div>
-                  <figcaption class="p-3 text-sm text-slate-500">
-                    교육 목적의 설명 영상입니다. 클릭 시 플레이어가 로드됩니다.
-                  </figcaption>
-                  <noscript>
-                    <p class="p-3 text-sm text-slate-500">
-                      자바스크립트를 사용하지 않는 경우 <a href="https://www.youtube.com/watch?v=fX91kQH7zpI" rel="noopener nofollow ugc" target="_blank">유튜브에서 시청</a>하세요.
-                    </p>
-                  </noscript>
-                </figure>
-                <!-- ▲ 변경 끝 -->
-
-                <div class="prose">
-                    <section id="architecture">
-                        <h2 data-ko="2. 시스템 아키텍처: 전체적인 관점" data-en="2. System Architecture: A Holistic View">2. 시스템 아키텍처: 전체적인 관점</h2>
-                        <p data-ko="에이전트 자체는 퍼즐의 한 조각에 불과합니다. 견고한 시스템은 지원 서비스의 전체 스택을 필요로 하며, 이 모든 것이 원활하게 조율되어야 합니다. 저희는 Docker Compose를 사용하여 이 생태계를 관리하며, 여기에는 다음이 포함됩니다:" data-en="The agent itself is just one piece of the puzzle. A robust system requires a full stack of supporting services, all orchestrated seamlessly. We use Docker Compose to manage this ecosystem, which includes:">
-                            에이전트 자체는 퍼즐의 한 조각에 불과합니다. 견고한 시스템은 지원 서비스의 전체 스택을 필요로 하며, 이 모든 것이 원활하게 조율되어야 합니다. 저희는 Docker Compose를 사용하여 이 생태계를 관리하며, 여기에는 다음이 포함됩니다:
-                        </p>
-                        <div class="mermaid" style="width: 100%; background-color: white; padding: 1rem; border-radius: 0.5rem;">
-                            graph TD
-                                subgraph User
-                                    A[Browser]
-                                end
-                                subgraph Docker Network
-                                    B(observe-llm Agent) -- HTTP Request --> A
-                                    B -- Trace Data --> C(Langfuse Server)
-                                    C -- Writes/Reads --> D(PostgreSQL)
-                                    C -- Writes/Reads --> E(Clickhouse)
-                                    C -- Uses --> F(Redis)
-                                    C -- Uses --> G(Minio)
-                                end
-                                A -- Interacts --> B
-                        </div>
-                        <p class="text-sm text-center mt-2 text-slate-500" data-ko="그림 1: Docker Compose로 관리되는 전체 시스템 아키텍처" data-en="Figure 1: Overall system architecture managed by Docker Compose.">
-                            그림 1: Docker Compose로 관리되는 전체 시스템 아키텍처
-                        </p>
-                    </section>
-
-                    <section id="deep-dive">
-                        <h2 data-ko="3. 코드 분석: Self-Correcting Loop" data-en="3. Code Deep Dive: The Self-Correcting Loop">3. 코드 분석: Self-Correcting Loop</h2>
-                        <p data-ko="핵심 로직은 `run_agent.py`에 있습니다. LangGraph를 사용하여 인간이 글을 다듬는 과정을 모방한 순환적인 '비평 및 수정' 워크플로우를 가능하게 하는 상태 머신을 만듭니다." data-en="The core logic resides in `run_agent.py`. It uses LangGraph to create a state machine that enables a cyclical 'critique and revision' workflow, mimicking how a human might refine a piece of writing.">
-                            핵심 로직은 `run_agent.py`에 있습니다. LangGraph를 사용하여 인간이 글을 다듬는 과정을 모방한 순환적인 '비평 및 수정' 워크플로우를 가능하게 하는 상태 머신을 만듭니다.
-                        </p>
-                        <div class="mermaid" style="width: 100%; background-color: white; padding: 1rem; border-radius: 0.5rem;">
-                            graph TD
-                                Start --> Researcher
-                                Researcher --> Writer
-                                Writer --> Critique
-                                Critique -- REVISE --> Reviser
-                                Reviser --> Critique
-                                Critique -- APPROVE --> SetFinalOutput
-                                SetFinalOutput --> End
-                        </div>
-                         <p class="text-sm text-center mt-2 text-slate-500" data-ko="그림 2: LangGraph 에이전트의 워크플로우" data-en="Figure 2: The LangGraph agent's workflow.">
-                            그림 2: LangGraph 에이전트의 워크플로우
-                        </p>
-                        <h3 data-ko="상태 머신 (`AgentState`)" data-en="The State Machine (`AgentState`)">상태 머신 (`AgentState`)</h3>
-                        <p data-ko="`AgentState` TypedDict는 에이전트의 생명선입니다. 그래프의 각 노드가 읽고 쓰는 공유 메모리 역할을 하여 워크플로우 전반에 걸쳐 원활한 정보 흐름을 보장합니다." data-en="The `AgentState` TypedDict is the lifeblood of the agent. It's a shared memory that each node in the graph reads from and writes to, ensuring a seamless flow of information through the workflow.">
-                            `AgentState` TypedDict는 에이전트의 생명선입니다. 그래프의 각 노드가 읽고 쓰는 공유 메모리 역할을 하여 워크플로우 전반에 걸쳐 원활한 정보 흐름을 보장합니다.
-                        </p>
-                        <div class="code-block" onclick="selectCode(this)">
-                            <pre><code>class AgentState(TypedDict):
-    topic: str
-    research_result: str
-    draft: str
-    critique: str
-    # ... and other state variables
-</code></pre>
-                        </div>
-                        <h3 data-ko="조건부 엣지의 역할" data-en="The Role of the Conditional Edge">조건부 엣지의 역할</h3>
-                        <p data-ko="이 워크플로우의 핵심은 `Critique` 노드 이후의 분기입니다. `should_revise` 함수는 `critique`의 내용에 'REVISE'라는 키워드가 있는지 확인하여, 에이전트가 수정을 계속할지 아니면 작업을 완료할지를 동적으로 결정합니다. 이 조건부 라우팅이 바로 LangGraph의 강력함입니다." data-en="The magic of this workflow is the branch after the `Critique` node. The `should_revise` function checks for the keyword 'REVISE' in the critique's output to dynamically decide whether the agent should continue revising or finalize its work. This conditional routing is the power of LangGraph.">
-                            이 워크플로우의 핵심은 `Critique` 노드 이후의 분기입니다. `should_revise` 함수는 `critique`의 내용에 'REVISE'라는 키워드가 있는지 확인하여, 에이전트가 수정을 계속할지 아니면 작업을 완료할지를 동적으로 결정합니다. 이 조건부 라우팅이 바로 LangGraph의 강력함입니다.
-                        </p>
-                        <div class="code-block" onclick="selectCode(this)">
-                            <pre><code>def should_revise(state: AgentState) -> str:
-    if "REVISE" in state["critique"]:
-        return "reviser"  # Loop back to revise
-    else:
-        return "set_final_output" # Exit the loop
-</code></pre>
-                        </div>
-                    </section>
-
-                    <section id="deployment-ops">
-                        <h2 data-ko="4. 개발에서 배포까지" data-en="4. From Development to Distribution">4. 개발에서 배포까지</h2>
-                        <p data-ko="이 프로젝트를 진정으로 운영 가능하게 만들기 위해 몇 가지 핵심적인 운영 전략이 구현되었습니다." data-en="To make this project truly production-ready, several key operational strategies were implemented.">
-                            이 프로젝트를 진정으로 운영 가능하게 만들기 위해 몇 가지 핵심적인 운영 전략이 구현되었습니다.
-                        </p>
-                        <h3 data-ko="보안 및 구성" data-en="Security & Configuration">보안 및 구성</h3>
-                        <p data-ko="API 키와 같은 모든 민감 정보는 `.env` 파일을 통해 관리됩니다. `docker-compose.yml`은 이러한 변수를 참조하여 소스 코드에 비밀이 하드코딩되지 않도록 합니다. `.gitignore` 파일은 `.env` 파일이 버전 제어에 커밋되는 것을 방지합니다." data-en="All sensitive information, such as API keys, is managed through a `.env` file. The `docker-compose.yml` references these variables, ensuring that no secrets are hardcoded in the source code. The `.gitignore` file prevents the `.env` file from ever being committed to version control.">
-                            API 키와 같은 모든 민감 정보는 `.env` 파일을 통해 관리됩니다. `docker-compose.yml`은 이러한 변수를 참조하여 소스 코드에 비밀이 하드코딩되지 않도록 합니다. `.gitignore` 파일은 `.env` 파일이 버전 제어에 커밋되는 것을 방지합니다.
-                        </p>
-                        <h3 data-ko="데이터 영속성" data-en="Data Persistence">데이터 영속성</h3>
-                        <p data-ko="Langfuse 스택은 영구 데이터를 필요로 합니다. 임시 Docker 볼륨 대신, 시스템은 로컬 바인드 마운트로 구성됩니다. 모든 데이터는 로컬 머신의 `langfuse-data/` 디렉토리에 저장되어, 컨테이너 재시작 및 제거에도 추적 기록이 유지됩니다." data-en="The Langfuse stack requires persistent data. Instead of using ephemeral Docker volumes, the system is configured with local bind mounts. All data is saved to a `langfuse-data/` directory on your local machine, guaranteeing that your trace history survives container restarts and removals.">
-                            Langfuse 스택은 영구 데이터를 필요로 합니다. 임시 Docker 볼륨 대신, 시스템은 로컬 바인드 마운트로 구성됩니다. 모든 데이터는 로컬 머신의 `langfuse-data/` 디렉토리에 저장되어, 컨테이너 재시작 및 제거에도 추적 기록이 유지됩니다.
-                        </p>
-                    </section>
-
-                    <section id="future-work">
-                        <h2 data-ko="5. 향후 방향 및 고도화" data-en="5. 향후 방향 및 고도화">5. 향후 방향 및 고도화</h2>
-                        <p data-ko="`observe-llm`은 견고한 기반을 제공하지만, 확장할 수 있는 흥미로운 방법이 많이 있습니다:" data-en="`observe-llm` provides a solid foundation, but there are many exciting ways it could be extended:">
-                            `observe-llm`은 견고한 기반을 제공하지만, 확장할 수 있는 흥미로운 방법이 많이 있습니다:
-                        </p>
-                        <ul>
-                            <li data-ko="<strong>에이전트 도구 추가:</strong> `researcher` 노드에 웹 검색 API(예: Tavily)와 같은 도구를 제공하여 기능을 향상시킬 수 있습니다. 이를 통해 에이전트는 실시간 정보를 통합하고 더 강력한 팩트체크를 수행할 수 있습니다." data-en="<strong>Agent Tooling:</strong> Enhance the `researcher` node by giving it access to tools, such as a web search API (e.g., Tavily). This would allow the agent to incorporate real-time information and perform more robust fact-checking.">
-                                <strong>에이전트 도구 추가:</strong> `researcher` 노드에 웹 검색 API(예: Tavily)와 같은 도구를 제공하여 기능을 향상시킬 수 있습니다. 이를 통해 에이전트는 실시간 정보를 통합하고 더 강력한 팩트체크를 수행할 수 있습니다.
-                            </li>
-                            <li data-ko="<strong>인간 참여 루프(Human-in-the-Loop):</strong> Langfuse의 사용자 피드백 기능을 통합합니다. 에이전트가 수정 루프를 완료한 후, 최종 초안을 인간에게 제시하여 최종 '승인' 또는 '거절' 조치를 받게 하고, 이 피드백을 Langfuse에 기록하여 에이전트의 성능을 추가로 평가할 수 있습니다." data-en="<strong>Human-in-the-Loop:</strong> Integrate Langfuse's user feedback features. After the agent completes its revision loop, the final draft could be presented to a human for a final 'approve' or 'reject' action, with that feedback being logged in Langfuse to further evaluate the agent's performance.">
-                                <strong>인간 참여 루프(Human-in-the-Loop):</strong> Langfuse의 사용자 피드백 기능을 통합합니다. 에이전트가 수정 루프를 완료한 후, 최종 초안을 인간에게 제시하여 최종 '승인' 또는 '거절' 조치를 받게 하고, 이 피드백을 Langfuse에 기록하여 에이전트의 성능을 추가로 평가할 수 있습니다.
-                            </li>
-                            <li data-ko="<strong>자동화된 테스트 및 평가:</strong> Langfuse의 데이터셋 및 점수 기능을 사용하여 자동화된 평가 파이프라인을 만듭니다. 주제와 예상 요점의 데이터셋을 구축한 다음, 이 데이터셋에 대해 에이전트를 프로그래밍 방식으로 실행하여 시간 경과에 따른 정확성과 일관성을 점수화할 수 있습니다." data-en="<strong>Automated Testing & Evaluation:</strong> Use Langfuse's dataset and scoring features to create an automated evaluation pipeline. We could build a dataset of topics and expected key points, and then programmatically run the agent against this dataset to score its accuracy and consistency over time.">
-                                <strong>자동화된 테스트 및 평가:</strong> Langfuse의 데이터셋 및 점수 기능을 사용하여 자동화된 평가 파이프라인을 만듭니다. 주제와 예상 요점의 데이터셋을 구축한 다음, 이 데이터셋에 대해 에이전트를 프로그래밍 방식으로 실행하여 시간 경과에 따른 정확성과 일관성을 점수화할 수 있습니다.
-                            </li>
-                        </ul>
-                    </section>
-                </div>
-            </main>
-        </div>
+<body class="bg-slate-50">
+    <div class="container mx-auto max-w-4xl px-4 py-12 sm:py-20">
         
-        <footer class="text-center mt-20 text-slate-500">
-            <p>&copy; 2025 jae-choi. All rights reserved.</p>
-        </footer>
+        <div class="flex justify-end mb-4">
+            <div class="flex items-center bg-gray-800 rounded-full p-1">
+                <button id="btn-ko" class="lang-btn" onclick="switchLang('ko')">KOR</button>
+                <button id="btn-en" class="lang-btn" onclick="switchLang('en')">ENG</button>
+            </div>
+        </div>
+
+        <article class="bg-white rounded-lg shadow-lg p-8 sm:p-12 prose lg:prose-lg">
+            
+            <header class="mb-8 text-center">
+                <h1 class="lang lang-ko text-4xl font-bold tracking-tight text-gray-900 sm:text-5xl">자연어와 데이터 사이의 간극</h1>
+                <h1 class="lang lang-en text-4xl font-bold tracking-tight text-gray-900 sm:text-5xl" style="display:none;">The Gap Between Natural Language and Data</h1>
+            </header>
+            
+            <figure class="my-8">
+                <svg class="w-full h-full rounded-lg" viewBox="0 0 200 120" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="NL2SQL Philosophy Infographic">
+                    <rect width="200" height="120" fill="#f7fafc"/>
+                    <g>
+                        <path d="M 40 40 C 20 40, 20 60, 40 60 C 40 80, 60 80, 60 60 C 80 60, 80 40, 60 40 C 60 20, 40 20, 40 40 Z" fill="#A1887F" fill-opacity="0.3"/>
+                        <text x="50" y="55" font-family="Playfair Display" font-size="24" text-anchor="middle" fill="#1a202c">?</text>
+                        <text x="50" y="80" font-family="Inter" font-size="9" text-anchor="middle" fill="#4a5568">Why?</text>
+                    </g>
+                    <path d="M 80 60 C 100 40, 100 80, 120 60" stroke="#3D5A80" stroke-width="1.5" fill="none" stroke-dasharray="4,4"/>
+                    <text x="100" y="50" font-family="Inter" font-size="9" text-anchor="middle" fill="#3D5A80">LLM</text>
+                    <g>
+                        <ellipse cx="150" cy="60" rx="25" ry="10" fill="#3D5A80"/>
+                        <path d="M 125 60 V 80 C 125 85.523, 136.193 90, 150 90 C 163.807 90, 175 85.523, 175 80 V 60" fill="#3D5A80" stroke="#1a202c" stroke-width="0.5"/>
+                        <text x="150" y="75" font-family="monospace" font-size="8" fill="white" text-anchor="middle">SELECT *</text>
+                    </g>
+                </svg>
+                <figcaption class="lang lang-ko text-center text-sm text-gray-500 mt-2">인간의 '왜?'라는 질문이 LLM을 통해 기계가 이해하는 언어로 번역됩니다.</figcaption>
+                <figcaption class="lang lang-en text-center text-sm text-gray-500 mt-2" style="display:none;">The human question of 'Why?' is translated by an LLM into a language the machine can understand.</figcaption>
+            </figure>
+
+            <div class="quote-block my-12">
+                <p class="lang lang-ko text-lg leading-relaxed">우리가 던지는 비즈니스 질문과 데이터베이스가 이해하는 언어(SQL) 사이에는 본질적인 의미의 간극이 존재합니다. 예를 들어, “어제 가입한 신규 사용자 중 특정 상품을 구매한 사람들의 연령 분포는?” 이라는 질문은, 데이터베이스 입장에서는 <code>JOIN</code>, <code>WHERE</code>, <code>GROUP BY</code> 같은 구조적 구문으로 번역되어야만 이해할 수 있습니다.</p>
+                <p class="lang lang-en text-lg leading-relaxed" style="display:none;">A fundamental semantic gap exists between the business questions we ask and the language a database understands (SQL). For example, a question like, “What is the age distribution of new users who signed up yesterday and purchased a specific product?” must be translated into structured clauses like <code>JOIN</code>, <code>WHERE</code>, and <code>GROUP BY</code> for a database to comprehend it.</p>
+            </div>
+
+            <section class="mt-12">
+                <h2 class="lang lang-ko text-3xl font-bold mb-6 border-b pb-2">1. 실제 구현을 위한 기술 아키텍처</h2>
+                <h2 class="lang lang-en text-3xl font-bold mb-6 border-b pb-2" style="display:none;">1. Technical Architecture for Real-World Implementation</h2>
+                <p class="lang lang-ko">전체 흐름은 다음과 같습니다: <br> [사용자] → [① 사용자 UI] → [② 백엔드 서버] ↔ [③ LLM API] → [④ Redash API] → [⑤ BigQuery]</p>
+                <p class="lang lang-en" style="display:none;">The overall flow is as follows: <br> [User] → [① User UI] → [② Backend Server] ↔ [③ LLM API] → [④ Redash API] → [⑤ BigQuery]</p>
+                <ul class="list-decimal list-inside space-y-2 mt-4">
+                    <li><strong><span class="lang lang-ko">사용자 UI:</span><span class="lang lang-en" style="display:none;">User UI:</span></strong> <span class="lang lang-ko">사용자가 자연어 질문을 입력하는 전용 웹 인터페이스</span><span class="lang lang-en" style="display:none;">A dedicated web interface for users to input natural language questions.</span></li>
+                    <li><strong><span class="lang lang-ko">백엔드 서버 (오케스트레이터):</span><span class="lang lang-en" style="display:none;">Backend Server (Orchestrator):</span></strong> <span class="lang lang-ko">전체 흐름을 제어하는 두뇌. LLM 호출 및 Redash API 연동 담당</span><span class="lang lang-en" style="display:none;">The brain that controls the entire flow, handling LLM calls and Redash API integration.</span></li>
+                    <li><strong><span class="lang lang-ko">LLM API (번역기):</span><span class="lang lang-en" style="display:none;">LLM API (Translator):</span></strong> <span class="lang lang-ko">백엔드로부터 질문 + 스키마 정보를 받아 정밀한 BigQuery SQL로 변환</span><span class="lang lang-en" style="display:none;">Receives questions and schema information from the backend to translate them into precise BigQuery SQL.</span></li>
+                    <li><strong><span class="lang lang-ko">Redash API (실행 및 시각화):</span><span class="lang lang-en" style="display:none;">Redash API (Execution & Visualization):</span></strong> <span class="lang lang-ko">생성된 SQL을 Redash로 전송하고 결과를 시각화</span><span class="lang lang-en" style="display:none;">Sends the generated SQL to Redash for execution and visualizes the results.</span></li>
+                    <li><strong><span class="lang lang-ko">BigQuery (데이터 소스):</span><span class="lang lang-en" style="display:none;">BigQuery (Data Source):</span></strong> <span class="lang lang-ko">실제 쿼리가 실행되는 데이터 웨어하우스</span><span class="lang lang-en" style="display:none;">The data warehouse where the actual query is executed.</span></li>
+                </ul>
+                <div class="my-8">
+                    <figure class="w-full rounded-lg overflow-hidden shadow-lg bg-white">
+                      <div class="yt-card" data-video-id="l5J7jMobUD4" aria-label="NL2SQL Redash 데모 영상" role="button" tabindex="0">
+                        <img src="https://img.youtube.com/vi/l5J7jMobUD4/maxresdefault.jpg" alt="NL2SQL Redash 데모 영상 썸네일" loading="lazy">
+                        <button aria-label="Play Video">
+                          <span class="play-badge">
+                            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5v14l11-7z"></path></svg>
+                          </span>
+                        </button>
+                      </div>
+                      <figcaption class="p-2 text-sm text-slate-500 text-center">
+                        <span class="lang lang-ko">교육 목적의 설명 영상입니다. 클릭 시 플레이어가 로드됩니다.</span>
+                        <span class="lang lang-en" style="display:none;">This is an instructional video. The player will load upon clicking.</span>
+                      </figcaption>
+                    </figure>
+                </div>
+            </section>
+
+            <section class="mt-12">
+                <h2 class="lang lang-ko text-3xl font-bold mb-6 border-b pb-2">2. 핵심 과제: 스키마 인식과 의미 매핑</h2>
+                <h2 class="lang lang-en text-3xl font-bold mb-6 border-b pb-2" style="display:none;">2. Core Challenge: Schema Awareness and Semantic Mapping</h2>
+                <p class="lang lang-ko">이 구조의 성공은 LLM이 데이터 스키마를 얼마나 잘 이해하고 자연어 개념을 정확히 SQL로 매핑하느냐에 달려 있습니다.</p>
+                <p class="lang lang-en" style="display:none;">The success of this architecture depends on how well the LLM understands the data schema and accurately maps natural language concepts to SQL.</p>
+                <p class="lang lang-ko">예를 들어, <code>WHERE DATE(signup_timestamp) = CURRENT_DATE() - 1</code> 같은 쿼리를 정확히 생성하도록 LLM을 프롬프트 엔지니어링이나 라이트 파인튜닝을 통해 유도해야 합니다. 이는 단순한 기술 구현을 넘어 의미 기반 해석 능력을 요구하는 작업입니다.</p>
+                <p class="lang lang-en" style="display:none;">For instance, the LLM must be guided through prompt engineering or light fine-tuning to accurately generate queries like <code>WHERE DATE(signup_timestamp) = CURRENT_DATE() - 1</code>. This task requires more than just technical implementation; it demands a capacity for semantic interpretation.</p>
+            </section>
+
+            <section class="mt-12">
+                <h2 class="lang lang-ko text-3xl font-bold mb-6 border-b pb-2">3. 실전에서 마주치는 복잡한 과제들</h2>
+                <h2 class="lang lang-en text-3xl font-bold mb-6 border-b pb-2" style="display:none;">3. Complex Challenges in Practice</h2>
+                <ul class="list-disc list-inside space-y-3">
+                    <li><strong><span class="lang lang-ko">쿼리 검증 및 비용 최적화:</span><span class="lang lang-en" style="display:none;">Query Validation & Cost Optimization:</span></strong> <span class="lang lang-ko">생성된 SQL의 성능과 비용을 백엔드에서 검증하는 로직 필요</span><span class="lang lang-en" style="display:none;">Logic is needed on the backend to validate the performance and cost of the generated SQL.</span></li>
+                    <li><strong><span class="lang lang-ko">질문 모호성 해결:</span><span class="lang lang-en" style="display:none;">Resolving Ambiguity:</span></strong> <span class="lang lang-ko">예) “인기 있는 상품” 같은 표현을 해석하기 위한 정책 수립 필요</span><span class="lang lang-en" style="display:none;">Policies must be established to interpret ambiguous phrases like “popular products.”</span></li>
+                    <li><strong><span class="lang lang-ko">데이터 거버넌스와 보안:</span><span class="lang lang-en" style="display:none;">Data Governance & Security:</span></strong> <span class="lang lang-ko">백엔드는 사용자 권한을 확인하고 데이터 접근을 통제하는 관문 역할 수행</span><span class="lang lang-en" style="display:none;">The backend acts as a gateway, verifying user permissions and controlling data access.</span></li>
+                </ul>
+            </section>
+
+            <footer class="mt-16 pt-8 border-t">
+                 <div class="quote-block">
+                    <h2 class="lang lang-ko text-2xl font-semibold mb-4">결론: ‘好奇心의 민주화’를 향한 문화적 전환</h2>
+                    <h2 class="lang lang-en text-2xl font-semibold mb-4" style="display:none;">Conclusion: A Cultural Shift Towards the 'Democratization of Curiosity'</h2>
+                    <p class="lang lang-ko text-lg leading-relaxed">Text-to-SQL 기술이 가져오는 변화는 단순한 <strong>효율 향상</strong>을 넘어 <strong>문화의 전환</strong>을 의미합니다. <strong>"어떻게"</strong> 질문해야 하는지(SQL을 작성하는 기술)를 몰라도 되는 순간, 사람의 가치는 <strong>"무엇을"</strong> 그리고 <strong>"왜"</strong> 질문할 것인가로 이동합니다. 기술은 <strong>문법</strong>을 처리하고, 사람은 <strong>맥락과 전략</strong>을 다룹니다. 이 여정의 궁극적인 목적은 기술 배경과 무관하게 모든 구성원이 자유롭게 데이터 기반 <strong>호기심</strong>을 탐색할 수 있는 <strong>조직 문화</strong>를 만드는 것입니다. 그리고 그 <strong>호기심</strong>이, 조직을 한 걸음 더 나아가게 할 다음 질문을 만들어낼 것입니다.</p>
+                    <p class="lang lang-en text-lg leading-relaxed" style="display:none;">The change brought by Text-to-SQL technology signifies more than just an <strong>increase in efficiency</strong>; it represents a <strong>cultural transformation</strong>. The moment we no longer need to know <strong>"how"</strong> to ask (the skill of writing SQL), the value of a person shifts to <strong>"what"</strong> and <strong>"why"</strong> they ask. Technology handles the <strong>syntax</strong>, while people handle <strong>context and strategy</strong>. The ultimate goal of this journey is to create an organizational culture where all members, regardless of their technical background, can freely explore their <strong>data-driven curiosity</strong>. And it is that <strong>curiosity</strong> that will generate the next questions to move the organization forward.</p>
+                </div>
+            </footer>
+        </article>
+
+        <div class="mt-16 text-center">
+            <a href="redash.html" class="text-xl font-semibold text-teal-600 hover:text-teal-700 transition-colors group">
+                <span class="lang lang-ko">이어지는 글: 기술적 구현의 여정 <span class="opacity-0 group-hover:opacity-100 transition-opacity">→</span></span>
+                <span class="lang lang-en" style="display:none;">Next Up: The Journey of Technical Implementation <span class="opacity-0 group-hover:opacity-100 transition-opacity">→</span></span>
+            </a>
+        </div>
     </div>
 
-    <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
     <script>
-        mermaid.initialize({ startOnLoad: true, theme: 'neutral' });
+        const titles = {
+            ko: '자연어와 데이터 사이의 간극 | Peter Choi',
+            en: 'The Gap Between Natural Language and Data | Peter Choi'
+        };
 
-        function selectCode(element) {
-            const range = document.createRange();
-            range.selectNodeContents(element.querySelector('code'));
-            const selection = window.getSelection();
-            selection.removeAllRanges();
-            selection.addRange(range);
-        }
-
-        function switchLanguage(lang) {
-            document.querySelectorAll('[data-ko]').forEach(el => {
-                if (el.dataset[lang]) {
-                    el.innerHTML = el.dataset[lang];
+        function updateLinksWithLang(lang) {
+            document.querySelectorAll('a[href*=".html"]').forEach(link => {
+                let href = link.getAttribute('href');
+                if (!href || !href.endsWith('.html')) {
+                    return;
+                }
+                
+                try {
+                    const url = new URL(href, window.location.href);
+                    url.searchParams.set('lang', lang);
+                    link.href = url.href;
+                } catch (e) {
+                    console.error(`Could not update link href: ${href}`, e);
                 }
             });
-            document.documentElement.lang = lang;
-            document.getElementById('btn-ko').classList.toggle('active', lang === 'ko');
-            document.getElementById('btn-en').classList.toggle('active', lang === 'en');
         }
-        // Set initial language
-        switchLanguage('ko');
 
-        /* ▼ 추가: 클릭 시에만 iframe 생성 */
+        function switchLang(lang) {
+            document.documentElement.lang = lang;
+            document.documentElement.className = lang;
+            localStorage.setItem('language', lang);
+            document.title = titles[lang];
+
+            document.querySelectorAll('.lang').forEach(el => {
+                if (el.classList.contains(`lang-${lang}`)) {
+                    el.style.display = '';
+                } else {
+                    el.style.display = 'none';
+                }
+            });
+
+            document.querySelectorAll('.lang-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            document.getElementById(`btn-${lang}`).classList.add('active');
+            updateLinksWithLang(lang);
+        }
+        
+        document.addEventListener('DOMContentLoaded', () => {
+            const urlParams = new URLSearchParams(window.location.search);
+            const langFromUrl = urlParams.get('lang');
+            const langFromStorage = localStorage.getItem('language');
+            const browserLang = (navigator.language || navigator.userLanguage).startsWith('en') ? 'en' : 'ko';
+            
+            const initialLang = langFromUrl || langFromStorage || browserLang;
+            switchLang(initialLang);
+        });
+
         function mountYouTubeIframe(container, videoId) {
             const iframe = document.createElement('iframe');
-            iframe.src = `https://www.youtube-nocookie.com/embed/${encodeURIComponent(videoId)}`;
+            iframe.src = `https://www.youtube-nocookie.com/embed/${encodeURIComponent(videoId)}?autoplay=1`;
             iframe.title = 'YouTube video player';
             iframe.loading = 'lazy';
             iframe.className = 'absolute top-0 left-0 w-full h-full';
             iframe.frameBorder = '0';
             iframe.referrerPolicy = 'strict-origin-when-cross-origin';
-            iframe.allow = 'accelerometer; clipboard-write; encrypted-media; picture-in-picture; web-share';
+            iframe.allow = 'accelerometer; autoplay; clipboard-write; encrypted-media; picture-in-picture; web-share';
             iframe.sandbox = 'allow-same-origin allow-scripts allow-popups allow-presentation';
             container.innerHTML = '';
             container.appendChild(iframe);
@@ -295,7 +250,6 @@
             cards.forEach(card => {
                 const videoId = card.getAttribute('data-video-id');
                 const activate = () => mountYouTubeIframe(card, videoId);
-                // 클릭 1회만 활성화, 키보드 접근성 포함
                 card.addEventListener('click', activate, { once: true });
                 card.addEventListener('keydown', (e) => {
                     if (e.key === 'Enter' || e.key === ' ') {
@@ -311,8 +265,6 @@
         } else {
             setupLiteYouTube();
         }
-        /* ▲ 추가 끝 */
     </script>
-
 </body>
 </html>
