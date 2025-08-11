@@ -42,6 +42,15 @@
             color: #94a3b8;
             background-color: transparent;
         }
+        .yt-card { position: relative; padding-top: 56.25%; background: #000; cursor: pointer; }
+        .yt-card img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+        .yt-card button { position: absolute; inset: 0; display: grid; place-items: center; background: transparent; border: 0; }
+        .yt-card .play-badge {
+            width: 68px; height: 48px; border-radius: 14px; background: rgba(0,0,0,.6);
+            display: grid; place-items: center; transition: transform .2s ease, background .2s ease;
+        }
+        .yt-card .play-badge svg { width: 22px; height: 22px; fill: #fff; margin-left: 2px; }
+        .yt-card:hover .play-badge { transform: scale(1.05); background: rgba(0,0,0,.7); }
     </style>
 </head>
 <body class="bg-gray-50 text-gray-800">
@@ -79,8 +88,21 @@
                     <section id="introduction" class="content-section">
                         <h2 class="text-3xl font-bold mt-10 mb-6 pb-2 border-b"><span class="lang lang-ko">ADK (Agent Development Kit) 소개</span><span class="lang lang-en" style="display:none;">Introduction to ADK (Agent Development Kit)</span></h2>
                         <p class="text-lg mt-4"><span class="lang lang-ko">아래 영상은 로컬에서 `adk web`으로 실행한 모습입니다.</span><span class="lang lang-en" style="display:none;">The video below shows a demo running locally with `adk web`.</span></p>
-                        <div class="aspect-w-16 aspect-h-9 my-6">
-                            <iframe src="https://www.youtube.com/embed/u_wlIhBYI2w" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen style="width: 100%; height: 500px; border-radius: 0.5rem;"></iframe>
+                        <div class="my-8">
+                            <figure class="w-full rounded-lg overflow-hidden shadow-lg bg-white not-prose">
+                              <div class="yt-card" data-video-id="u_wlIhBYI2w" aria-label="ADK Web Demo" role="button" tabindex="0">
+                                <img src="https://img.youtube.com/vi/u_wlIhBYI2w/maxresdefault.jpg" alt="ADK Web Demo Thumbnail" loading="lazy">
+                                <button aria-label="Play Video">
+                                  <span class="play-badge">
+                                    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5v14l11-7z"></path></svg>
+                                  </span>
+                                </button>
+                              </div>
+                              <figcaption class="p-2 text-sm text-slate-500 text-center">
+                                <span class="lang lang-ko">교육 목적의 설명 영상입니다. 클릭 시 플레이어가 로드됩니다.</span>
+                                <span class="lang lang-en" style="display:none;">This is an instructional video. The player will load upon clicking.</span>
+                              </figcaption>
+                            </figure>
                         </div>
                         <p class="text-lg"><span class="lang lang-ko">AI 에이전트는 복잡한 질문에 답하고 작업을 완료하는 데 도움을 주는 대화형 파트너입니다. Google Agent Development Kit(ADK)는 개발자가 다중 에이전트 시스템을 신속하게 구축하고 맞춤설정할 수 있도록 지원하는 클라이언트 측 Python SDK입니다.</span><span class="lang lang-en" style="display:none;">An AI agent is a conversational partner that helps answer complex questions and complete tasks. The Google Agent Development Kit (ADK) is a client-side Python SDK that enables developers to quickly build and customize multi-agent systems.</span></p>
                         <p class="text-lg mt-4"><span class="lang lang-ko">ADK는 복잡한 다중 에이전트 시스템의 개발을 간소화하도록 설계되었습니다. 에이전트 간의 통신, 대화 기록, 상태 공유와 같은 어려운 문제들을 처리해주므로, 개발자는 인프라에 대한 고민 없이 에이전트의 핵심 로직과 상호작용을 구축하는 데 집중할 수 있습니다.</span><span class="lang lang-en" style="display:none;">ADK is designed to simplify the development of complex multi-agent systems. It handles challenging issues like inter-agent communication, conversation history, and state sharing, allowing developers to focus on building the core logic and interactions of their agents without worrying about infrastructure.</span></p>
@@ -521,6 +543,41 @@ root_agent = Agent(
             switchLang(initialLang);
             showSection(window.location.hash);
         });
+
+        function mountYouTubeIframe(container, videoId) {
+            const iframe = document.createElement('iframe');
+            iframe.src = `https://www.youtube-nocookie.com/embed/${encodeURIComponent(videoId)}?autoplay=1`;
+            iframe.title = 'YouTube video player';
+            iframe.loading = 'lazy';
+            iframe.className = 'absolute top-0 left-0 w-full h-full';
+            iframe.frameBorder = '0';
+            iframe.referrerPolicy = 'strict-origin-when-cross-origin';
+            iframe.allow = 'accelerometer; autoplay; clipboard-write; encrypted-media; picture-in-picture; web-share';
+            iframe.sandbox = 'allow-same-origin allow-scripts allow-popups allow-presentation';
+            container.innerHTML = '';
+            container.appendChild(iframe);
+        }
+
+        function setupLiteYouTube() {
+            const cards = document.querySelectorAll('.yt-card');
+            cards.forEach(card => {
+                const videoId = card.getAttribute('data-video-id');
+                const activate = () => mountYouTubeIframe(card, videoId);
+                card.addEventListener('click', activate, { once: true });
+                card.addEventListener('keydown', (e) => {
+                    if (e.key === 'Enter' || e.key === ' ') {
+                        e.preventDefault();
+                        activate();
+                    }
+                }, { once: true });
+            });
+        }
+
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', setupLiteYouTube);
+        } else {
+            setupLiteYouTube();
+        }
     </script>
 
 </body>
