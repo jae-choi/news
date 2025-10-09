@@ -1,0 +1,465 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- The title will be set by JavaScript -->
+    <title>삼각함수 관계 시각화 도구</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            transition: background-color 0.3s;
+        }
+        .info-box {
+            background-color: rgba(31, 41, 55, 0.5); /* bg-gray-800 with opacity */
+            backdrop-filter: blur(10px);
+            border-radius: 0.75rem;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 20px;
+            height: 20px;
+            background: #60a5fa; /* blue-400 */
+            cursor: pointer;
+            border-radius: 50%;
+            border: 2px solid white;
+            transition: transform 0.1s ease-in-out;
+        }
+        input[type="range"]::-webkit-slider-thumb:active {
+            transform: scale(1.2);
+        }
+        input[type="range"]::-moz-range-thumb {
+            width: 20px;
+            height: 20px;
+            background: #60a5fa; /* blue-400 */
+            cursor: pointer;
+            border-radius: 50%;
+            border: 2px solid white;
+        }
+        .lang-btn {
+            transition: all 0.2s ease-in-out;
+        }
+        .lang-btn.active {
+            background-color: #3b82f6; /* blue-500 */
+            color: white;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body class="bg-gray-900 text-white flex flex-col items-center p-4 sm:p-6 lg:p-8">
+
+    <!-- Language Switcher -->
+    <div class="w-full max-w-7xl mx-auto flex justify-end mb-4">
+        <div class="flex rounded-lg bg-gray-700 p-1">
+            <button id="lang-ko" class="lang-btn px-4 py-1 text-sm rounded-md text-gray-300">한국어</button>
+            <button id="lang-en" class="lang-btn px-4 py-1 text-sm rounded-md text-gray-300">English</button>
+        </div>
+    </div>
+
+
+    <div class="w-full max-w-7xl mx-auto flex flex-col lg:flex-row items-center justify-center gap-8 py-8">
+        
+        <!-- Canvas for visualization -->
+        <div class="w-full lg:w-2/3 aspect-square max-h-[85vh]">
+            <canvas id="trigCanvas"></canvas>
+        </div>
+        
+        <!-- Controls and Info Panel -->
+        <div class="w-full lg:w-1/3 flex flex-col gap-4">
+            <div class="text-center">
+                <h1 class="text-3xl font-bold text-blue-300" data-lang-key="main-title">삼각함수 시각화 도구</h1>
+                <p class="text-gray-400 mt-1" data-lang-key="main-subtitle">슬라이더를 움직여 각도 α를 바꿔보세요.</p>
+            </div>
+            
+            <!-- Angle Slider -->
+            <div class="info-box p-5">
+                <label for="angleSlider" class="text-lg font-medium"><span data-lang-key="angle-label">각도 α</span>: <span id="angleValue" class="font-bold text-blue-300 w-12 inline-block">30°</span></label>
+                <input id="angleSlider" type="range" min="0" max="360" value="30" class="w-full h-2 bg-gray-700 rounded-lg appearance-none cursor-pointer mt-2">
+            </div>
+
+            <!-- Value Display -->
+            <div class="info-box p-5 text-lg">
+                <div class="flex flex-col gap-3">
+                    <div class="flex justify-between items-center">
+                        <span class="text-gray-300">cos(α)</span>
+                        <span id="cosAlpha" class="font-mono text-cyan-400 font-semibold"></span>
+                    </div>
+                    <div class="flex justify-between items-center">
+                        <span class="text-gray-300">sin(α)</span>
+                        <span id="sinAlpha" class="font-mono text-red-400 font-semibold"></span>
+                    </div>
+                    
+                    <div class="border-t border-gray-700 my-1"></div>
+
+                    <div class="flex justify-between items-center">
+                        <span class="text-gray-300">cos(α+90°)</span>
+                        <span id="cosAlpha90" class="font-mono text-red-400 font-semibold"></span>
+                    </div>
+                    <div class="flex justify-between items-center">
+                        <span class="text-gray-300">-sin(α)</span>
+                        <span id="negSinAlpha" class="font-mono text-red-400 font-semibold"></span>
+                    </div>
+                </div>
+                 <div class="border-t border-gray-700 mt-4 pt-4">
+                    <p class="text-xl text-center font-bold transition-all duration-300" id="result"></p>
+                </div>
+            </div>
+
+            <!-- Legend -->
+            <div class="info-box p-4 text-sm text-gray-300">
+                <h3 class="font-bold text-white mb-2 text-base" data-lang-key="legend-title">핵심 원리: 좌표의 회전</h3>
+                <ul class="list-disc list-inside space-y-2 text-gray-400">
+                    <li data-lang-key="legend-li1"><span class="font-bold text-cyan-400">cos(α)</span>와 <span class="font-bold text-red-400">sin(α)</span>는 점 P의 <strong class="text-white">가로(x), 세로(y) 좌표</strong>입니다.</li>
+                    <li data-lang-key="legend-li2">점 P를 <strong class="text-white">반시계 방향으로 90° 회전</strong>시키면 점 P'가 됩니다.</li>
+                    <li data-lang-key="legend-li3">회전 후, 원래의 <span class="font-bold text-red-400">세로 높이(sin)</span>가 새로운 <span class="font-bold text-red-400 opacity-70">가로 위치(cos)</span>로 바뀌면서 부호가 반대가 됩니다.</li>
+                    <li data-lang-key="legend-li4">이것이 바로 <strong class="text-green-400">cos(α+90°) = -sin(α)</strong> 관계의 비밀입니다!</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <div class="w-full max-w-7xl mx-auto mt-8 text-gray-300">
+        <div class="info-box p-6">
+            <h2 class="text-2xl font-bold text-blue-300 mb-4" data-lang-key="adv-title">심화 학습: 회전 행렬로 덧셈공식 유도하기</h2>
+            <div class="space-y-4 text-gray-400">
+                <p data-lang-key="adv-intro">
+                    벡터와 행렬 곱을 이용하면 <code class="bg-gray-700 text-green-400 px-1 rounded">cos(θ+α) = cosθcosα - sinθsinα</code> 공식을 유도할 수 있습니다.
+                </p>
+                
+                <h3 class="text-lg font-semibold text-white pt-2" data-lang-key="adv-concept">개념 요약</h3>
+                <ul class="list-disc list-inside space-y-1">
+                    <li data-lang-key="adv-concept1"><strong>시작 벡터 (<code class="text-cyan-400">v</code>):</strong> 각도가 <code class="text-cyan-400">θ</code>인 단위 벡터에서 시작합니다.</li>
+                    <li data-lang-key="adv-concept2"><strong>회전 변환 (<code class="text-purple-400">Rα</code>):</strong> 이 벡터를 각도 <code class="text-purple-400">α</code>만큼 더 회전시키는 변환 행렬을 적용합니다.</li>
+                    <li data-lang-key="adv-concept3"><strong>결과 벡터 (<code class="text-green-400">v'</code>):</strong> 회전 후 새로운 벡터는 총 <code class="text-green-400">θ+α</code>의 각도를 가집니다.</li>
+                    <li data-lang-key="adv-concept4"><strong>성분 비교:</strong> 행렬 곱으로 계산된 <code class="text-green-400">v'</code>의 x성분과, 각도 <code class="text-green-400">(θ+α)</code>로 정의된 <code class="text-green-400">v'</code>의 x성분이 같다는 점을 이용합니다.</li>
+                </ul>
+
+                <h3 class="text-lg font-semibold text-white pt-2" data-lang-key="adv-proof">단계별 증명</h3>
+                <div class="space-y-4">
+                    <div>
+                        <h4 class="font-bold text-gray-200" data-lang-key="adv-step1-title">1. 시작 벡터 정의</h4>
+                        <p data-lang-key="adv-step1-desc">x축과 θ의 각도를 이루는 단위 벡터 <code class="text-cyan-400">v</code>의 좌표는 다음과 같습니다.</p>
+                        <p class="font-mono text-center text-cyan-300 text-lg bg-gray-800 p-2 rounded mt-1">v = [cosθ, sinθ]</p>
+                    </div>
+                    <div>
+                        <h4 class="font-bold text-gray-200" data-lang-key="adv-step2-title">2. 회전 변환 행렬</h4>
+                        <p data-lang-key="adv-step2-desc">반시계 방향으로 α만큼 회전시키는 행렬 <code class="text-purple-400">Rα</code>는 다음과 같습니다.</p>
+                        <div class="font-mono text-purple-300 text-lg bg-gray-800 p-4 rounded mt-1 flex justify-center items-center">
+                            <span>Rα =&nbsp;</span>
+                            <div class="flex items-center"><span class="text-5xl font-thin">(</span><div class="flex flex-col text-center mx-2"><div class="flex"><span class="w-24 text-center">cosα</span><span class="w-24 text-center">-sinα</span></div><div class="flex"><span class="w-24 text-center">sinα</span><span class="w-24 text-center">cosα</span></div></div><span class="text-5xl font-thin">)</span></div>
+                        </div>
+                    </div>
+                    <div>
+                        <h4 class="font-bold text-gray-200" data-lang-key="adv-step3-title">3. 변환된 벡터 계산</h4>
+                        <p data-lang-key="adv-step3-desc">벡터 <code class="text-cyan-400">v</code>를 행렬 <code class="text-purple-400">Rα</code>로 회전시킨 새로운 벡터 <code class="text-green-400">v'</code>는 <code class="text-green-400">Rα * v</code> 입니다.</p>
+                        <div class="font-mono text-green-300 text-lg bg-gray-800 p-4 rounded mt-1 flex flex-wrap justify-center items-center">
+                            <span>v' = Rα v =&nbsp;</span>
+                            <div class="flex items-center"><span class="text-5xl font-thin">(</span><div class="flex flex-col text-center mx-2"><div class="flex"><span class="w-24 text-center">cosα</span><span class="w-24 text-center">-sinα</span></div><div class="flex"><span class="w-24 text-center">sinα</span><span class="w-24 text-center">cosα</span></div></div><span class="text-5xl font-thin">)</span></div>
+                            <div class="flex items-center ml-2"><span class="text-5xl font-thin">(</span><div class="flex flex-col text-center mx-2"><span>cosθ</span><span>sinθ</span></div><span class="text-5xl font-thin">)</span></div>
+                        </div>
+                        <div class="font-mono text-green-300 text-lg bg-gray-800 p-4 rounded mt-4 flex justify-center items-center">
+                            <span>v' =&nbsp;</span>
+                            <div class="flex items-center"><span class="text-5xl font-thin">(</span><div class="flex flex-col text-center mx-2 text-sm"><span>(cosα)(cosθ) - (sinα)(sinθ)</span><span>(sinα)(cosθ) + (cosα)(sinθ)</span></div><span class="text-5xl font-thin">)</span></div>
+                        </div>
+                    </div>
+                     <div>
+                        <h4 class="font-bold text-gray-200" data-lang-key="adv-step4-title">4. 결과 비교</h4>
+                        <p data-lang-key="adv-step4-desc">회전 후 벡터 <code class="text-green-400">v'</code>의 각도는 <code class="text-green-400">θ+α</code>이므로, 그 x좌표는 <code class="text-green-400">cos(θ+α)</code> 입니다. 위에서 행렬 곱으로 계산한 x좌표와 이 값은 당연히 같아야 합니다.</p>
+                        <p class="font-mono text-center text-yellow-300 text-xl bg-gray-800 p-3 rounded mt-1">cos(θ+α) = cosθcosα - sinθsinα</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const translations = {
+            ko: {
+                'page-title': '삼각함수 관계 시각화 도구',
+                'main-title': '삼각함수 시각화 도구',
+                'main-subtitle': '슬라이더를 움직여 각도 α를 바꿔보세요.',
+                'angle-label': '각도 α',
+                'legend-title': '핵심 원리: 좌표의 회전',
+                'legend-li1': '<span class="font-bold text-cyan-400">cos(α)</span>와 <span class="font-bold text-red-400">sin(α)</span>는 점 P의 <strong class="text-white">가로(x), 세로(y) 좌표</strong>입니다.',
+                'legend-li2': '점 P를 <strong class="text-white">반시계 방향으로 90° 회전</strong>시키면 점 P\'가 됩니다.',
+                'legend-li3': '회전 후, 원래의 <span class="font-bold text-red-400">세로 높이(sin)</span>가 새로운 <span class="font-bold text-red-400 opacity-70">가로 위치(cos)</span>로 바뀌면서 부호가 반대가 됩니다.',
+                'legend-li4': '이것이 바로 <strong class="text-green-400">cos(α+90°) = -sin(α)</strong> 관계의 비밀입니다!',
+                'adv-title': '심화 학습: 회전 행렬로 덧셈공식 유도하기',
+                'adv-intro': '벡터와 행렬 곱을 이용하면 <code class="bg-gray-700 text-green-400 px-1 rounded">cos(θ+α) = cosθcosα - sinθsinα</code> 공식을 유도할 수 있습니다.',
+                'adv-concept': '개념 요약',
+                'adv-concept1': '<strong>시작 벡터 (<code class="text-cyan-400">v</code>):</strong> 각도가 <code class="text-cyan-400">θ</code>인 단위 벡터에서 시작합니다.',
+                'adv-concept2': '<strong>회전 변환 (<code class="text-purple-400">Rα</code>):</strong> 이 벡터를 각도 <code class="text-purple-400">α</code>만큼 더 회전시키는 변환 행렬을 적용합니다.',
+                'adv-concept3': '<strong>결과 벡터 (<code class="text-green-400">v\'</code>):</strong> 회전 후 새로운 벡터는 총 <code class="text-green-400">θ+α</code>의 각도를 가집니다.',
+                'adv-concept4': '<strong>성분 비교:</strong> 행렬 곱으로 계산된 <code class="text-green-400">v\'</code>의 x성분과, 각도 <code class="text-green-400">(θ+α)</code>로 정의된 <code class="text-green-400">v\'</code>의 x성분이 같다는 점을 이용합니다.',
+                'adv-proof': '단계별 증명',
+                'adv-step1-title': '1. 시작 벡터 정의',
+                'adv-step1-desc': 'x축과 θ의 각도를 이루는 단위 벡터 <code class="text-cyan-400">v</code>의 좌표는 다음과 같습니다.',
+                'adv-step2-title': '2. 회전 변환 행렬',
+                'adv-step2-desc': '반시계 방향으로 α만큼 회전시키는 행렬 <code class="text-purple-400">Rα</code>는 다음과 같습니다.',
+                'adv-step3-title': '3. 변환된 벡터 계산',
+                'adv-step3-desc': '벡터 <code class="text-cyan-400">v</code>를 행렬 <code class="text-purple-400">Rα</code>로 회전시킨 새로운 벡터 <code class="text-green-400">v\'</code>는 <code class="text-green-400">Rα * v</code> 입니다.',
+                'adv-step4-title': '4. 결과 비교',
+                'adv-step4-desc': '회전 후 벡터 <code class="text-green-400">v\'</code>의 각도는 <code class="text-green-400">θ+α</code>이므로, 그 x좌표는 <code class="text-green-400">cos(θ+α)</code> 입니다. 위에서 행렬 곱으로 계산한 x좌표와 이 값은 당연히 같아야 합니다.',
+                'result-match': 'cos(α+90°) = -sin(α)',
+                'result-mismatch': '값이 일치하지 않습니다!'
+            },
+            en: {
+                'page-title': 'Trigonometric Relations Visualizer',
+                'main-title': 'Trigonometry Visualizer',
+                'main-subtitle': 'Move the slider to change the angle α.',
+                'angle-label': 'Angle α',
+                'legend-title': 'Core Principle: Coordinate Rotation',
+                'legend-li1': '<span class="font-bold text-cyan-400">cos(α)</span> and <span class="font-bold text-red-400">sin(α)</span> are the <strong class="text-white">horizontal (x) and vertical (y) coordinates</strong> of point P.',
+                'legend-li2': 'Rotating point P by <strong class="text-white">90° counter-clockwise</strong> results in point P\'.',
+                'legend-li3': 'After rotation, the original <span class="font-bold text-red-400">vertical height (sin)</span> becomes the new <span class="font-bold text-red-400 opacity-70">horizontal position (cos)</span>, with its sign flipped.',
+                'legend-li4': 'This is the secret behind the <strong class="text-green-400">cos(α+90°) = -sin(α)</strong> relationship!',
+                'adv-title': 'Advanced: Deriving Addition Formula with Rotation Matrix',
+                'adv-intro': 'Using vector and matrix multiplication, we can derive the formula <code class="bg-gray-700 text-green-400 px-1 rounded">cos(θ+α) = cosθcosα - sinθsinα</code>.',
+                'adv-concept': 'Concept Summary',
+                'adv-concept1': '<strong>Initial Vector (<code class="text-cyan-400">v</code>):</strong> Start with a unit vector at angle <code class="text-cyan-400">θ</code>.',
+                'adv-concept2': '<strong>Rotation Transform (<code class="text-purple-400">Rα</code>):</strong> Apply a transformation matrix that rotates it by an additional angle <code class="text-purple-400">α</code>.',
+                'adv-concept3': '<strong>Resultant Vector (<code class="text-green-400">v\'</code>):</strong> After rotation, the new vector has a total angle of <code class="text-green-400">θ+α</code>.',
+                'adv-concept4': '<strong>Component Comparison:</strong> We use the fact that the x-component of <code class="text-green-400">v\'</code> calculated via matrix multiplication is equal to the x-component of <code class="text-green-400">v\'</code> defined by the angle <code class="text-green-400">(θ+α)</code>.',
+                'adv-proof': 'Step-by-step Proof',
+                'adv-step1-title': '1. Define Initial Vector',
+                'adv-step1-desc': 'The coordinates of a unit vector <code class="text-cyan-400">v</code> at an angle θ with the x-axis are as follows.',
+                'adv-step2-title': '2. Rotation Transformation Matrix',
+                'adv-step2-desc': 'The matrix <code class="text-purple-400">Rα</code> for a counter-clockwise rotation by α is as follows.',
+                'adv-step3-title': '3. Calculate Transformed Vector',
+                'adv-step3-desc': 'The new vector <code class="text-green-400">v\'</code>, which is vector <code class="text-cyan-400">v</code> rotated by matrix <code class="text-purple-400">Rα</code>, is <code class="text-green-400">Rα * v</code>.',
+                'adv-step4-title': '4. Compare Results',
+                'adv-step4-desc': 'After rotation, the angle of vector <code class="text-green-400">v\'</code> is <code class="text-green-400">θ+α</code>, so its x-coordinate is <code class="text-green-400">cos(θ+α)</code>. This must be equal to the x-coordinate calculated from the matrix multiplication above.',
+                'result-match': 'cos(α+90°) = -sin(α)',
+                'result-mismatch': 'Values do not match!'
+            }
+        };
+
+        let currentLang = localStorage.getItem('trig-visualizer-lang') || 'ko';
+
+        const setLanguage = (lang) => {
+            currentLang = lang;
+            localStorage.setItem('trig-visualizer-lang', lang);
+
+            document.documentElement.lang = lang;
+            document.title = translations[lang]['page-title'];
+
+            document.querySelectorAll('[data-lang-key]').forEach(element => {
+                const key = element.getAttribute('data-lang-key');
+                if (translations[lang][key]) {
+                    element.innerHTML = translations[lang][key];
+                }
+            });
+
+            document.getElementById('lang-ko').classList.toggle('active', lang === 'ko');
+            document.getElementById('lang-en').classList.toggle('active', lang === 'en');
+            
+            // Re-draw to update dynamic text like the result
+            draw();
+        };
+
+        document.getElementById('lang-ko').addEventListener('click', () => setLanguage('ko'));
+        document.getElementById('lang-en').addEventListener('click', () => setLanguage('en'));
+        
+        // --- Existing Canvas Logic ---
+        const canvas = document.getElementById('trigCanvas');
+        const ctx = canvas.getContext('2d');
+        const slider = document.getElementById('angleSlider');
+        
+        const angleValueDisplay = document.getElementById('angleValue');
+        const cosAlphaDisplay = document.getElementById('cosAlpha');
+        const sinAlphaDisplay = document.getElementById('sinAlpha');
+        const cosAlpha90Display = document.getElementById('cosAlpha90');
+        const negSinAlphaDisplay = document.getElementById('negSinAlpha');
+        const resultDisplay = document.getElementById('result');
+
+        let centerX, centerY, radius;
+
+        function resizeCanvas() {
+            const container = canvas.parentElement;
+            const size = Math.min(container.clientWidth, container.clientHeight);
+            canvas.width = size;
+            canvas.height = size;
+            centerX = canvas.width / 2;
+            centerY = canvas.height / 2;
+            radius = canvas.width * 0.4;
+            draw();
+        }
+
+        function draw() {
+            if (!ctx) return;
+            const angleDeg = parseFloat(slider.value);
+            const angleRad = angleDeg * Math.PI / 180;
+
+            ctx.fillStyle = '#111827';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+            // Axes
+            ctx.strokeStyle = '#4b5563';
+            ctx.lineWidth = 1;
+            ctx.beginPath();
+            ctx.moveTo(0, centerY);
+            ctx.lineTo(canvas.width, centerY);
+            ctx.moveTo(centerX, 0);
+            ctx.lineTo(centerX, canvas.height);
+            ctx.stroke();
+
+            // Unit circle
+            ctx.strokeStyle = '#374151';
+            ctx.lineWidth = 2;
+            ctx.beginPath();
+            ctx.arc(centerX, centerY, radius, 0, 2 * Math.PI);
+            ctx.stroke();
+            
+            const x = centerX + radius * Math.cos(angleRad);
+            const y = centerY - radius * Math.sin(angleRad);
+
+            const angleRad90 = angleRad + Math.PI / 2;
+            const x90 = centerX + radius * Math.cos(angleRad90);
+            const y90 = centerY - radius * Math.sin(angleRad90);
+            
+            // Projection lines
+            ctx.setLineDash([3, 3]);
+            ctx.strokeStyle = '#4b5563';
+            ctx.lineWidth = 1.5;
+            ctx.beginPath();
+            ctx.moveTo(x, y);
+            ctx.lineTo(x, centerY);
+            ctx.stroke();
+            ctx.beginPath();
+            ctx.moveTo(x90, y90);
+            ctx.lineTo(x90, centerY);
+            ctx.stroke();
+            ctx.setLineDash([]);
+
+            // cos(α) line
+            ctx.strokeStyle = '#22d3ee'; // cyan-400
+            ctx.lineWidth = 4;
+            ctx.beginPath();
+            ctx.moveTo(centerX, centerY);
+            ctx.lineTo(x, centerY);
+            ctx.stroke();
+            
+            // sin(α) line
+            ctx.strokeStyle = '#f87171'; // red-400
+            ctx.lineWidth = 4;
+            ctx.beginPath();
+            ctx.moveTo(x, centerY);
+            ctx.lineTo(x, y);
+            ctx.stroke();
+            
+            // cos(α+90°) line which is -sin(α)
+            ctx.strokeStyle = '#f87171'; // red-400
+            ctx.lineWidth = 4;
+            ctx.globalAlpha = 0.7;
+            ctx.beginPath();
+            ctx.moveTo(centerX, centerY);
+            ctx.lineTo(x90, centerY);
+            ctx.stroke();
+            ctx.globalAlpha = 1.0;
+
+            // Radius to P
+            ctx.strokeStyle = 'white';
+            ctx.lineWidth = 2;
+            ctx.beginPath();
+            ctx.moveTo(centerX, centerY);
+            ctx.lineTo(x, y);
+            ctx.stroke();
+            
+            // Radius to P'
+            ctx.strokeStyle = '#9ca3af'; // gray-400
+            ctx.beginPath();
+            ctx.moveTo(centerX, centerY);
+            ctx.lineTo(x90, y90);
+            ctx.stroke();
+
+            // Angle α arc at origin
+            ctx.strokeStyle = "rgba(255, 255, 255, 0.5)";
+            ctx.lineWidth = 1.5;
+            ctx.beginPath();
+            ctx.arc(centerX, centerY, radius * 0.2, 0, -angleRad, true);
+            ctx.stroke();
+            ctx.fillStyle = "white";
+            ctx.font = "bold 16px sans-serif";
+            ctx.textAlign = "center";
+            ctx.textBaseline = "middle";
+            ctx.save();
+            ctx.translate(centerX + radius * 0.25 * Math.cos(-angleRad/2), centerY + radius * 0.25 * Math.sin(-angleRad/2));
+            ctx.rotate(-angleRad/2);
+            ctx.fillText("α", 0, 0);
+            ctx.restore();
+            
+            // Angle α arc at vertex P' (visualizing the rotated triangle)
+            ctx.strokeStyle = "rgba(74, 222, 128, 0.8)";
+            ctx.lineWidth = 2;
+            ctx.beginPath();
+            const angleP_line1 = Math.atan2(centerY - y90, centerX - x90); 
+            const angleP_line2 = Math.PI / 2;
+            ctx.arc(x90, y90, radius * 0.15, angleP_line1, angleP_line2, false);
+            ctx.stroke();
+            
+            ctx.fillStyle = "#4ade80"; // green-400
+            ctx.save();
+            const midAngleP_vertex = (angleP_line1 + angleP_line2) / 2;
+            ctx.translate(x90 + radius * 0.2 * Math.cos(midAngleP_vertex), y90 + radius * 0.2 * Math.sin(midAngleP_vertex));
+            ctx.rotate(midAngleP_vertex);
+            ctx.fillText("α", 0, 0);
+            ctx.restore();
+
+            // Point P
+            ctx.fillStyle = 'white';
+            ctx.beginPath();
+            ctx.arc(x, y, 7, 0, 2 * Math.PI);
+            ctx.fill();
+            ctx.fillStyle = 'white';
+            ctx.font = "bold 16px sans-serif";
+            const textOffsetX = (x - centerX) * 0.12;
+            const textOffsetY = (y - centerY) * 0.12;
+            ctx.fillText("P", x + textOffsetX + 10, y + textOffsetY - 10);
+
+            // Point P'
+            ctx.fillStyle = '#9ca3af';
+            ctx.beginPath();
+            ctx.arc(x90, y90, 7, 0, 2 * Math.PI);
+            ctx.fill();
+            ctx.fillStyle = '#9ca3af';
+            const textOffsetX90 = (x90 - centerX) * 0.15;
+            const textOffsetY90 = (y90 - centerY) * 0.15;
+            ctx.fillText("P'", x90 + textOffsetX90 + 10, y90 + textOffsetY90 - 10);
+
+            updateInfo(angleDeg, angleRad, angleRad90);
+        }
+        
+        function updateInfo(angleDeg, angleRad, angleRad90) {
+            const cosA = Math.cos(angleRad);
+            const sinA = Math.sin(angleRad);
+            const cosA90 = Math.cos(angleRad90);
+
+            angleValueDisplay.textContent = `${angleDeg.toFixed(0)}°`;
+            cosAlphaDisplay.textContent = cosA.toFixed(3);
+            sinAlphaDisplay.textContent = sinA.toFixed(3);
+            cosAlpha90Display.textContent = cosA90.toFixed(3);
+            negSinAlphaDisplay.textContent = (-sinA).toFixed(3);
+
+            if (Math.abs(cosA90 - (-sinA)) < 0.0001) {
+                resultDisplay.textContent = translations[currentLang]['result-match'];
+                resultDisplay.classList.remove('text-red-500');
+                resultDisplay.classList.add('text-green-400');
+            } else {
+                resultDisplay.textContent = translations[currentLang]['result-mismatch'];
+                resultDisplay.classList.remove('text-green-400');
+                resultDisplay.classList.add('text-red-500');
+            }
+        }
+
+        slider.addEventListener('input', draw);
+        window.addEventListener('resize', resizeCanvas);
+
+        // Initial setup
+        setLanguage(currentLang);
+        resizeCanvas();
+    </script>
+</body>
+</html>
