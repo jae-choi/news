@@ -1,0 +1,363 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" href="https://avatars.githubusercontent.com/u/35217573?v=4" type="image/x-icon">
+    <title>코사인 덧셈정리 증명</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- KaTeX CSS CDN -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css" xintegrity="sha384-n8MVd4RsNIU0KOVEMVIARBEGEOOfWpvvsGFsLSqujPAcFg/dQU2kPwImIuzRQTMo" crossorigin="anonymous">
+    <!-- KaTeX JS CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js" xintegrity="sha384-XjKyOOlGwcjNTAIQHIpgOno0Hl1YQqzYCcm2KEKAyokagzvrVxALQzuo3mceopVi" crossorigin="anonymous"></script>
+    <!-- KaTeX auto-render extension -->
+    <script src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js" xintegrity="sha384-+VBxd3r6XgURycqtZ117nYw44OOcIax56Z4dCRWbxyPt0Koah1uHoK0o4+/RRE05" crossorigin="anonymous"></script>
+    <style>
+        .katex { font-size: 1.2em !important; }
+        body { font-family: 'Inter', 'Noto Sans KR', sans-serif; }
+        .lang-btn {
+            background-color: #e2e8f0;
+            color: #4a5568;
+            padding: 0.5rem 1rem;
+            border-radius: 0.5rem;
+            font-weight: 700;
+            transition: all 0.2s ease-in-out;
+        }
+        .lang-btn.active {
+            background-color: #6366f1;
+            color: white;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+        }
+    </style>
+</head>
+<body class="bg-gray-100 flex items-center justify-center min-h-screen p-4">
+    <div class="bg-white w-full max-w-4xl rounded-xl shadow-lg p-6 md:p-10 relative">
+        <!-- Language Switcher -->
+        <div class="absolute top-4 right-4">
+            <button id="lang-ko" class="lang-btn active">KR</button>
+            <button id="lang-en" class="lang-btn">EN</button>
+        </div>
+
+        <header class="text-center border-b pb-4 mb-6">
+            <h1 class="text-3xl md:text-4xl font-bold text-gray-800" data-lang="main_title">코사인 덧셈정리 증명</h1>
+            <p class="text-lg text-indigo-600 mt-2 font-semibold">$$ \cos(\alpha - \beta) = \cos\alpha\cos\beta + \sin\alpha\sin\beta $$</p>
+        </header>
+
+        <main>
+            <!-- 질문 섹션 -->
+            <section class="mb-8 p-6 bg-amber-50 rounded-lg border border-amber-200">
+                <h2 class="text-2xl font-bold text-amber-800 mb-3" data-lang="q_title">🤔 잠깐, 왜 좌표가 $(\cos\alpha, \sin\alpha)$ 인가요?</h2>
+                <div class="text-gray-700 space-y-3 leading-relaxed">
+                    <p data-lang="q_p1">
+                        좋은 질문입니다! 이는 삼각함수의 가장 기본적인 정의에서 비롯됩니다.
+                        중심이 원점 $(0,0)$이고 반지름이 $r$인 원을 생각해봅시다. 원 위의 한 점 $P(x, y)$까지 원점이 잇는 선(동경)이 x축 양의 방향과 이루는 각을 $\theta$라고 할 때, 삼각함수는 다음과 같이 정의됩니다.
+                    </p>
+                    <div class="text-center py-2">
+                        $$ \cos\theta = \frac{x}{r}, \quad \sin\theta = \frac{y}{r} $$
+                    </div>
+                    <p data-lang="q_p2">
+                        만약 반지름이 1인 <strong>단위원</strong>이라면 $r=1$이므로, 이 정의는 훨씬 간단해집니다.
+                        $ \cos\theta = x $, $ \sin\theta = y $. 따라서 단위원 위의 점의 좌표는 $(x, y) = (\cos\theta, \sin\theta)$ 로 바로 표현할 수 있습니다.
+                    </p>
+                    <div class="my-4 p-4 bg-white rounded-lg shadow-sm flex justify-center">
+                        <svg viewBox="0 0 400 300" xmlns="http://www.w3.org/2000/svg" class="rounded-lg max-w-sm w-full" aria-labelledby="svg-title1">
+                            <title id="svg-title1" data-lang="svg_title1">단위원에서의 삼각함수 정의 다이어그램</title>
+                            <defs>
+                                <marker id="arrowhead" markerWidth="10" markerHeight="7" refX="0" refY="3.5" orient="auto">
+                                    <polygon points="0 0, 10 3.5, 0 7" fill="#4A5568"/>
+                                </marker>
+                            </defs>
+                            
+                            <!-- Axes -->
+                            <line x1="20" y1="150" x2="380" y2="150" stroke="#4A5568" stroke-width="2" marker-end="url(#arrowhead)" />
+                            <line x1="200" y1="280" x2="200" y2="20" stroke="#4A5568" stroke-width="2" marker-end="url(#arrowhead)" />
+                            <text x="385" y="155" font-family="sans-serif" font-size="14" fill="#4A5568">x</text>
+                            <text x="195" y="15" font-family="sans-serif" font-size="14" fill="#4A5568">y</text>
+                            <text x="185" y="165" font-family="sans-serif" font-size="12" fill="#4A5568">O</text>
+
+                            <!-- Unit Circle -->
+                            <circle cx="200" cy="150" r="100" fill="rgba(239, 246, 255, 0.5)" stroke="#60A5FA" stroke-width="2"/>
+                            
+                            <!-- Point P and lines (at approx 30 degrees for clarity) -->
+                            <line x1="200" y1="150" x2="286.6" y2="100" stroke="#F87171" stroke-width="2.5"/>
+                            <line x1="286.6" y1="150" x2="286.6" y2="100" stroke="#4A5568" stroke-width="1.5" stroke-dasharray="4"/>
+                            <circle cx="286.6" cy="100" r="4" fill="#EF4444"/>
+                            <text x="291" y="98" font-family="sans-serif" font-size="14" font-weight="bold" fill="#C82C2C">P(x, y)</text>
+                            
+                            <!-- Labels -->
+                            <text x="240" y="165" font-family="sans-serif" font-size="14" fill="#2563EB">x = cosθ</text>
+                            <text x="235" y="120" font-family="sans-serif" font-size="14" fill="#F87171" transform="rotate(-30 235 120)">r = 1</text>
+                            <text x="291" y="125" font-family="sans-serif" font-size="14" fill="#2563EB" writing-mode="vertical-rl">y = sinθ</text>
+                            
+                            <!-- Angle theta -->
+                            <path d="M 230 150 A 30 30 0 0 1 225.98 135" fill="none" stroke="#34D399" stroke-width="2"/>
+                            <text x="233" y="142" font-family="serif" font-style="italic" font-size="16" fill="#059669">θ</text>
+                        </svg>
+                    </div>
+                </div>
+            </section>
+            
+            <!-- 증명 섹션 -->
+            <section>
+                <h2 class="text-2xl font-bold text-gray-800 mb-4" data-lang="proof_title">증명 과정 따라가기</h2>
+                
+                <div class="space-y-6">
+                    <!-- 1. 기본 설정 -->
+                    <div class="p-4 border-l-4 border-indigo-500 bg-indigo-50 rounded-r-lg">
+                        <h3 class="text-xl font-semibold text-gray-900 mb-2" data-lang="step1_title">1. 기본 설정 ⚙️</h3>
+                        <p class="text-gray-700" data-lang="step1_p1">
+                            좌표평면 위에 중심이 원점 $O(0, 0)$이고 반지름이 1인 <strong>단위원</strong>을 가정합니다. 이 원 위에 두 점 A와 B를 잡겠습니다.
+                        </p>
+                        <ul class="list-disc list-inside ml-4 mt-2 text-gray-700 space-y-1">
+                            <li data-lang="step1_li1">점 A: 원점으로부터 동경이 x축 양의 방향과 이루는 각이 $\alpha$인 점. 좌표는 $A(\cos\alpha, \sin\alpha)$ 입니다.</li>
+                            <li data-lang="step1_li2">점 B: 원점으로부터 동경이 x축 양의 방향과 이루는 각이 $\beta$인 점. 좌표는 $B(\cos\beta, \sin\beta)$ 입니다.</li>
+                        </ul>
+                        <div class="my-4 p-2 bg-white rounded-lg shadow-sm flex justify-center">
+                           <svg viewBox="0 0 400 300" xmlns="http://www.w3.org/2000/svg" class="rounded-lg max-w-md w-full" aria-labelledby="svg-title2">
+                                <title id="svg-title2" data-lang="svg_title2">코사인 덧셈정리 증명을 위한 단위원 다이어그램</title>
+                                <defs>
+                                    <marker id="arrowhead2" markerWidth="10" markerHeight="7" refX="0" refY="3.5" orient="auto">
+                                        <polygon points="0 0, 10 3.5, 0 7" fill="#4A5568"/>
+                                    </marker>
+                                </defs>
+
+                                <!-- Axes -->
+                                <line x1="20" y1="150" x2="380" y2="150" stroke="#4A5568" stroke-width="2" marker-end="url(#arrowhead2)" />
+                                <line x1="200" y1="280" x2="200" y2="20" stroke="#4A5568" stroke-width="2" marker-end="url(#arrowhead2)" />
+                                <text x="385" y="155" font-family="sans-serif" font-size="14" fill="#4A5568">x</text>
+                                <text x="195" y="15" font-family="sans-serif" font-size="14" fill="#4A5568">y</text>
+                                <text x="185" y="165" font-family="sans-serif" font-size="12" fill="#4A5568">O</text>
+
+                                <!-- Unit Circle -->
+                                <circle cx="200" cy="150" r="100" fill="rgba(236, 253, 245, 0.5)" stroke="#34D399" stroke-width="2"/>
+
+                                <!-- Point B (at approx 30 degrees) -->
+                                <line x1="200" y1="150" x2="286.6" y2="100" stroke="#60A5FA" stroke-width="2.5"/>
+                                <circle cx="286.6" cy="100" r="4" fill="#3B82F6"/>
+                                <text x="291" y="98" font-family="sans-serif" font-size="14" font-weight="bold" fill="#1D4ED8">B</text>
+                                <text x="291" y="115" font-family="sans-serif" font-size="12" fill="#1D4ED8">(cosβ, sinβ)</text>
+
+                                <!-- Point A (at approx 60 degrees) -->
+                                <line x1="200" y1="150" x2="250" y2="63.4" stroke="#F87171" stroke-width="2.5"/>
+                                <circle cx="250" cy="63.4" r="4" fill="#EF4444"/>
+                                <text x="250" y="58" font-family="sans-serif" font-size="14" font-weight="bold" fill="#C82C2C">A</text>
+                                <text x="220" y="50" font-family="sans-serif" font-size="12" fill="#C82C2C">(cosα, sinα)</text>
+                                
+                                <!-- Line AB -->
+                                <line x1="286.6" y1="100" x2="250" y2="63.4" stroke="#4A5568" stroke-width="2" stroke-dasharray="4,4"/>
+                                <text x="260" y="85" font-family="sans-serif" font-size="14" fill="#1F2937">AB</text>
+
+                                <!-- Angle beta (30 deg) -->
+                                <path d="M 240 150 A 40 40 0 0 1 234.64 130" fill="none" stroke="#2563EB" stroke-width="1.5"/>
+                                <text x="245" y="138" font-family="serif" font-style="italic" font-size="16" fill="#1D4ED8">β</text>
+
+                                <!-- Angle alpha (60 deg) -->
+                                <path d="M 260 150 A 60 60 0 0 1 230 98.04" fill="none" stroke="#DC2626" stroke-width="1.5"/>
+                                <text x="265" y="120" font-family="serif" font-style="italic" font-size="16" fill="#DC2626">α</text>
+                           </svg>
+                        </div>
+                         <p class="mt-3 text-gray-700" data-lang="step1_p2">
+                            우리의 목표는 <strong>선분 AB 길이의 제곱($AB^2$)</strong>을 두 가지 다른 방법으로 구하는 것입니다.
+                        </p>
+                    </div>
+
+                    <!-- 2. 방법 1 -->
+                    <div class="p-4 border-l-4 border-teal-500 bg-teal-50 rounded-r-lg">
+                        <h3 class="text-xl font-semibold text-gray-900 mb-2" data-lang="step2_title">2. 방법 1: 두 점 사이의 거리 공식 이용</h3>
+                        <p class="text-gray-700 mb-3" data-lang="step2_p1">
+                           좌표평면 위 두 점 $(x_1, y_1), (x_2, y_2)$ 사이의 거리 제곱 공식 $d^2 = (x_2-x_1)^2 + (y_2-y_1)^2$을 점 A와 B에 적용합니다.
+                        </p>
+                        <div class="p-4 bg-white rounded-md shadow-sm">
+                            $$ AB^2 = (\cos\alpha - \cos\beta)^2 + (\sin\alpha - \sin\beta)^2 $$
+                            <p class="text-gray-600 my-2 text-sm" data-lang="step2_comment1">// 식을 전개합니다.</p>
+                            $$ AB^2 = (\cos^2\alpha - 2\cos\alpha\cos\beta + \cos^2\beta) + (\sin^2\alpha - 2\sin\alpha\sin\beta + \sin^2\beta) $$
+                             <p class="text-gray-600 my-2 text-sm" data-lang="step2_comment2">// 항의 순서를 재배치하여 $\sin^2\theta + \cos^2\theta=1$을 적용합니다.</p>
+                            $$ AB^2 = (\sin^2\alpha + \cos^2\alpha) + (\sin^2\beta + \cos^2\beta) - 2\cos\alpha\cos\beta - 2\sin\alpha\sin\beta $$
+                             <p class="text-gray-600 my-2 text-sm" data-lang="step2_comment3">// 위 항등식을 이용해 식을 간단히 합니다.</p>
+                            $$ AB^2 = 1 + 1 - 2(\cos\alpha\cos\beta + \sin\alpha\sin\beta) $$
+                            <p class="text-gray-600 my-2 text-sm" data-lang="step2_comment4">// 최종 결과입니다.</p>
+                            <div class="mt-3 p-3 bg-teal-100 border border-teal-200 rounded text-center">
+                                $$ AB^2 = 2 - 2(\cos\alpha\cos\beta + \sin\alpha\sin\beta) $$
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- 3. 방법 2 -->
+                    <div class="p-4 border-l-4 border-sky-500 bg-sky-50 rounded-r-lg">
+                        <a href="cosine2.html" class="text-xl font-semibold text-gray-900 mb-2 hover:text-indigo-600 hover:underline" data-lang="step3_title">3. 방법 2: 제2코사인법칙 이용</a>
+                        <p class="text-gray-700 mb-3" data-lang="step3_p1">
+                           원점 O와 두 점 A, B를 꼭짓점으로 하는 삼각형 OAB를 생각합니다. 제2코사인법칙 $c^2 = a^2+b^2-2ab\cos C$를 적용합니다.
+                        </p>
+                        <div class="my-4 p-4 bg-sky-100/50 rounded-lg shadow-sm flex justify-center border border-sky-200">
+                            <svg viewBox="0 0 400 250" xmlns="http://www.w3.org/2000/svg" class="max-w-xs w-full" aria-labelledby="svg-title3">
+                                <title id="svg-title3" data-lang="svg_title3">제2코사인법칙 다이어그램</title>
+                                <!-- Triangle -->
+                                <polygon points="50,200 350,200 200,50" fill="rgba(14, 165, 233, 0.1)" stroke="#0ea5e9" stroke-width="2" />
+
+                                <!-- Vertices -->
+                                <circle cx="50" cy="200" r="4" fill="#0284c7" />
+                                <text x="35" y="215" font-family="sans-serif" font-size="16" font-weight="bold" fill="#0369a1">A</text>
+                                
+                                <circle cx="350" cy="200" r="4" fill="#0284c7" />
+                                <text x="355" y="215" font-family="sans-serif" font-size="16" font-weight="bold" fill="#0369a1">B</text>
+
+                                <circle cx="200" cy="50" r="4" fill="#0284c7" />
+                                <text x="195" y="45" font-family="sans-serif" font-size="16" font-weight="bold" fill="#0369a1">C</text>
+
+                                <!-- Sides -->
+                                <text x="200" y="220" font-family="serif" font-style="italic" font-size="18" fill="#334155">c</text>
+                                <text x="110" y="130" font-family="serif" font-style="italic" font-size="18" fill="#334155">b</text>
+                                <text x="280" y="130" font-family="serif" font-style="italic" font-size="18" fill="#334155">a</text>
+
+                                <!-- Angle C -->
+                                <path d="M 214.14 64.14 A 20 20 0 0 1 185.86 64.14" fill="none" stroke="#f59e0b" stroke-width="2"/>
+                                <text x="195" y="80" font-family="serif" font-style="italic" font-size="16" fill="#d97706">C</text>
+                            </svg>
+                        </div>
+                        <p class="text-gray-600 text-sm text-center -mt-2 mb-4" data-lang="step3_p2">일반 삼각형에서 변 c의 길이는 두 변 a, b와 그 끼인각 C로 구할 수 있습니다.</p>
+                         <ul class="list-disc list-inside ml-4 mb-3 text-gray-700 space-y-1">
+                            <li data-lang="step3_li1">변 OA의 길이: 원의 반지름이므로 1</li>
+                            <li data-lang="step3_li2">변 OB의 길이: 원의 반지름이므로 1</li>
+                            <li data-lang="step3_li3">두 변 사이의 끼인각 $\angle AOB$: 두 동경이 이루는 각이므로 $\alpha - \beta$</li>
+                        </ul>
+                        <div class="p-4 bg-white rounded-md shadow-sm">
+                            $$ AB^2 = OA^2 + OB^2 - 2(OA)(OB)\cos(\angle AOB) $$
+                            <p class="text-gray-600 my-2 text-sm" data-lang="step3_comment1">// 알고 있는 값들을 대입합니다.</p>
+                            $$ AB^2 = 1^2 + 1^2 - 2(1)(1)\cos(\alpha - \beta) $$
+                            <p class="text-gray-600 my-2 text-sm" data-lang="step3_comment2">// 최종 결과입니다.</p>
+                             <div class="mt-3 p-3 bg-sky-100 border border-sky-200 rounded text-center">
+                                $$ AB^2 = 2 - 2\cos(\alpha - \beta) $$
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- 4. 결론 -->
+                    <div class="p-4 border-l-4 border-violet-500 bg-violet-50 rounded-r-lg">
+                        <h3 class="text-xl font-semibold text-gray-900 mb-2" data-lang="step4_title">4. 결론 💡</h3>
+                        <p class="text-gray-700 mb-3" data-lang="step4_p1">
+                           두 가지 방법으로 구한 $AB^2$의 결과는 당연히 서로 같아야 합니다.
+                        </p>
+                        <div class="p-4 bg-white rounded-md shadow-sm">
+                            $$ 2 - 2(\cos\alpha\cos\beta + \sin\alpha\sin\beta) = 2 - 2\cos(\alpha - \beta) $$
+                            <p class="text-gray-600 my-2 text-sm" data-lang="step4_comment1">// 양변에서 2를 빼고, -2로 나누어 정리합니다.</p>
+                            $$ \cos\alpha\cos\beta + \sin\alpha\sin\beta = \cos(\alpha - \beta) $$
+                        </div>
+                    </div>
+                </div>
+            </section>
+            
+             <!-- 최종 공식 -->
+            <section class="mt-10">
+                <div class="bg-gray-800 text-white p-6 rounded-lg text-center shadow-2xl">
+                    <p class="text-lg mb-2" data-lang="final_p1">최종적으로 다음 공식이 증명되었습니다.</p>
+                    <p class="text-2xl font-bold tracking-wider">$$ \cos(\alpha - \beta) = \cos\alpha\cos\beta + \sin\alpha\sin\beta $$</p>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <script>
+        const translations = {
+            ko: {
+                main_title: "코사인 덧셈정리 증명",
+                q_title: "🤔 잠깐, 왜 좌표가 $(\\cos\\alpha, \\sin\\alpha)$ 인가요?",
+                q_p1: "좋은 질문입니다! 이는 삼각함수의 가장 기본적인 정의에서 비롯됩니다. 중심이 원점 $(0,0)$이고 반지름이 $r$인 원을 생각해봅시다. 원 위의 한 점 $P(x, y)$까지 원점이 잇는 선(동경)이 x축 양의 방향과 이루는 각을 $\\theta$라고 할 때, 삼각함수는 다음과 같이 정의됩니다.",
+                q_p2: "만약 반지름이 1인 <strong>단위원</strong>이라면 $r=1$이므로, 이 정의는 훨씬 간단해집니다. $ \\cos\\theta = x $, $ \\sin\\theta = y $. 따라서 단위원 위의 점의 좌표는 $(x, y) = (\\cos\\theta, \\sin\\theta)$ 로 바로 표현할 수 있습니다.",
+                svg_title1: "단위원에서의 삼각함수 정의 다이어그램",
+                proof_title: "증명 과정 따라가기",
+                step1_title: "1. 기본 설정 ⚙️",
+                step1_p1: "좌표평면 위에 중심이 원점 $O(0, 0)$이고 반지름이 1인 <strong>단위원</strong>을 가정합니다. 이 원 위에 두 점 A와 B를 잡겠습니다.",
+                step1_li1: "점 A: 원점으로부터 동경이 x축 양의 방향과 이루는 각이 $\\alpha$인 점. 좌표는 $A(\\cos\\alpha, \\sin\\alpha)$ 입니다.",
+                step1_li2: "점 B: 원점으로부터 동경이 x축 양의 방향과 이루는 각이 $\\beta$인 점. 좌표는 $B(\\cos\\beta, \\sin\\beta)$ 입니다.",
+                svg_title2: "코사인 덧셈정리 증명을 위한 단위원 다이어그램",
+                step1_p2: "우리의 목표는 <strong>선분 AB 길이의 제곱($AB^2$)</strong>을 두 가지 다른 방법으로 구하는 것입니다.",
+                step2_title: "2. 방법 1: 두 점 사이의 거리 공식 이용",
+                step2_p1: "좌표평면 위 두 점 $(x_1, y_1), (x_2, y_2)$ 사이의 거리 제곱 공식 $d^2 = (x_2-x_1)^2 + (y_2-y_1)^2$을 점 A와 B에 적용합니다.",
+                step2_comment1: "// 식을 전개합니다.",
+                step2_comment2: "// 항의 순서를 재배치하여 $\\sin^2\\theta + \\cos^2\\theta=1$을 적용합니다.",
+                step2_comment3: "// 위 항등식을 이용해 식을 간단히 합니다.",
+                step2_comment4: "// 최종 결과입니다.",
+                step3_title: "3. 방법 2: 제2코사인법칙 이용",
+                step3_p1: "원점 O와 두 점 A, B를 꼭짓점으로 하는 삼각형 OAB를 생각합니다. 제2코사인법칙 $c^2 = a^2+b^2-2ab\\cos C$를 적용합니다.",
+                svg_title3: "제2코사인법칙 다이어그램",
+                step3_p2: "일반 삼각형에서 변 c의 길이는 두 변 a, b와 그 끼인각 C로 구할 수 있습니다.",
+                step3_li1: "변 OA의 길이: 원의 반지름이므로 1",
+                step3_li2: "변 OB의 길이: 원의 반지름이므로 1",
+                step3_li3: "두 변 사이의 끼인각 $\\angle AOB$: 두 동경이 이루는 각이므로 $\\alpha - \\beta$",
+                step3_comment1: "// 알고 있는 값들을 대입합니다.",
+                step3_comment2: "// 최종 결과입니다.",
+                step4_title: "4. 결론 💡",
+                step4_p1: "두 가지 방법으로 구한 $AB^2$의 결과는 당연히 서로 같아야 합니다.",
+                step4_comment1: "// 양변에서 2를 빼고, -2로 나누어 정리합니다.",
+                final_p1: "최종적으로 다음 공식이 증명되었습니다."
+            },
+            en: {
+                main_title: "Proof of the Cosine Addition Formula",
+                q_title: "🤔 Wait, why are the coordinates $(\\cos\\alpha, \\sin\\alpha)$?",
+                q_p1: "Great question! This comes from the fundamental definition of trigonometric functions. Consider a circle with its center at the origin $(0,0)$ and a radius of $r$. When the line segment from the origin to a point $P(x, y)$ on the circle forms an angle $\\theta$ with the positive x-axis, the trigonometric functions are defined as follows:",
+                q_p2: "If we use a <strong>unit circle</strong> where the radius is 1 ($r=1$), this definition becomes much simpler: $ \\cos\\theta = x $, $ \\sin\\theta = y $. Therefore, the coordinates of a point on the unit circle can be directly expressed as $(x, y) = (\\cos\\theta, \\sin\\theta)$.",
+                svg_title1: "Diagram of trigonometric definitions on a unit circle",
+                proof_title: "Following the Proof",
+                step1_title: "1. Initial Setup ⚙️",
+                step1_p1: "On the coordinate plane, assume a <strong>unit circle</strong> with its center at the origin $O(0, 0)$ and a radius of 1. Let's place two points, A and B, on this circle.",
+                step1_li1: "Point A: The point where the angle from the positive x-axis is $\\alpha$. Its coordinates are $A(\\cos\\alpha, \\sin\\alpha)$.",
+                step1_li2: "Point B: The point where the angle from the positive x-axis is $\\beta$. Its coordinates are $B(\\cos\\beta, \\sin\\beta)$.",
+                svg_title2: "Unit circle diagram for the cosine addition formula proof",
+                step1_p2: "Our goal is to find the <strong>square of the length of the segment AB ($AB^2$)</strong> using two different methods.",
+                step2_title: "2. Method 1: Using the Distance Formula",
+                step2_p1: "We apply the distance squared formula, $d^2 = (x_2-x_1)^2 + (y_2-y_1)^2$, to points A and B.",
+                step2_comment1: "// Expand the expression.",
+                step2_comment2: "// Rearrange the terms to apply the identity $\\sin^2\\theta + \\cos^2\\theta=1$.",
+                step2_comment3: "// Simplify the expression using the identity.",
+                step2_comment4: "// This is the final result.",
+                step3_title: "3. Method 2: Using the Law of Cosines",
+                step3_p1: "Consider the triangle OAB, formed by the origin O and points A and B. We apply the Law of Cosines, $c^2 = a^2+b^2-2ab\\cos C$.",
+                svg_title3: "Diagram for the Law of Cosines",
+                step3_p2: "In a general triangle, the length of side c can be found from sides a, b, and the included angle C.",
+                step3_li1: "Length of side OA: This is the radius of the circle, so it is 1.",
+                step3_li2: "Length of side OB: This is also the radius, so it is 1.",
+                step3_li3: "The included angle $\\angle AOB$: This is the angle between the two position vectors, so it is $\\alpha - \\beta$.",
+                step3_comment1: "// Substitute the known values.",
+                step3_comment2: "// This is the final result.",
+                step4_title: "4. Conclusion 💡",
+                step4_p1: "The results for $AB^2$ obtained from the two methods must be equal.",
+                step4_comment1: "// Subtract 2 from both sides and divide by -2.",
+                final_p1: "Thus, the following formula is proven:"
+            }
+        };
+
+        let currentLang = 'ko';
+
+        function setLanguage(lang) {
+            currentLang = lang;
+            document.documentElement.lang = lang;
+            
+            document.querySelectorAll('[data-lang]').forEach(el => {
+                const key = el.getAttribute('data-lang');
+                if (translations[lang][key]) {
+                    el.innerHTML = translations[lang][key];
+                }
+            });
+
+            // Re-render KaTeX after changing text
+            renderMathInElement(document.body, {
+                delimiters: [
+                    {left: "$$", right: "$$", display: true}, {left: "$", right: "$", display: false},
+                    {left: "\\(", right: "\\)", display: false}, {left: "\\[", right: "\\]", display: true}
+                ]
+            });
+            
+            document.getElementById('lang-ko').classList.toggle('active', lang === 'ko');
+            document.getElementById('lang-en').classList.toggle('active', lang === 'en');
+        }
+
+        document.getElementById('lang-ko').addEventListener('click', () => setLanguage('ko'));
+        document.getElementById('lang-en').addEventListener('click', () => setLanguage('en'));
+
+        document.addEventListener("DOMContentLoaded", function() {
+            setLanguage('ko'); // Set initial language
+        });
+    </script>
+</body>
+</html>
