@@ -4,249 +4,365 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="icon" href="https://avatars.githubusercontent.com/u/35217573?v=4" type="image/x-icon">
-    <title data-ko="observe-llm: 운영 가능한 Self-Correcting AI Agent" data-en="observe-llm: A Production-Ready, Self-Correcting AI Agent">observe-llm: 운영 가능한 Self-Correcting AI Agent</title>
+    <title data-ko="운영 환경 AI Agent 모니터링 체계" data-en="Production AI Agent Observability">운영 환경 AI Agent 모니터링 체계 - observe-llm</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Noto+Sans+KR:wght@400;500;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Noto+Sans+KR:wght@400;500;700;900&display=swap" rel="stylesheet">
     <style>
         body {
             font-family: 'Inter', 'Noto Sans KR', sans-serif;
             background-color: #f8fafc; /* slate-50 */
         }
-        .code-block {
-            background-color: #1e293b; /* slate-800 */
-            color: #e2e8f0; /* slate-200 */
-            border-radius: 0.5rem;
-            padding: 1rem;
-            position: relative;
-            overflow-x: auto;
-            font-family: 'Courier New', Courier, monospace;
-            font-size: 0.9rem;
-            cursor: pointer;
-        }
-        .code-block pre { margin: 0; }
-        .section-title-icon {
-            width: 2.5rem; height: 2.5rem; margin-right: 1rem; color: #4f46e5; /* indigo-600 */
-        }
         html { scroll-behavior: smooth; }
         section { scroll-margin-top: 5rem; }
-        .prose section:not(:first-child) { margin-top: 5rem; }
-        .mermaid { display: flex; justify-content: center; }
-        .prose h2 { font-size: 1.875rem; font-weight: 700; margin-bottom: 1.5rem; }
-        .prose h3 { font-size: 1.5rem; font-weight: 600; margin-top: 2rem; margin-bottom: 1rem; }
-        .prose p, .prose ul, .prose li { color: #475569; line-height: 1.8; }
-        .prose a { color: #4f46e5; text-decoration: none; }
-        .prose a:hover { text-decoration: underline; }
-        .prose strong { color: #1e293b; }
-        .lang-toggle button.active {
-            background-color: #4f46e5;
-            color: white;
+        main section:not(:first-child) { margin-top: 4rem; }
+        h2 {
+            font-size: 1.875rem; font-weight: 800; margin-bottom: 1.5rem; letter-spacing: -0.025em; color: #0f172a;
         }
-        /* ▼ 추가: 클릭 시에만 iframe 생성용 썸네일 카드 */
-        .yt-card { position: relative; padding-top: 56.25%; background: #000; cursor: pointer; }
-        .yt-card img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
-        .yt-card button { position: absolute; inset: 0; display: grid; place-items: center; background: transparent; border: 0; }
-        .yt-card .play-badge {
-            width: 68px; height: 48px; border-radius: 14px; background: rgba(0,0,0,.6);
-            display: grid; place-items: center; transition: transform .2s ease, background .2s ease;
+        h3 {
+            font-size: 1.5rem; font-weight: 700; margin-top: 2rem; margin-bottom: 1rem; color: #1e293b;
         }
-        .yt-card .play-badge svg { width: 22px; height: 22px; fill: #fff; margin-left: 2px; }
-        .yt-card:hover .play-badge { transform: scale(1.05); background: rgba(0,0,0,.7); }
-        /* ▲ 추가 끝 */
+        p, ul, ol, li { color: #475569; line-height: 1.75; }
+        main a { color: #2563eb; text-decoration: none; font-weight: 600; }
+        main a:hover { text-decoration: underline; color: #1d4ed8; }
+        strong { color: #1e293b; }
+        
+        .code-block {
+            background-color: #1e293b; color: #e2e8f0; border-radius: 0.5rem; padding: 1rem;
+            position: relative; overflow-x: auto; font-family: 'Courier New', Courier, monospace;
+            font-size: 0.9rem; cursor: pointer; margin-top: 1rem; margin-bottom: 1.5rem;
+        }
+        .code-block pre { margin: 0; }
+        
+        .lang-toggle button.active { background-color: #4f46e5; color: white; }
+        
+        .workflow-box {
+            background: linear-gradient(to right bottom, #ffffff, #f8fafc);
+            border: 1px solid #e2e8f0; border-radius: 1rem; padding: 1.5rem;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05); transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+        .workflow-box:hover { transform: translateY(-2px); box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1); }
+        .step-number {
+            display: inline-flex; align-items: center; justify-content: center;
+            width: 2rem; height: 2rem; border-radius: 9999px; background-color: #4f46e5;
+            color: white; font-weight: 700; margin-right: 0.75rem;
+        }
+        
+        /* Mobile TOC Override */
+        #mobile-toc.open {
+            display: block !important; animation: slideUp 0.3s ease-out forwards;
+        }
+        @keyframes slideUp {
+            from { transform: translateY(10px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+        .mermaid { display: flex; justify-content: center; margin-top: 1.5rem; margin-bottom: 1.5rem;}
     </style>
 </head>
-<body class="text-slate-800">
+<body class="text-slate-800 relative pb-24 md:pb-0">
 
-    <!-- Language Toggle -->
-    <div class="fixed top-4 right-4 z-50 lang-toggle bg-white shadow-lg rounded-full p-1 flex space-x-1">
-        <button id="btn-ko" class="px-3 py-1 text-sm font-semibold rounded-full transition-colors duration-200 active" onclick="switchLanguage('ko')">한국어</button>
-        <button id="btn-en" class="px-3 py-1 text-sm font-semibold rounded-full transition-colors duration-200" onclick="switchLanguage('en')">English</button>
+    <!-- Header Actions -->
+    <div class="fixed top-4 right-4 z-50 flex items-center space-x-2">
+        <div class="lang-toggle bg-white/80 backdrop-blur-md shadow border border-slate-200 rounded-full p-1 flex space-x-1">
+            <button id="btn-ko" class="px-4 py-1.5 text-sm font-semibold rounded-full transition-all duration-200 active" onclick="switchLanguage('ko')">한국어</button>
+            <button id="btn-en" class="px-4 py-1.5 text-sm font-semibold rounded-full transition-all duration-200" onclick="switchLanguage('en')">English</button>
+        </div>
+        <button id="mobile-menu-btn" class="md:hidden bg-indigo-600 text-white p-2.5 rounded-full shadow-lg" aria-label="Toggle Table of Contents">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h7"></path></svg>
+        </button>
     </div>
 
-    <div class="container mx-auto px-4 py-12 md:py-16 max-w-5xl">
+    <!-- Mobile TOC Dropdown -->
+    <nav id="mobile-toc" class="hidden fixed top-16 right-4 z-40 bg-white p-4 rounded-xl shadow-xl border border-slate-200 w-64">
+        <ul class="space-y-3 font-medium text-sm text-slate-600">
+            <li><a href="#why" class="block hover:text-indigo-600 transition-colors" data-ko="1. Problem" data-en="1. Problem">1. Problem</a></li>
+            <li><a href="#what" class="block hover:text-indigo-600 transition-colors" data-ko="2. Solution" data-en="2. Solution">2. Solution</a></li>
+            <li><a href="#key-design" class="block hover:text-indigo-600 transition-colors" data-ko="3. Architecture" data-en="3. Architecture">3. Architecture</a></li>
+            <li><a href="#trade-off" class="block hover:text-indigo-600 transition-colors" data-ko="4. Technical Decisions" data-en="4. Technical Decisions">4. Technical Decisions</a></li>
+            <li><a href="#impact" class="block hover:text-indigo-600 transition-colors" data-ko="5. Business Impact" data-en="5. Business Impact">5. Business Impact</a></li>
+        </ul>
+    </nav>
+
+    <div class="container mx-auto px-4 py-10 md:py-16 max-w-7xl">
         <!-- Header -->
-        <header class="text-center mb-12 md:mb-20">
-            <h1 class="text-4xl md:text-6xl font-bold text-slate-900 mb-4">observe-llm</h1>
-            <p class="text-xl text-slate-600 max-w-3xl mx-auto" data-ko="운영 환경을 고려한 Self-Correcting AI Agent와 완전한 관찰 가능성" data-en="A Production-Ready, Self-Correcting AI Agent with Full Observability">
-                운영 환경을 고려한 Self-Correcting AI Agent와 완전한 관찰 가능성
+        <header class="text-center mb-16 md:mb-24">
+            <div class="inline-block px-3 py-1 mb-4 text-xs font-semibold tracking-wider text-indigo-600 uppercase bg-indigo-100 rounded-full">Prototype</div>
+            <h1 class="text-4xl md:text-5xl lg:text-6xl font-extrabold text-slate-900 mb-6 tracking-tight" data-ko="운영 환경 AI Agent 모니터링 체계" data-en="Production AI Agent Observability">
+                운영 환경 AI Agent 모니터링 체계
+            </h1>
+            <p class="text-xl md:text-2xl text-slate-600 font-medium max-w-4xl mx-auto mb-4" data-ko="운영(Production) 환경을 고려한 Self-Correcting 에이전트와 시스템 관찰 가능성(Observability) 검증 아키텍처" data-en="An architecture validating a production-ready, self-correcting agent and system observability.">
+                운영(Production) 환경을 고려한 Self-Correcting 에이전트와 시스템 관찰 가능성(Observability) 검증 아키텍처
             </p>
+            <p class="text-slate-500" data-ko="Developed by choije (2025) / observe-llm" data-en="Developed by choije (2025) / observe-llm">Developed by choije (2025) / observe-llm</p>
         </header>
 
-        <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-10">
             <!-- Sidebar Navigation -->
-            <aside class="lg:col-span-3 lg:sticky top-8 self-start">
-                <nav class="bg-white p-4 rounded-lg shadow-sm">
-                    <h3 class="font-bold text-lg mb-4 text-slate-900" data-ko="목차" data-en="Table of Contents">목차</h3>
-                    <ul class="space-y-2">
-                        <li><a href="#introduction" class="text-slate-600 hover:text-indigo-600 block" data-ko="1. 프로젝트 소개" data-en="1. Introduction">1. 프로젝트 소개</a></li>
-                        <li><a href="#architecture" class="text-slate-600 hover:text-indigo-600 block" data-ko="2. 시스템 아키텍처" data-en="2. System Architecture">2. 시스템 아키텍처</a></li>
-                        <li><a href="#deep-dive" class="text-slate-600 hover:text-indigo-600 block" data-ko="3. 코드 분석" data-en="3. Code Deep Dive">3. 코드 분석</a></li>
-                        <li><a href="#deployment-ops" class="text-slate-600 hover:text-indigo-600 block" data-ko="4. 배포 및 운영 전략" data-en="4. Deployment & Ops">4. 배포 및 운영 전략</a></li>
-                        <li><a href="#future-work" class="text-slate-600 hover:text-indigo-600 block" data-ko="5. 향후 방향" data-en="5. Future Work">5. 향후 방향</a></li>
+            <aside class="lg:col-span-3 lg:sticky top-8 self-start hidden md:block">
+                <nav class="bg-white p-6 rounded-xl shadow-sm border border-slate-100">
+                    <h3 class="font-extrabold text-lg mb-5 text-slate-900 uppercase tracking-wider text-sm" data-ko="목차" data-en="Table of Contents">목차</h3>
+                    <ul class="space-y-3 font-medium text-slate-600">
+                        <li><a href="#why" class="flex items-center hover:text-indigo-600 transition-colors" data-ko="1. Problem" data-en="1. Problem">1. Problem</a></li>
+                        <li><a href="#what" class="flex items-center hover:text-indigo-600 transition-colors" data-ko="2. Solution" data-en="2. Solution">2. Solution</a></li>
+                        <li><a href="#key-design" class="flex items-center hover:text-indigo-600 transition-colors" data-ko="3. Architecture" data-en="3. Architecture">3. Architecture</a></li>
+                        <li><a href="#trade-off" class="flex items-center hover:text-indigo-600 transition-colors" data-ko="4. Technical Decisions" data-en="4. Technical Decisions">4. Technical Decisions</a></li>
+                        <li><a href="#impact" class="flex items-center hover:text-indigo-600 transition-colors" data-ko="5. Business Impact" data-en="5. Business Impact">5. Business Impact</a></li>
                     </ul>
                 </nav>
             </aside>
 
             <!-- Main Content -->
-            <main class="lg:col-span-9 space-y-20">
-                
-                <div class="prose">
-                    <section id="introduction">
-                        <h2 data-ko="1. 소개: 프로토타입을 넘어서" data-en="1. Introduction: Beyond the Prototype">1. 소개: 프로토타입을 넘어서</h2>
-                        <p data-ko="많은 AI 에이전트 프로젝트는 개념 증명(PoC) 단계에 머물러 있습니다. 핵심 기능은 보여주지만, 배포, 모니터링, 확장성이라는 중요한 측면을 간과하는 경우가 많습니다. <a href='https://github.com/jae-choi/observe-llm' target='_blank' rel='noopener noreferrer'>`observe-llm`</a>은 이 간극을 메우기 위해 만들어졌습니다. 단순한 스크립트를 넘어, 견고하고 운영 가능한(production-ready) AI 에이전트 시스템을 구축하는 방법을 보여주는 실용적인 오픈소스 예제입니다." data-en="Many AI agent projects remain at the proof-of-concept stage. They demonstrate a core capability but often overlook the crucial aspects of deployment, monitoring, and scalability. <a href='https://github.com/jae-choi/observe-llm' target='_blank' rel='noopener noreferrer'>`observe-llm`</a> was created to bridge this gap. It's a practical, open-source example that goes beyond a simple script to showcase how to build a robust, production-ready AI agent system.">
-                            많은 AI 에이전트 프로젝트는 개념 증명(PoC) 단계에 머물러 있습니다. 핵심 기능은 보여주지만, 배포, 모니터링, 확장성이라는 중요한 측면을 간과하는 경우가 많습니다. <a href="https://github.com/jae-choi/observe-llm" target="_blank" rel="noopener noreferrer">`observe-llm`</a>은 이 간극을 메우기 위해 만들어졌습니다. 단순한 스크립트를 넘어, 견고하고 운영 가능한(production-ready) AI 에이전트 시스템을 구축하는 방법을 보여주는 실용적인 오픈소스 예제입니다.
-                        </p>
-                        <h3 data-ko="왜 Langfuse가 필수적인가?" data-en="Why is Langfuse Essential?">왜 Langfuse가 필수적인가?</h3>
-                        <p data-ko="단순한 LLM 체인은 디버깅하기 쉽지만, 순환적인 Self-Correcting 루프를 가진 에이전트는 '블랙박스'가 될 수 있습니다. Langfuse는 에이전트의 모든 생각과 행동에 대한 깊은 통찰력을 제공하여, 복잡한 AI 워크플로우의 <strong>관찰 가능성(observability)</strong> 문제를 해결합니다." data-en="While simple LLM chains are easy to debug, agents with cyclical, self-correcting loops can become 'black boxes.' Langfuse solves the challenge of <strong>observability in complex AI workflows</strong> by providing deep insights into every thought and action of the agent.">
-                            단순한 LLM 체인은 디버깅하기 쉽지만, 순환적인 Self-Correcting 루프를 가진 에이전트는 '블랙박스'가 될 수 있습니다. Langfuse는 에이전트의 모든 생각과 행동에 대한 깊은 통찰력을 제공하여, 복잡한 AI 워크플로우의 <strong>관찰 가능성(observability)</strong>문제를 해결합니다.
-                        </p>
-                         <ul>
-                            <li data-ko="<strong>사용자별 비용 추적:</strong> `user_id`를 기준으로 각 API 호출의 비용을 정확하게 추적하여 사용자별 과금의 기반을 마련할 수 있습니다." data-en="<strong>Cost Tracking per User:</strong> Accurately track the cost of each API call on a per-user basis, laying the groundwork for user-based billing.">
-                                <strong>사용자별 비용 추적:</strong> `user_id`를 기준으로 각 API 호출의 비용을 정확하게 추적하여 사용자별 과금의 기반을 마련할 수 있습니다.
-                            </li>
-                            <li data-ko="<strong>성능 병목 분석:</strong> LLM 모델별, 에이전트의 각 노드(단계)별 평균 지연 시간(latency)과 토큰 사용량을 분석하여 어느 부분에서 시간이 오래 걸리는지, 어떤 모델이 비효율적인지 쉽게 파악할 수 있습니다." data-en="<strong>Performance Bottleneck Analysis:</strong> Analyze average latency and token usage per LLM model and per agent node (step) to easily identify bottlenecks and inefficient models.">
-                                <strong>성능 병목 분석:</strong> LLM 모델별, 에이전트의 각 노드(단계)별 평균 지연 시간(latency)과 토큰 사용량을 분석하여 어느 부분에서 시간이 오래 걸리는지, 어떤 모델이 비효율적인지 쉽게 파악할 수 있습니다.
-                            </li>
-                            <li data-ko="<strong>품질 평가:</strong> 프롬프트의 버전을 관리하고, 동일한 입력에 대해 다른 프롬프트나 모델 버전이 어떻게 다른 결과물을 내놓는지 A/B 테스트하며, 사용자 피드백을 수집하여 에이전트의 응답 품질을 정량적으로 평가할 수 있습니다." data-en="<strong>Quality Evaluation:</strong> Manage prompt versions, A/B test different prompts or models on the same input, and collect user feedback to quantitatively assess the quality of the agent's responses.">
-                                <strong>품질 평가:</strong> 프롬프트의 버전을 관리하고, 동일한 입력에 대해 다른 프롬프트나 모델 버전이 어떻게 다른 결과물을 내놓는지 A/B 테스트하며, 사용자 피드백을 수집하여 에이전트의 응답 품질을 정량적으로 평가할 수 있습니다.
-                            </li>
-                            <li data-ko="<strong>신속한 디버깅:</strong> 복잡한 에이전트의 실행 흐름 전체를 시각적인 트레이스로 한눈에 파악하여, 어느 단계에서 문제가 발생했는지 신속하게 디버깅할 수 있습니다." data-en="<strong>Rapid Debugging:</strong> Gain a clear, visual trace of the entire complex agent workflow, allowing for quick identification and debugging of issues at any step.">
-                                <strong>신속한 디버깅:</strong> 복잡한 에이전트의 실행 흐름 전체를 시각적인 트레이스로 한눈에 파악하여, 어느 단계에서 문제가 발생했는지 신속하게 디버깅할 수 있습니다.
-                            </li>
-                        </ul>
-                    </section>
-                </div>
+            <main class="lg:col-span-9 space-y-16">
 
-                <!-- ▼ 변경: 초기 DOM에 iframe이 0개, 클릭 시에만 생성 -->
-                <figure class="w-full my-8 rounded-lg overflow-hidden shadow-lg bg-white">
-                  <div class="yt-card" data-video-id="1kSrzl0eaN4" aria-label="observe-llm 소개 영상" role="button" tabindex="0">
-                    <img src="https://img.youtube.com/vi/1kSrzl0eaN4/maxresdefault.jpg" alt="observe-llm 소개 영상 썸네일" loading="lazy">
-                    <button aria-label="Play Video">
-                      <span class="play-badge">
-                        <!-- YouTube play icon -->
-                        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5v14l11-7z"></path></svg>
-                      </span>
-                    </button>
-                  </div>
-                  <figcaption class="p-3 text-sm text-slate-500">
-                    교육 목적의 설명 영상입니다. 클릭 시 플레이어가 로드됩니다.
-                  </figcaption>
-                  <noscript>
-                    <p class="p-3 text-sm text-slate-500">
-                      자바스크립트를 사용하지 않는 경우 <a href="https://www.youtube.com/watch?v=1kSrzl0eaN4" rel="noopener nofollow ugc" target="_blank">유튜브에서 시청</a>하세요.
+                <!-- 요약 개요 -->
+                <section class="bg-white p-8 md:p-10 rounded-2xl shadow-sm border border-slate-100">
+                    <div class="max-w-4xl space-y-4">
+                        <p class="text-lg leading-relaxed text-slate-700" data-ko="단일 스크립트 기반의 AI 모델 테스트는 구축이 간편하지만, 다수의 모델과 에이전트가 복잡하게 상호작용하는 환경에서는 제어가 어렵습니다." data-en="Testing AI models using single scripts is simple, but control becomes difficult in environments where multiple models and agents interact intricately.">
+                            단일 스크립트 기반의 AI 모델 테스트는 구축이 간편하지만, 다수의 모델과 에이전트가 복잡하게 상호작용하는 환경에서는 제어가 어렵습니다.
+                        </p>
+                        <p class="text-lg leading-relaxed text-slate-700" data-ko="특히 <strong>내부 의사결정 과정(Thought Process) 추적, 리소스 비용 모니터링, 그리고 시스템 확장</strong> 등 운영 관점에서의 요구사항을 만족시키기 위해서는 별도의 시스템 아키텍처가 필요합니다." data-en="Specifically, to meet operational requirements such as <strong>tracking the internal thought process, monitoring resource costs, and system scaling</strong>, a distinct system architecture is necessary.">
+                            특히 <strong>내부 의사결정 과정(Thought Process) 추적, 리소스 비용 모니터링, 그리고 시스템 확장</strong> 등 운영 관점에서의 요구사항을 만족시키기 위해서는 별도의 시스템 아키텍처가 필요합니다.
+                        </p>
+                        <p class="text-lg leading-relaxed text-slate-700" data-ko="`observe-llm`은 이러한 배경에서 시작된 프로젝트로, 실무 수준(Production-Ready)의 <strong>AI 모니터링 및 로깅 파이프라인</strong>을 검증하기 위한 레퍼런스 구현체입니다." data-en="Initiated from this context, `observe-llm` is a reference implementation validating a production-ready <strong>AI monitoring and logging pipeline</strong>.">
+                            `observe-llm`은 이러한 배경에서 시작된 프로젝트로, 실무 수준(Production-Ready)의 <strong>AI 모니터링 및 로깅 파이프라인</strong>을 검증하기 위한 레퍼런스 구현체입니다.
+                        </p>
+                    </div>
+                </section>
+
+                <!-- 1. Why -->
+                <section id="why" class="scroll-mt-24">
+                    <div class="flex items-center mb-2">
+                        <div class="bg-indigo-100 p-2 rounded-lg mr-4">
+                            <svg class="w-7 h-7 text-indigo-600" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                        </div>
+                        <h2 class="text-3xl font-extrabold m-0" data-ko="1. Problem" data-en="1. Problem">1. Problem</h2>
+                    </div>
+                    
+                    <p class="text-slate-500 font-medium mb-6 max-w-4xl" data-ko="블랙박스가 되어버리는 복잡한 AI 에이전트 워크플로우의 한계" data-en="The limitations of complex AI agent workflows that turn into black boxes.">
+                        블랙박스가 되어버리는 복잡한 AI 에이전트 워크플로우의 한계
                     </p>
-                  </noscript>
-                </figure>
-                <!-- ▲ 변경 끝 -->
+                    
+                    <div class="grid md:grid-cols-2 gap-6">
+                        <div class="bg-red-50 p-6 rounded-xl border border-red-100">
+                            <h4 class="text-red-800 font-bold text-lg mb-3 flex items-center" data-ko="<svg class='w-5 h-5 mr-2' fill='none' viewBox='0 0 24 24' stroke='currentColor'><path stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z'></path></svg> 단방향 생성의 구조적 결함" data-en="<svg class='w-5 h-5 mr-2' fill='none' viewBox='0 0 24 24' stroke='currentColor'><path stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z'></path></svg> Flaws in Unidirectional Generation">
+                                <svg class='w-5 h-5 mr-2' fill='none' viewBox='0 0 24 24' stroke='currentColor'><path stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z'></path></svg> 단방향 생성의 구조적 결함
+                            </h4>
+                            <p class="text-red-900/80 mb-3" data-ko="대부분의 단순 LLM 애플리케이션은 질문을 던지고 답변을 받는 '1-pass' 체인에 의존합니다." data-en="Most simple LLM applications rely on a '1-pass' chain: you ask a question, and you get an answer.">
+                                대부분의 단순 LLM 애플리케이션은 질문을 던지고 답변을 받는 '1-pass' 체인에 의존합니다.
+                            </p>
+                            <div class="bg-white/60 p-3 rounded text-sm text-red-950 font-medium" data-ko="문제: 스스로 오류를 발견하고 수정할 수 없어, 복잡한 태스크에서 환각(Hallucination)과 논리적 비약이 통제 없이 노출됨" data-en="Problem: Inability to detect and fix its own errors, leading to uncontrolled hallucinations and logical leaps in complex tasks.">
+                                문제: 스스로 오류를 발견하고 수정할 수 없어, 복잡한 태스크에서 환각(Hallucination)과 논리적 비약이 통제 없이 노출됨
+                            </div>
+                        </div>
+                        <div class="bg-orange-50 p-6 rounded-xl border border-orange-100">
+                            <h4 class="text-orange-800 font-bold text-lg mb-3 flex items-center" data-ko="<svg class='w-5 h-5 mr-2' fill='none' viewBox='0 0 24 24' stroke='currentColor'><path stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z'></path></svg> 자율 에이전트의 '블랙박스'화" data-en="<svg class='w-5 h-5 mr-2' fill='none' viewBox='0 0 24 24' stroke='currentColor'><path stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z'></path></svg> The 'Black Box' of Autonomous Agents">
+                                <svg class='w-5 h-5 mr-2' fill='none' viewBox='0 0 24 24' stroke='currentColor'><path stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z'></path></svg> 자율 에이전트의 '블랙박스'화
+                            </h4>
+                            <p class="text-orange-900/80 mb-3" data-ko="이를 해결하기 위해 순환적인 루프(자기 비판/수정)를 도입하면, 반대로 에이전트 내부에서 어떤 결정이 어떻게 내려졌는지 개발자가 파악하기 불가능해집니다." data-en="Introducing a cyclical loop (self-critique/revision) to solve this ironically makes it impossible for developers to track how decisions were made internally.">
+                                이를 해결하기 위해 순환적인 루프(자기 비판/수정)를 도입하면, 반대로 에이전트 내부에서 어떤 결정이 어떻게 내려졌는지 개발자가 파악하기 불가능해집니다.
+                            </p>
+                            <div class="bg-white/60 p-3 rounded text-sm text-orange-950 font-medium" data-ko="문제: 오류 발생 시 원인을 추적할 수 없고(디버깅 불가), 병목 구간(Latency) 파악 및 토큰 비용 측정이 어려움" data-en="Problem: Inability to trace error origins (un-debuggable), locate latency bottlenecks, and measure token costs accurately.">
+                                문제: 오류 발생 시 원인을 추적할 수 없고(디버깅 불가), 병목 구간(Latency) 파악 및 토큰 비용 측정이 어려움
+                            </div>
+                        </div>
+                    </div>
+                </section>
 
-                <div class="prose">
-                    <section id="architecture">
-                        <h2 data-ko="2. 시스템 아키텍처: 전체적인 관점" data-en="2. System Architecture: A Holistic View">2. 시스템 아키텍처: 전체적인 관점</h2>
-                        <p data-ko="에이전트 자체는 퍼즐의 한 조각에 불과합니다. 견고한 시스템은 지원 서비스의 전체 스택을 필요로 하며, 이 모든 것이 원활하게 조율되어야 합니다. 저희는 Docker Compose를 사용하여 이 생태계를 관리하며, 여기에는 다음이 포함됩니다:" data-en="The agent itself is just one piece of the puzzle. A robust system requires a full stack of supporting services, all orchestrated seamlessly. We use Docker Compose to manage this ecosystem, which includes:">
-                            에이전트 자체는 퍼즐의 한 조각에 불과합니다. 견고한 시스템은 지원 서비스의 전체 스택을 필요로 하며, 이 모든 것이 원활하게 조율되어야 합니다. 저희는 Docker Compose를 사용하여 이 생태계를 관리하며, 여기에는 다음이 포함됩니다:
+                <!-- 2. What -->
+                <section id="what" class="scroll-mt-24">
+                    <div class="flex items-center mb-2">
+                        <div class="bg-indigo-100 p-2 rounded-lg mr-4">
+                            <svg class="w-7 h-7 text-indigo-600" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
+                        </div>
+                        <h2 class="text-3xl font-extrabold m-0" data-ko="2. Solution" data-en="2. Solution">2. Solution</h2>
+                    </div>
+
+                    <p class="text-slate-500 font-medium mb-6 max-w-4xl" data-ko="LangGraph와 Langfuse를 연동한 추적 가능한 에이전트 파이프라인 설계" data-en="A traceable agent pipeline design integrating LangGraph and Langfuse.">
+                        LangGraph와 Langfuse를 연동한 추적 가능한 에이전트 파이프라인 설계
+                    </p>
+
+                    <div class="max-w-4xl mb-8 text-lg text-slate-700">
+                        <p data-ko="콘텐츠 검수 및 보완 프로세스를 구조화하여, <strong>'작성 &rarr; 비평 &rarr; 수정'</strong>을 시스템이 자체적으로 반복하는 상태 기반(State-based) 워크플로우를 LangGraph로 구축했습니다." data-en="By structuring the content review and revision process, we built a state-based workflow with LangGraph where the system iteratively loops through <strong>'Draft &rarr; Critique &rarr; Revise'</strong>.">
+                            콘텐츠 검수 및 보완 프로세스를 구조화하여, <strong>'작성 &rarr; 비평 &rarr; 수정'</strong>을 시스템이 자체적으로 반복하는 상태 기반(State-based) 워크플로우를 LangGraph로 구축했습니다.
                         </p>
-                        <div class="mermaid" style="width: 100%; background-color: white; padding: 1rem; border-radius: 0.5rem;">
+                        <p class="mt-2" data-ko="이 과정에 Langfuse 플랫폼을 연동하여, 에이전트의 세부 실행 내역(Trace)과 노드별 의사결정 과정을 시각화(Observability)하도록 설정했습니다." data-en="By integrating the Langfuse platform into this process, we configured it to visualize the agent's detailed execution traces and node-level decision-making (Observability).">
+                            이 과정에 Langfuse 플랫폼을 연동하여, 에이전트의 세부 실행 내역(Trace)과 노드별 의사결정 과정을 시각화(Observability)하도록 설정했습니다.
+                        </p>
+                    </div>
+
+                    <!-- Workflow -->
+                    <div class="space-y-4">
+                        <h4 class="font-bold text-slate-900 mb-4" data-ko="Self-Correcting 워크플로우 구성" data-en="Self-Correcting Workflow Structure">Self-Correcting 워크플로우 구성</h4>
+                        
+                        <div class="grid md:grid-cols-2 gap-4">
+                            <div class="workflow-box border-l-4 border-l-blue-500">
+                                <h5 class="font-bold text-slate-800 flex items-center mb-2" data-ko="<span class='step-number bg-blue-500'>1</span> 초안 작성 (Draft)" data-en="<span class='step-number bg-blue-500'>1</span> Initial Draft"><span class='step-number bg-blue-500'>1</span> 초안 작성 (Draft)</h5>
+                                <p class="text-sm" data-ko="지정된 주제 혹은 제공된 데이터를 기반으로 초기 콘텐츠 초안을 생성합니다." data-en="Generates an initial content draft based on the specified topic or provided data.">지정된 주제 혹은 제공된 데이터를 기반으로 초기 콘텐츠 초안을 생성합니다.</p>
+                            </div>
+                            <div class="workflow-box border-l-4 border-l-indigo-500">
+                                <h5 class="font-bold text-slate-800 flex items-center mb-2" data-ko="<span class='step-number bg-indigo-500'>2</span> 논리 검증 (Critique)" data-en="<span class='step-number bg-indigo-500'>2</span> Logic Validation (Critique)"><span class='step-number bg-indigo-500'>2</span> 논리 검증 (Critique)</h5>
+                                <p class="text-sm" data-ko="사전 정의된 평가 기준에 따라 작성된 초안의 논리적 모순이나 정보 누락 여부를 검토합니다." data-en="Reviews the draft for logical contradictions or missing information based on pre-defined evaluation criteria.">사전 정의된 평가 기준에 따라 작성된 초안의 논리적 모순이나 정보 누락 여부를 검토합니다.</p>
+                            </div>
+                        </div>
+
+                        <div class="grid grid-cols-1">
+                            <div class="workflow-box border-l-4 border-l-purple-500 transform md:ml-8 bg-purple-50/30">
+                                <h5 class="font-bold text-purple-900 flex items-center mb-2" data-ko="<span class='step-number bg-purple-500'>3</span> 동적 분기 및 기록 (Routing & Logging)" data-en="<span class='step-number bg-purple-500'>3</span> Dynamic Routing & Logging"><span class='step-number bg-purple-500'>3</span> 동적 분기 및 기록 (Routing & Logging)</h5>
+                                <p class="text-sm" data-ko="검증 결과에 따라 수정이 필요하면 <strong>'Reviser'</strong>로 이동하고, 기준을 충족하면 프로세스를 종료합니다. 이 라우팅 과정 전체의 메타데이터와 소요 시간은 Langfuse에 자동 기록됩니다." data-en="If revision is needed based on the validation, it moves to <strong>'Reviser'</strong>; if criteria are met, the process terminates. The metadata and duration of this entire routing process are automatically logged in Langfuse.">검증 결과에 따라 수정이 필요하면 <strong>'Reviser'</strong>로 이동하고, 기준을 충족하면 프로세스를 종료합니다. 이 라우팅 과정 전체의 메타데이터와 소요 시간은 Langfuse에 자동 기록됩니다.</p>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- 3. Architecture -->
+                <section id="key-design" class="scroll-mt-24">
+                    <div class="flex items-center mb-2">
+                        <div class="bg-indigo-100 p-2 rounded-lg mr-4">
+                            <svg class="w-7 h-7 text-indigo-600" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
+                        </div>
+                        <h2 class="text-3xl font-extrabold m-0" data-ko="3. Architecture" data-en="3. Architecture">3. Architecture</h2>
+                    </div>
+                    
+                    <p class="text-slate-500 font-medium mb-6 max-w-4xl" data-ko="에이전트를 지원하는 전체 운영 생태계(Ecosystem)의 구축" data-en="Building an entire operational ecosystem to support the agent.">
+                        에이전트를 지원하는 전체 운영 생태계(Ecosystem)의 구축
+                    </p>
+
+                    <div class="max-w-4xl mb-6 text-lg text-slate-700">
+                        <p data-ko="견고한 시스템은 단순한 파이썬 스크립트 하나로 완성되지 않습니다. API 요청부터 모니터링 로깅, 데이터 저장까지 전체 스택이 원활하게 조율되어야 합니다." data-en="A robust system isn't finished with a single Python script. The entire stack—from API requests to monitoring logging and data storage—must be seamlessly orchestrated.">
+                            견고한 시스템은 단순한 파이썬 스크립트 하나로 완성되지 않습니다. API 요청부터 모니터링 로깅, 데이터 저장까지 전체 스택이 원활하게 조율되어야 합니다.
+                        </p>
+                    </div>
+
+                    <div class="bg-white p-6 rounded-xl border border-slate-200 shadow-sm mb-6 max-w-4xl">
+                        <div class="mermaid">
                             graph TD
                                 subgraph User
                                     A[Browser]
                                 end
-                                subgraph Docker Network
-                                    B(observe-llm Agent) -- HTTP Request --> A
+                                subgraph Docker Network Ecosystem
+                                    B(LangGraph Agent) -- HTTP Request --> A
                                     B -- Trace Data --> C(Langfuse Server)
-                                    C -- Writes/Reads --> D(PostgreSQL)
-                                    C -- Writes/Reads --> E(Clickhouse)
-                                    C -- Uses --> F(Redis)
-                                    C -- Uses --> G(Minio)
+                                    C -- Relational --> D[(PostgreSQL)]
+                                    C -- Analytics --> E[(Clickhouse)]
+                                    C -- Caching --> F(Redis)
                                 end
-                                A -- Interacts --> B
+                                A -- Prompts & Tasks --> B
                         </div>
-                        <p class="text-sm text-center mt-2 text-slate-500" data-ko="그림 1: Docker Compose로 관리되는 전체 시스템 아키텍처" data-en="Figure 1: Overall system architecture managed by Docker Compose.">
-                            그림 1: Docker Compose로 관리되는 전체 시스템 아키텍처
+                        <p class="text-sm text-center mt-4 text-slate-500" data-ko="Docker Compose 기반의 Observability 지원 아키텍처" data-en="Docker Compose-based architecture supporting observability.">
+                            Docker Compose 기반의 Observability 지원 아키텍처
                         </p>
-                    </section>
+                    </div>
+                </section>
 
-                    <section id="deep-dive">
-                        <h2 data-ko="3. 코드 분석: Self-Correcting Loop" data-en="3. Code Deep Dive: The Self-Correcting Loop">3. 코드 분석: Self-Correcting Loop</h2>
-                        <p data-ko="핵심 로직은 `run_agent.py`에 있습니다. LangGraph를 사용하여 인간이 글을 다듬는 과정을 모방한 순환적인 '비평 및 수정' 워크플로우를 가능하게 하는 상태 머신을 만듭니다." data-en="The core logic resides in `run_agent.py`. It uses LangGraph to create a state machine that enables a cyclical 'critique and revision' workflow, mimicking how a human might refine a piece of writing.">
-                            핵심 로직은 `run_agent.py`에 있습니다. LangGraph를 사용하여 인간이 글을 다듬는 과정을 모방한 순환적인 '비평 및 수정' 워크플로우를 가능하게 하는 상태 머신을 만듭니다.
-                        </p>
-                        <div class="mermaid" style="width: 100%; background-color: white; padding: 1rem; border-radius: 0.5rem;">
-                            graph TD
-                                Start --> Researcher
-                                Researcher --> Writer
-                                Writer --> Critique
-                                Critique -- REVISE --> Reviser
-                                Reviser --> Critique
-                                Critique -- APPROVE --> SetFinalOutput
-                                SetFinalOutput --> End
+                <!-- 4. Trade-off -->
+                <section id="trade-off" class="scroll-mt-24">
+                    <div class="flex items-center mb-2">
+                        <div class="bg-indigo-100 p-2 rounded-lg mr-4">
+                            <svg class="w-7 h-7 text-indigo-600" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 6l3 1m0 0l-3 9a5.002 5.002 0 006.001 0M6 7l3 9M6 7l6-2m6 2l3-1m-3 1l-3 9a5.002 5.002 0 006.001 0M18 7l3 9m-3-9l-6-2m0-2v2m0 16V5m0 16H9m3 0h3"></path></svg>
                         </div>
-                         <p class="text-sm text-center mt-2 text-slate-500" data-ko="그림 2: LangGraph 에이전트의 워크플로우" data-en="Figure 2: The LangGraph agent's workflow.">
-                            그림 2: LangGraph 에이전트의 워크플로우
-                        </p>
-                        <h3 data-ko="상태 머신 (`AgentState`)" data-en="The State Machine (`AgentState`)">상태 머신 (`AgentState`)</h3>
-                        <p data-ko="`AgentState` TypedDict는 에이전트의 생명선입니다. 그래프의 각 노드가 읽고 쓰는 공유 메모리 역할을 하여 워크플로우 전반에 걸쳐 원활한 정보 흐름을 보장합니다." data-en="The `AgentState` TypedDict is the lifeblood of the agent. It's a shared memory that each node in the graph reads from and writes to, ensuring a seamless flow of information through the workflow.">
-                            `AgentState` TypedDict는 에이전트의 생명선입니다. 그래프의 각 노드가 읽고 쓰는 공유 메모리 역할을 하여 워크플로우 전반에 걸쳐 원활한 정보 흐름을 보장합니다.
-                        </p>
-                        <div class="code-block" onclick="selectCode(this)">
-                            <pre><code>class AgentState(TypedDict):
-    topic: str
-    research_result: str
-    draft: str
-    critique: str
-    # ... and other state variables
-</code></pre>
-                        </div>
-                        <h3 data-ko="조건부 엣지의 역할" data-en="The Role of the Conditional Edge">조건부 엣지의 역할</h3>
-                        <p data-ko="이 워크플로우의 핵심은 `Critique` 노드 이후의 분기입니다. `should_revise` 함수는 `critique`의 내용에 'REVISE'라는 키워드가 있는지 확인하여, 에이전트가 수정을 계속할지 아니면 작업을 완료할지를 동적으로 결정합니다. 이 조건부 라우팅이 바로 LangGraph의 강력함입니다." data-en="The magic of this workflow is the branch after the `Critique` node. The `should_revise` function checks for the keyword 'REVISE' in the critique's output to dynamically decide whether the agent should continue revising or finalize its work. This conditional routing is the power of LangGraph.">
-                            이 워크플로우의 핵심은 `Critique` 노드 이후의 분기입니다. `should_revise` 함수는 `critique`의 내용에 'REVISE'라는 키워드가 있는지 확인하여, 에이전트가 수정을 계속할지 아니면 작업을 완료할지를 동적으로 결정합니다. 이 조건부 라우팅이 바로 LangGraph의 강력함입니다.
-                        </p>
-                        <div class="code-block" onclick="selectCode(this)">
-                            <pre><code>def should_revise(state: AgentState) -> str:
+                        <h2 class="text-3xl font-extrabold m-0" data-ko="4. Technical Decisions" data-en="4. Technical Decisions">4. Technical Decisions</h2>
+                    </div>
+
+                    <p class="text-slate-500 font-medium mb-6 max-w-4xl" data-ko="안정적 운영과 인프라 확장을 위해 거쳤던 치열한 엔지니어링 고민" data-en="Intense engineering considerations to ensure stable operations and infrastructure scalability.">
+                        안정적 운영과 인프라 확장을 위해 거쳤던 치열한 엔지니어링 고민
+                    </p>
+
+                    <div class="space-y-6 max-w-4xl">
+                        <!-- Trade-off 1 -->
+                        <div class="border border-slate-200 rounded-xl overflow-hidden">
+                            <div class="bg-slate-50 px-6 py-4 border-b border-slate-200">
+                                <h4 class="font-bold text-lg m-0 flex items-center" data-ko="단순 파이프라인 <span class='text-slate-400 mx-3'>vs</span> 조건부 엣지(Conditional Edge) 라우팅" data-en="Simple Pipeline vs Conditional Edge Routing">
+                                    단순 파이프라인 <span class='text-slate-400 mx-3'>vs</span> 조건부 엣지(Conditional Edge) 라우팅
+                                </h4>
+                            </div>
+                            <div class="p-6 bg-white text-slate-700">
+                                <p class="mb-4" data-ko="결과가 나올 때까지 기다리기만 하는 선형적 파이프라인은 구축이 쉽지만, 답변의 논리적 오류를 방어할 메커니즘이 없습니다." data-en="A linear pipeline that just waits for an output is easy to build, but lacks mechanisms to defend against logical errors in the response.">
+                                    결과가 나올 때까지 기다리기만 하는 선형적 파이프라인은 구축이 쉽지만, 답변의 논리적 오류를 방어할 메커니즘이 없습니다.
+                                </p>
+                                <div class="bg-slate-100 p-4 rounded-lg border-l-4 border-yellow-500">
+                                    <strong class="text-slate-900 block mb-1" data-ko="해결: 조건부 엣지(Conditional Edge) 설계" data-en="Solution: Conditional Edge Design">해결: 조건부 엣지(Conditional Edge) 설계</strong>
+                                    <span class="text-sm" data-ko="<code>AgentState</code> 객체를 활용하여 노드 간 데이터를 공유하고, 라우팅 함수에서 출력물 내 특정 문자열(예: 'REVISE') 포함 여부를 검사하여 <strong>조건부 흐름 제어</strong>를 구현했습니다." data-en="Utilized the <code>AgentState</code> object to share data between nodes, and implemented <strong>conditional flow control</strong> by having the routing function check for the presence of specific strings (e.g., 'REVISE') in the output.">
+                                        <code>AgentState</code> 객체를 활용하여 노드 간 데이터를 공유하고, 라우팅 함수에서 출력물 내 특정 문자열(예: 'REVISE') 포함 여부를 검사하여 <strong>조건부 흐름 제어</strong>를 구현했습니다.
+                                    </span>
+                                </div>
+                                <div class="code-block" onclick="selectCode(this)">
+                                    <pre><code>def should_revise(state: AgentState) -> str:
     if "REVISE" in state["critique"]:
         return "reviser"  # Loop back to revise
     else:
-        return "set_final_output" # Exit the loop
-</code></pre>
+        return "set_final_output" # Exit the loop</code></pre>
+                                </div>
+                            </div>
                         </div>
-                    </section>
 
-                    <section id="deployment-ops">
-                        <h2 data-ko="4. 개발에서 배포까지" data-en="4. From Development to Distribution">4. 개발에서 배포까지</h2>
-                        <p data-ko="이 프로젝트를 진정으로 운영 가능하게 만들기 위해 몇 가지 핵심적인 운영 전략이 구현되었습니다." data-en="To make this project truly production-ready, several key operational strategies were implemented.">
-                            이 프로젝트를 진정으로 운영 가능하게 만들기 위해 몇 가지 핵심적인 운영 전략이 구현되었습니다.
-                        </p>
-                        <h3 data-ko="보안 및 구성" data-en="Security & Configuration">보안 및 구성</h3>
-                        <p data-ko="API 키와 같은 모든 민감 정보는 `.env` 파일을 통해 관리됩니다. `docker-compose.yml`은 이러한 변수를 참조하여 소스 코드에 비밀이 하드코딩되지 않도록 합니다. `.gitignore` 파일은 `.env` 파일이 버전 제어에 커밋되는 것을 방지합니다." data-en="All sensitive information, such as API keys, is managed through a `.env` file. The `docker-compose.yml` references these variables, ensuring that no secrets are hardcoded in the source code. The `.gitignore` file prevents the `.env` file from ever being committed to version control.">
-                            API 키와 같은 모든 민감 정보는 `.env` 파일을 통해 관리됩니다. `docker-compose.yml`은 이러한 변수를 참조하여 소스 코드에 비밀이 하드코딩되지 않도록 합니다. `.gitignore` 파일은 `.env` 파일이 버전 제어에 커밋되는 것을 방지합니다.
-                        </p>
-                        <h3 data-ko="데이터 영속성" data-en="Data Persistence">데이터 영속성</h3>
-                        <p data-ko="Langfuse 스택은 영구 데이터를 필요로 합니다. 임시 Docker 볼륨 대신, 시스템은 로컬 바인드 마운트로 구성됩니다. 모든 데이터는 로컬 머신의 `langfuse-data/` 디렉토리에 저장되어, 컨테이너 재시작 및 제거에도 추적 기록이 유지됩니다." data-en="The Langfuse stack requires persistent data. Instead of using ephemeral Docker volumes, the system is configured with local bind mounts. All data is saved to a `langfuse-data/` directory on your local machine, guaranteeing that your trace history survives container restarts and removals.">
-                            Langfuse 스택은 영구 데이터를 필요로 합니다. 임시 Docker 볼륨 대신, 시스템은 로컬 바인드 마운트로 구성됩니다. 모든 데이터는 로컬 머신의 `langfuse-data/` 디렉토리에 저장되어, 컨테이너 재시작 및 제거에도 추적 기록이 유지됩니다.
-                        </p>
-                    </section>
+                        <!-- Trade-off 2 -->
+                        <div class="border border-slate-200 rounded-xl overflow-hidden">
+                            <div class="bg-slate-50 px-6 py-4 border-b border-slate-200">
+                                <h4 class="font-bold text-lg m-0 flex items-center" data-ko="빠른 데모 세팅 <span class='text-slate-400 mx-3'>vs</span> 영속성(Persistence)과 보안 중심 인프라" data-en="Quick Demo Setup vs Persistence & Security-focused Infrastructure">
+                                    빠른 데모 세팅 <span class='text-slate-400 mx-3'>vs</span> 영속성(Persistence)과 보안 중심 인프라
+                                </h4>
+                            </div>
+                            <div class="p-6 bg-white text-slate-700">
+                                <p class="mb-4" data-ko="테스트 목적의 컨테이너 환경에서는 종료 시 데이터가 소멸되며, 구성 정보(API 키 등)가 코드 내에 남아있을 경우 운영 환경 배포 시 취약점이 됩니다." data-en="In testing container environments, data vanishes upon termination, and leaving configuration info (like API keys) in the code poses vulnerabilities during production deployment.">
+                                    테스트 목적의 컨테이너 환경에서는 종료 시 데이터가 소멸되며, 구성 정보(API 키 등)가 코드 내에 남아있을 경우 운영 환경 배포 시 취약점이 됩니다.
+                                </p>
+                                <div class="bg-slate-100 p-4 rounded-lg border-l-4 border-indigo-500">
+                                    <strong class="text-slate-900 block mb-1" data-ko="해결: 볼륨 바인딩 및 구성 파일 격리" data-en="Solution: Volume Binding and Configuration Isolation">해결: 볼륨 바인딩 및 구성 파일 격리</strong>
+                                    <span class="text-sm" data-ko="로그 DB(PostgreSQL, Clickhouse) 컨테이너에 <strong>로컬 바인드 마운트</strong>를 적용하여 시스템 재시작 시에도 로깅 데이터를 보존합니다. 더불어 <code>.env</code> 파일 기반의 환경 변수 주입 구조를 통해 민감 정보를 소스코드로부터 물리적으로 분리했습니다." data-en="Applied <strong>local bind mounts</strong> to log DB (PostgreSQL, Clickhouse) containers to preserve logging data across restarts. Additionally, physically separated sensitive information from the source code via a <code>.env</code> file-based variable injection structure.">
+                                        로그 DB(PostgreSQL, Clickhouse) 컨테이너에 <strong>로컬 바인드 마운트</strong>를 적용하여 시스템 재시작 시에도 로깅 데이터를 보존합니다. 더불어 <code>.env</code> 파일 기반의 환경 변수 주입 구조를 통해 민감 정보를 소스코드로부터 물리적으로 분리했습니다.
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
 
-                    <section id="future-work">
-                        <h2 data-ko="5. 향후 방향 및 고도화" data-en="5. 향후 방향 및 고도화">5. 향후 방향 및 고도화</h2>
-                        <p data-ko="`observe-llm`은 견고한 기반을 제공하지만, 확장할 수 있는 흥미로운 방법이 많이 있습니다:" data-en="`observe-llm` provides a solid foundation, but there are many exciting ways it could be extended:">
-                            `observe-llm`은 견고한 기반을 제공하지만, 확장할 수 있는 흥미로운 방법이 많이 있습니다:
-                        </p>
-                        <ul>
-                            <li data-ko="<strong>에이전트 도구 추가:</strong> `researcher` 노드에 웹 검색 API(예: Tavily)와 같은 도구를 제공하여 기능을 향상시킬 수 있습니다. 이를 통해 에이전트는 실시간 정보를 통합하고 더 강력한 팩트체크를 수행할 수 있습니다." data-en="<strong>Agent Tooling:</strong> Enhance the `researcher` node by giving it access to tools, such as a web search API (e.g., Tavily). This would allow the agent to incorporate real-time information and perform more robust fact-checking.">
-                                <strong>에이전트 도구 추가:</strong> `researcher` 노드에 웹 검색 API(예: Tavily)와 같은 도구를 제공하여 기능을 향상시킬 수 있습니다. 이를 통해 에이전트는 실시간 정보를 통합하고 더 강력한 팩트체크를 수행할 수 있습니다.
-                            </li>
-                            <li data-ko="<strong>인간 참여 루프(Human-in-the-Loop):</strong> Langfuse의 사용자 피드백 기능을 통합합니다. 에이전트가 수정 루프를 완료한 후, 최종 초안을 인간에게 제시하여 최종 '승인' 또는 '거절' 조치를 받게 하고, 이 피드백을 Langfuse에 기록하여 에이전트의 성능을 추가로 평가할 수 있습니다." data-en="<strong>Human-in-the-Loop:</strong> Integrate Langfuse's user feedback features. After the agent completes its revision loop, the final draft could be presented to a human for a final 'approve' or 'reject' action, with that feedback being logged in Langfuse to further evaluate the agent's performance.">
-                                <strong>인간 참여 루프(Human-in-the-Loop):</strong> Langfuse의 사용자 피드백 기능을 통합합니다. 에이전트가 수정 루프를 완료한 후, 최종 초안을 인간에게 제시하여 최종 '승인' 또는 '거절' 조치를 받게 하고, 이 피드백을 Langfuse에 기록하여 에이전트의 성능을 추가로 평가할 수 있습니다.
-                            </li>
-                            <li data-ko="<strong>자동화된 테스트 및 평가:</strong> Langfuse의 데이터셋 및 점수 기능을 사용하여 자동화된 평가 파이프라인을 만듭니다. 주제와 예상 요점의 데이터셋을 구축한 다음, 이 데이터셋에 대해 에이전트를 프로그래밍 방식으로 실행하여 시간 경과에 따른 정확성과 일관성을 점수화할 수 있습니다." data-en="<strong>Automated Testing & Evaluation:</strong> Use Langfuse's dataset and scoring features to create an automated evaluation pipeline. We could build a dataset of topics and expected key points, and then programmatically run the agent against this dataset to score its accuracy and consistency over time.">
-                                <strong>자동화된 테스트 및 평가:</strong> Langfuse의 데이터셋 및 점수 기능을 사용하여 자동화된 평가 파이프라인을 만듭니다. 주제와 예상 요점의 데이터셋을 구축한 다음, 이 데이터셋에 대해 에이전트를 프로그래밍 방식으로 실행하여 시간 경과에 따른 정확성과 일관성을 점수화할 수 있습니다.
-                            </li>
-                        </ul>
-                    </section>
-                </div>
+                <!-- 5. Impact -->
+                <section id="impact" class="scroll-mt-24 mb-10">
+                    <div class="flex items-center mb-6">
+                        <div class="bg-indigo-100 p-2 rounded-lg mr-4">
+                            <svg class="w-7 h-7 text-indigo-600" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"></path></svg>
+                        </div>
+                        <h2 class="text-3xl font-extrabold m-0" data-ko="5. Business Impact" data-en="5. Business Impact">5. Business Impact</h2>
+                    </div>
+
+                    <div class="grid md:grid-cols-2 gap-6 mt-6">
+                        <!-- Impact: Transparency -->
+                        <div class="bg-indigo-600 text-white p-8 rounded-2xl shadow-lg relative overflow-hidden">
+                            <!-- Decorative Circle -->
+                            <div class="absolute -right-10 -top-10 w-40 h-40 bg-white opacity-10 rounded-full"></div>
+                            <h4 class="text-indigo-100 font-bold mb-4" data-ko="가시성 기반의 서비스 운영 통제력 확보" data-en="Securing Operational Control Based on Visibility">가시성 기반의 서비스 운영 통제력 확보</h4>
+                            <p class="text-indigo-50 font-medium text-lg leading-relaxed mt-2" data-ko="모델별 응답 속도 지연(Latency) 원인과 노드 간 에러 구간을 시각적으로 모니터링할 수 있습니다. 또한, <strong>사용자 ID 단위(user_id)의 토큰 소비량 로깅 체계</strong>를 구축하여, API 비용 분석 및 B2B 서비스 과금 시스템 연동을 위한 데이터 기반을 마련했습니다." data-en="Visual monitoring allows identification of model latency causes and error segments between nodes. Additionally, establishing a <strong>token consumption logging system per user ID (user_id)</strong> provides a data foundation for API cost analysis and B2B billing system integration.">
+                                모델별 응답 속도 지연(Latency) 원인과 노드 간 에러 구간을 시각적으로 모니터링할 수 있습니다. 또한, <strong>사용자 ID 단위(user_id)의 토큰 소비량 로깅 체계</strong>를 구축하여, API 비용 분석 및 B2B 서비스 과금 시스템 연동을 위한 데이터 기반을 마련했습니다.
+                            </p>
+                        </div>
+
+                        <!-- Impact: Extensibility -->
+                        <div class="bg-white p-8 rounded-2xl border border-indigo-100 shadow-sm flex flex-col justify-center">
+                            <h4 class="text-slate-900 font-bold mb-4" data-ko="정량적 모델 평가 체계 구축" data-en="Establishing a Quantitative Evaluation Framework">정량적 모델 평가 체계 구축</h4>
+                            <ul class="space-y-4">
+                                <li class="flex items-start">
+                                    <svg class="w-6 h-6 text-emerald-500 mr-2 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+                                    <span class="text-slate-700" data-ko="<strong>프롬프트 A/B 테스트 환경</strong>: 동일한 입력 데이터에 대해 버전별 프롬프트의 결과 품질을 비교 및 수치화하여, 애플리케이션 업데이트 시 발생할 수 있는 품질 저하 리스크를 최소화합니다." data-en="<strong>Prompt A/B Testing Environment</strong>: Compares and quantifies the output quality of different prompt versions against the same input data, minimizing the risk of quality degradation during application updates.">
+                                        <strong>프롬프트 A/B 테스트 환경</strong>: 동일한 입력 데이터에 대해 버전별 프롬프트의 결과 품질을 비교 및 수치화하여, 애플리케이션 업데이트 시 발생할 수 있는 품질 저하 리스크를 최소화합니다.
+                                    </span>
+                                </li>
+                                <li class="flex items-start">
+                                    <svg class="w-6 h-6 text-emerald-500 mr-2 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+                                    <span class="text-slate-700" data-ko="<strong>추가 도구 연동 유연성</strong>: 해당 모니터링 아키텍처는 향후 웹 검색 플러그인(Tavily 등)이나 외부 RAG 데이터베이스를 확장 연동하더라도, 동일한 뷰 내에서 실행 로그를 통합 추적할 수 있도록 설계되었습니다." data-en="<strong>Flexibility for Additional Tool Integration</strong>: The monitoring architecture is designed so that even if web search plugins (like Tavily) or external RAG databases are integrated in the future, execution logs can still be tracked seamlessly within the same view.">
+                                        <strong>추가 도구 연동 유연성</strong>: 해당 모니터링 아키텍처는 향후 웹 검색 플러그인(Tavily 등)이나 외부 RAG 데이터베이스를 확장 연동하더라도, 동일한 뷰 내에서 실행 로그를 통합 추적할 수 있도록 설계되었습니다.
+                                    </span>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </section>
+                
             </main>
         </div>
         
-        <footer class="text-center mt-20 text-slate-500">
-            <p>&copy; 2025 jae-choi. All rights reserved.</p>
+        <!-- Footer -->
+        <footer class="text-center mt-20 pt-8 border-t border-slate-200 text-slate-500 text-sm">
+            <p>&copy; 2025 AI Agent Observability Project. Built for showcasing technical architecture.</p>
         </footer>
     </div>
 
@@ -262,6 +378,32 @@
             selection.addRange(range);
         }
 
+        // Mobile TOC Toggle
+        const mobileMenuBtn = document.getElementById('mobile-menu-btn');
+        const mobileToc = document.getElementById('mobile-toc');
+        
+        mobileMenuBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            mobileToc.classList.toggle('hidden');
+            mobileToc.classList.toggle('open');
+        });
+
+        // Close TOC when clicking outside or clicking a link
+        document.addEventListener('click', (e) => {
+            if (!mobileToc.contains(e.target) && !mobileMenuBtn.contains(e.target)) {
+                mobileToc.classList.add('hidden');
+                mobileToc.classList.remove('open');
+            }
+        });
+
+        mobileToc.querySelectorAll('a').forEach(link => {
+            link.addEventListener('click', () => {
+                mobileToc.classList.add('hidden');
+                mobileToc.classList.remove('open');
+            });
+        });
+
+        // Function to switch language
         function switchLanguage(lang) {
             document.querySelectorAll('[data-ko]').forEach(el => {
                 if (el.dataset[lang]) {
@@ -269,50 +411,27 @@
                 }
             });
             document.documentElement.lang = lang;
+            document.title = document.querySelector('title').dataset[lang];
+
+            // Update button active state
             document.getElementById('btn-ko').classList.toggle('active', lang === 'ko');
+            document.getElementById('btn-ko').classList.toggle('text-slate-600', lang !== 'ko');
+            document.getElementById('btn-ko').classList.toggle('bg-white', lang !== 'ko');
+            
             document.getElementById('btn-en').classList.toggle('active', lang === 'en');
+            document.getElementById('btn-en').classList.toggle('text-slate-600', lang !== 'en');
+            document.getElementById('btn-en').classList.toggle('bg-white', lang !== 'en');
         }
+
         // Set initial language
-        switchLanguage('ko');
-
-        /* ▼ 추가: 클릭 시에만 iframe 생성 */
-        function mountYouTubeIframe(container, videoId) {
-            const iframe = document.createElement('iframe');
-            iframe.src = `https://www.youtube-nocookie.com/embed/${encodeURIComponent(videoId)}`;
-            iframe.title = 'YouTube video player';
-            iframe.loading = 'lazy';
-            iframe.className = 'absolute top-0 left-0 w-full h-full';
-            iframe.frameBorder = '0';
-            iframe.referrerPolicy = 'strict-origin-when-cross-origin';
-            iframe.allow = 'accelerometer; clipboard-write; encrypted-media; picture-in-picture; web-share';
-            iframe.sandbox = 'allow-same-origin allow-scripts allow-popups allow-presentation';
-            container.innerHTML = '';
-            container.appendChild(iframe);
-        }
-
-        function setupLiteYouTube() {
-            const cards = document.querySelectorAll('.yt-card');
-            cards.forEach(card => {
-                const videoId = card.getAttribute('data-video-id');
-                const activate = () => mountYouTubeIframe(card, videoId);
-                // 클릭 1회만 활성화, 키보드 접근성 포함
-                card.addEventListener('click', activate, { once: true });
-                card.addEventListener('keydown', (e) => {
-                    if (e.key === 'Enter' || e.key === ' ') {
-                        e.preventDefault();
-                        activate();
-                    }
-                }, { once: true });
-            });
-        }
-
-        if (document.readyState === 'loading') {
-            document.addEventListener('DOMContentLoaded', setupLiteYouTube);
-        } else {
-            setupLiteYouTube();
-        }
-        /* ▲ 추가 끝 */
+        document.addEventListener('DOMContentLoaded', () => {
+            const userLang = navigator.language || navigator.userLanguage;
+            if (userLang.startsWith('en')) {
+                switchLanguage('en');
+            } else {
+                switchLanguage('ko');
+            }
+        });
     </script>
-
 </body>
 </html>
