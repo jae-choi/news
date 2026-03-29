@@ -1,0 +1,478 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" href="https://avatars.githubusercontent.com/u/35217573?v=4" type="image/x-icon">
+    <title data-ko="AI 마케팅 콘텐츠 팩토리" data-en="AI Marketing Content Factory">AI 마케팅 콘텐츠 팩토리</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Noto+Sans+KR:wght@400;500;700;900&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', 'Noto Sans KR', sans-serif;
+            background-color: #f8fafc; /* slate-50 */
+        }
+        .section-title-icon {
+            width: 2.5rem;
+            height: 2.5rem;
+            margin-right: 1rem;
+            color: #4f46e5; /* indigo-600 */
+        }
+        html {
+            scroll-behavior: smooth;
+        }
+        section {
+            scroll-margin-top: 5rem;
+        }
+        main section:not(:first-child) {
+            margin-top: 4rem;
+        }
+        h2 {
+            font-size: 1.875rem; /* text-3xl */
+            font-weight: 800; /* font-extrabold */
+            margin-bottom: 1.5rem; /* mb-6 */
+            letter-spacing: -0.025em;
+            color: #0f172a; /* slate-900 */
+        }
+        h3 {
+            font-size: 1.5rem; /* text-2xl */
+            font-weight: 700; /* font-bold */
+            margin-top: 2rem; /* mt-8 */
+            margin-bottom: 1rem; /* mb-4 */
+            color: #1e293b; /* slate-800 */
+        }
+        p, ul, ol {
+            color: #475569; /* slate-600 */
+            line-height: 1.75;
+        }
+        main a {
+            color: #2563eb; /* blue-600 */
+            text-decoration: none;
+            font-weight: 600; /* font-semibold */
+        }
+        main a:hover {
+            text-decoration: underline;
+            color: #1d4ed8; /* blue-700 */
+        }
+        strong {
+            color: #1e293b; /* slate-800 */
+        }
+        .lang-toggle button.active {
+            background-color: #4f46e5;
+            color: white;
+        }
+        /* Workflow Diagram Box */
+        .workflow-box {
+            background: linear-gradient(to right bottom, #ffffff, #f8fafc);
+            border: 1px solid #e2e8f0;
+            border-radius: 1rem;
+            padding: 1.5rem;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+        .workflow-box:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+        }
+        .step-number {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 2rem;
+            height: 2rem;
+            border-radius: 9999px;
+            background-color: #4f46e5;
+            color: white;
+            font-weight: 700;
+            margin-right: 0.75rem;
+        }
+        
+        /* Mobile TOC Override */
+        #mobile-toc.open {
+            display: block !important;
+            animation: slideUp 0.3s ease-out forwards;
+        }
+        @keyframes slideUp {
+            from { transform: translateY(10px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+    </style>
+</head>
+<body class="text-slate-800 relative pb-24 md:pb-0">
+
+    <!-- Header Actions (Lang Toggle & Mobile TOC Btn) -->
+    <div class="fixed top-4 right-4 z-50 flex items-center space-x-2">
+        <!-- Language Toggle -->
+        <div class="lang-toggle bg-white/80 backdrop-blur-md shadow border border-slate-200 rounded-full p-1 flex space-x-1">
+            <button id="btn-ko" class="px-4 py-1.5 text-sm font-semibold rounded-full transition-all duration-200 active" onclick="switchLanguage('ko')">한국어</button>
+            <button id="btn-en" class="px-4 py-1.5 text-sm font-semibold rounded-full transition-all duration-200" onclick="switchLanguage('en')">English</button>
+        </div>
+        
+        <!-- Mobile Menu Toggle Button (Visible only on small screens) -->
+        <button id="mobile-menu-btn" class="md:hidden bg-indigo-600 text-white p-2.5 rounded-full shadow-lg" aria-label="Toggle Table of Contents">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h7"></path></svg>
+        </button>
+    </div>
+
+    <!-- Mobile TOC Dropdown -->
+    <nav id="mobile-toc" class="hidden fixed top-16 right-4 z-40 bg-white p-4 rounded-xl shadow-xl border border-slate-200 w-64">
+        <ul class="space-y-3 font-medium text-sm text-slate-600">
+            <li><a href="#why" class="block hover:text-indigo-600 transition-colors" data-ko="1. Problem" data-en="1. Problem">1. Problem</a></li>
+            <li><a href="#what" class="block hover:text-indigo-600 transition-colors" data-ko="2. Solution" data-en="2. Solution">2. Solution</a></li>
+            <li><a href="#key-design" class="block hover:text-indigo-600 transition-colors" data-ko="3. Architecture" data-en="3. Architecture">3. Architecture</a></li>
+            <li><a href="#trade-off" class="block hover:text-indigo-600 transition-colors" data-ko="4. Technical Decisions" data-en="4. Technical Decisions">4. Technical Decisions</a></li>
+            <li><a href="#impact" class="block hover:text-indigo-600 transition-colors" data-ko="5. Business Impact" data-en="5. Business Impact">5. Business Impact</a></li>
+        </ul>
+    </nav>
+
+    <div class="container mx-auto px-4 py-10 md:py-16 max-w-7xl">
+        <!-- Header -->
+        <header class="text-center mb-16 md:mb-24">
+            <div class="inline-block px-3 py-1 mb-4 text-xs font-semibold tracking-wider text-indigo-600 uppercase bg-indigo-100 rounded-full">Prototype</div>
+            <h1 class="text-4xl md:text-5xl lg:text-6xl font-extrabold text-slate-900 mb-6 tracking-tight" data-ko="AI 마케팅 콘텐츠 팩토리" data-en="AI Marketing Content Factory">
+                AI 마케팅 콘텐츠 팩토리
+            </h1>
+            <p class="text-xl md:text-2xl text-slate-600 font-medium max-w-4xl mx-auto mb-4" data-ko="다양한 형태의 원시 데이터(문서, 영상, 음성, URL)를 분석하여 멀티채널 마케팅 콘텐츠를 즉시 생성하는 AI 통합 파이프라인" data-en="An integrated AI pipeline that analyzes various raw data formats (documents, videos, audio, URLs) to instantly generate multi-channel marketing content drafts.">
+                다양한 형태의 원시 데이터(문서, 영상, 음성, URL)를 분석하여 멀티채널 마케팅 콘텐츠를 즉시 생성하는 AI 통합 파이프라인
+            </p>
+            <p class="text-slate-500" data-ko="Developed by choije (2025)" data-en="Developed by choije (2025)">Developed by choije (2025)</p>
+        </header>
+
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-10">
+            <!-- Sidebar Navigation -->
+            <aside class="lg:col-span-3 lg:sticky top-8 self-start hidden md:block">
+                <nav class="bg-white p-6 rounded-xl shadow-sm border border-slate-100">
+                    <h3 class="font-extrabold text-lg mb-5 text-slate-900 uppercase tracking-wider text-sm" data-ko="목차" data-en="Table of Contents">목차</h3>
+                    <ul class="space-y-3 font-medium text-slate-600">
+                        <li><a href="#why" class="flex items-center hover:text-indigo-600 transition-colors" data-ko="1. Problem" data-en="1. Problem">1. Problem</a></li>
+                        <li><a href="#what" class="flex items-center hover:text-indigo-600 transition-colors" data-ko="2. Solution" data-en="2. Solution">2. Solution</a></li>
+                        <li><a href="#key-design" class="flex items-center hover:text-indigo-600 transition-colors" data-ko="3. Architecture" data-en="3. Architecture">3. Architecture</a></li>
+                        <li><a href="#trade-off" class="flex items-center hover:text-indigo-600 transition-colors" data-ko="4. Technical Decisions" data-en="4. Technical Decisions">4. Technical Decisions</a></li>
+                        <li><a href="#impact" class="flex items-center hover:text-indigo-600 transition-colors" data-ko="5. Business Impact" data-en="5. Business Impact">5. Business Impact</a></li>
+                    </ul>
+                </nav>
+            </aside>
+
+            <!-- Main Content -->
+            <main class="lg:col-span-9 space-y-16">
+
+                <!-- 요약 개요 (Intro Summary) -->
+                <section class="bg-white p-8 md:p-10 rounded-2xl shadow-sm border border-slate-100">
+                    <div class="max-w-4xl space-y-4">
+                        <p class="text-lg leading-relaxed text-slate-700" data-ko="이 프로토타입은 단순한 텍스트 생성을 넘어, 마케터가 AI 어시스턴트와 협업하여 콘텐츠를 고도화하는 과정을 담았습니다." data-en="Going beyond simple text generation, this prototype captures the process where marketers collaborate with AI assistants to refine content.">
+                            이 프로토타입은 단순한 텍스트 생성을 넘어, 마케터가 AI 어시스턴트와 협업하여 콘텐츠를 고도화하는 과정을 담았습니다.
+                        </p>
+                        <p class="text-lg leading-relaxed text-slate-700" data-ko="텍스트 초안부터 시각적 자산(Imagen 4.0을 통한 이미지, Veo 3를 통한 영상)까지 하나의 통합된 플랫폼(<strong>'통합 멀티모달 워크플로우'</strong>) 내에서 일괄 생성되도록 설계되었습니다." data-en="It is designed so that everything from text drafts to visual assets (images via Imagen 4.0, videos via Veo 3) is generated in bulk within a single platform (<strong>'Integrated Multimodal Workflow'</strong>).">
+                            텍스트 초안부터 시각적 자산(Imagen 4.0을 통한 이미지, Veo 3를 통한 영상)까지 하나의 통합된 플랫폼(<strong>'통합 멀티모달 워크플로우'</strong>) 내에서 일괄 생성되도록 설계되었습니다.
+                        </p>
+                        <p class="text-lg leading-relaxed text-slate-700" data-ko="이를 통해 데이터 파편화를 방지하고, 일관된 메시지를 도출하여 엔터프라이즈 환경에서의 AI 마케팅 기여 모델을 기술적으로 증명합니다." data-en="By preventing data fragmentation and ensuring consistent messaging, it technically proves an AI marketing contribution model in an enterprise environment.">
+                            이를 통해 데이터 파편화를 방지하고, 일관된 메시지를 도출하여 엔터프라이즈 환경에서의 AI 마케팅 기여 모델을 기술적으로 증명합니다.
+                        </p>
+                    </div>
+                </section>
+
+                <!-- 1. Why -->
+                <section id="why" class="scroll-mt-24">
+                    <div class="flex items-center mb-2">
+                        <div class="bg-indigo-100 p-2 rounded-lg mr-4">
+                            <svg class="w-7 h-7 text-indigo-600" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                        </div>
+                        <h2 class="text-3xl font-extrabold m-0" data-ko="1. Problem" data-en="1. Problem">1. Problem</h2>
+                    </div>
+                    
+                    <p class="text-slate-500 font-medium mb-6 max-w-4xl" data-ko="복합 원천 데이터 처리에 있어 파편화된 워크플로우와 문맥 단절 문제 제기" data-en="Addressing the fragmented workflow and context disconnection in handling complex source data.">
+                        복합 원천 데이터 처리에 있어 파편화된 워크플로우와 문맥 단절 문제 제기
+                    </p>
+                    
+                    <div class="grid md:grid-cols-2 gap-6">
+                        <div class="bg-red-50 p-6 rounded-xl border border-red-100">
+                            <h4 class="text-red-800 font-bold text-lg mb-3 flex items-center" data-ko="<svg class='w-5 h-5 mr-2' fill='none' viewBox='0 0 24 24' stroke='currentColor'><path stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z'></path></svg> 멀티 채널 콘텐츠 생성의 병목" data-en="<svg class='w-5 h-5 mr-2' fill='none' viewBox='0 0 24 24' stroke='currentColor'><path stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z'></path></svg> Bottleneck in Multi-channel Creation">
+                                <svg class='w-5 h-5 mr-2' fill='none' viewBox='0 0 24 24' stroke='currentColor'><path stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z'></path></svg> 멀티 채널 콘텐츠 생성의 병목
+                            </h4>
+                            <p class="text-red-900/80 mb-3" data-ko="현대의 마케팅 부서나 에이전시 환경에서, 복합적인 원천 데이터(문서, 영상, 링크 등)를 바탕으로 블로그, SNS, 유튜브 등 다양한 모달리티(Modality)의 콘텐츠를 생산합니다." data-en="In modern marketing departments or agencies, multi-modal content (blogs, SNS, YouTube) is produced based on complex source data (documents, videos, links).">
+                                현대의 마케팅 부서나 에이전시 환경에서, 복합적인 원천 데이터(문서, 영상, 링크 등)를 바탕으로 블로그, SNS, 유튜브 등 다양한 모달리티(Modality)의 콘텐츠를 생산합니다.
+                            </p>
+                            <div class="bg-white/60 p-3 rounded text-sm text-red-950 font-medium" data-ko="문제: 매체별 규격을 맞추기 위해 여러 도구를 옮겨다녀야 하는 구조적 병목" data-en="Problem: A structural bottleneck caused by moving between multiple tools to fit platform-specific requirements.">
+                                문제: 매체별 규격을 맞추기 위해 여러 도구를 옮겨다녀야 하는 구조적 병목
+                            </div>
+                        </div>
+                        <div class="bg-orange-50 p-6 rounded-xl border border-orange-100">
+                            <h4 class="text-orange-800 font-bold text-lg mb-3 flex items-center" data-ko="<svg class='w-5 h-5 mr-2' fill='none' viewBox='0 0 24 24' stroke='currentColor'><path stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z'></path></svg> 기존 AI 툴 조합의 컨텍스트 유실" data-en="<svg class='w-5 h-5 mr-2' fill='none' viewBox='0 0 24 24' stroke='currentColor'><path stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z'></path></svg> Context Loss in Simple Tool Combinations">
+                                <svg class='w-5 h-5 mr-2' fill='none' viewBox='0 0 24 24' stroke='currentColor'><path stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z'></path></svg> 기존 AI 툴 조합의 컨텍스트 유실
+                            </h4>
+                            <p class="text-orange-900/80 mb-3" data-ko="텍스트 생성기, 이미지 생성기, 영상 생성기를 작업자가 개별적으로 조합할 경우 초기 정보가 심각하게 파편화됩니다." data-en="When operators manually combine separate text, image, and video generators, initial information becomes severely fragmented.">
+                                텍스트 생성기, 이미지 생성기, 영상 생성기를 작업자가 개별적으로 조합할 경우 초기 정보가 심각하게 파편화됩니다.
+                            </p>
+                            <div class="bg-white/60 p-3 rounded text-sm text-orange-950 font-medium" data-ko="문제: 핵심 소구점(USP)과 일관된 브랜드 전략이 결여된 기계적인 결과물 도출" data-en="Problem: Mechanical outputs lacking core Unique Selling Propositions (USPs) and a consistent brand strategy.">
+                                문제: 핵심 소구점(USP)과 일관된 브랜드 전략이 결여된 기계적인 결과물 도출
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- 2. What -->
+                <section id="what" class="scroll-mt-24">
+                    <div class="flex items-center mb-2">
+                        <div class="bg-indigo-100 p-2 rounded-lg mr-4">
+                            <svg class="w-7 h-7 text-indigo-600" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
+                        </div>
+                        <h2 class="text-3xl font-extrabold m-0" data-ko="2. Solution" data-en="2. Solution">2. Solution</h2>
+                    </div>
+
+                    <p class="text-slate-500 font-medium mb-6 max-w-4xl" data-ko="멀티모달 통합 파이프라인을 통한 End-to-End 에셋 자동 완성" data-en="End-to-end asset auto-generation through an integrated multimodal pipeline.">
+                        멀티모달 통합 파이프라인을 통한 End-to-End 에셋 자동 완성
+                    </p>
+
+                    <div class="max-w-4xl mb-8 text-lg text-slate-700">
+                        <p data-ko="어떤 형태의 원시 데이터든 입력받아 지능적으로 분석(음성 전사, 영상 키프레임 추출 등)합니다." data-en="Ingests any form of raw data and analyzes it intelligently (e.g., audio transcription, video keyframe extraction).">
+                            어떤 형태의 원시 데이터든 입력받아 지능적으로 분석(음성 전사, 영상 키프레임 추출 등)합니다.
+                        </p>
+                        <p class="mt-2" data-ko="단일 소스에서 추출된 맥락을 유지한 채, 멀티미디어 마케팅 소스를 병렬로 자동 완성하는 구조를 설계했습니다." data-en="Maintains context extracted from the single source while automatically generating multimedia marketing assets in parallel.">
+                            단일 소스에서 추출된 맥락을 유지한 채, 멀티미디어 마케팅 소스를 병렬로 자동 완성하는 구조를 설계했습니다.
+                        </p>
+                    </div>
+
+                    <!-- 5-Step Workflow -->
+                    <div class="space-y-4">
+                        <h4 class="font-bold text-slate-900 mb-4" data-ko="5단계 핵심 워크플로우" data-en="5-Step Core Workflow">5단계 핵심 워크플로우</h4>
+                        
+                        <!-- Phase 1 -->
+                        <div class="grid md:grid-cols-2 gap-4">
+                            <div class="workflow-box border-l-4 border-l-blue-500">
+                                <h5 class="font-bold text-slate-800 flex items-center mb-2" data-ko="<span class='step-number bg-blue-500'>1</span> 복합 소스 지능형 분석" data-en="<span class='step-number bg-blue-500'>1</span> Intelligent Source Analysis"><span class='step-number bg-blue-500'>1</span> 복합 소스 지능형 분석</h5>
+                                <p class="text-sm" data-ko="텍스트, URL, 문서, 이미지, 영상/오디오 파일 등 전천후 포맷 데이터를 입력받아 컨텍스트를 추출 (오디오 스크립트, 시각 정보 분석)" data-en="Ingests omni-format data including text, URLs, documents, images, and A/V files to extract context (e.g., audio transcripts, visual information).">텍스트, URL, 문서, 이미지, 영상/오디오 파일 등 전천후 포맷 데이터를 입력받아 컨텍스트를 추출 (오디오 스크립트, 시각 정보 분석)</p>
+                            </div>
+                            <div class="workflow-box border-l-4 border-l-blue-500">
+                                <h5 class="font-bold text-slate-800 flex items-center mb-2" data-ko="<span class='step-number bg-blue-500'>2</span> 멀티 포맷 초안 자동 생성" data-en="<span class='step-number bg-blue-500'>2</span> Multi-Format Drafts"><span class='step-number bg-blue-500'>2</span> 멀티 포맷 초안 자동 생성</h5>
+                                <p class="text-sm" data-ko="블로그, 인스타그램, 유튜브 숏츠, 프로모션 이메일 채널별 동시 생성" data-en="Simultaneous generation for Blog, Instagram, YT Shorts, and Promo Emails.">블로그, 인스타그램, 유튜브 숏츠, 프로모션 이메일 채널별 동시 생성</p>
+                            </div>
+                        </div>
+
+                        <!-- Phase 2 -->
+                        <div class="grid grid-cols-1">
+                            <div class="workflow-box border-l-4 border-l-indigo-500 transform md:ml-8">
+                                <h5 class="font-bold text-slate-800 flex items-center mb-2" data-ko="<span class='step-number bg-indigo-500'>3</span> 콘텐츠 고도화 (Human-in-the-Loop)" data-en="<span class='step-number bg-indigo-500'>3</span> Content Refinement (HITL)"><span class='step-number bg-indigo-500'>3</span> 콘텐츠 고도화 (Human-in-the-Loop)</h5>
+                                <p class="text-sm" data-ko="AI 어시스턴트가 도출한 <strong>핵심 USP, 추천 SEO 키워드, 개선 방향</strong>을 마케터가 취사선택하여 의도를 반영하고 퀄리티를 통제 (Steerability 부여)" data-en="The AI assistant proposes <strong>Core USPs, SEO Keywords, and Improvements</strong>. The marketer curates these to reflect intent and control quality (providing steerability).">AI 어시스턴트가 도출한 <strong>핵심 USP, 추천 SEO 키워드, 개선 방향</strong>을 마케터가 취사선택하여 의도를 반영하고 퀄리티를 통제 (Steerability 부여)</p>
+                            </div>
+                        </div>
+
+                        <!-- Phase 3 -->
+                        <div class="grid md:grid-cols-2 gap-4">
+                            <div class="workflow-box border-l-4 border-l-purple-500">
+                                <h5 class="font-bold text-slate-800 flex items-center mb-2" data-ko="<span class='step-number bg-purple-500'>4</span> 멀티모달 생성 (비주얼)" data-en="<span class='step-number bg-purple-500'>4</span> Multimodal Visuals"><span class='step-number bg-purple-500'>4</span> 멀티모달 생성 (비주얼)</h5>
+                                <p class="text-sm" data-ko="확정된 스크립트 기반으로 광고 이미지(Imagen 4.0)와 숏폼 영상(Veo 3) 프롬프트 자동 최적화 및 에셋 생성" data-en="Based on finalized scripts, ad images (Imagen 4.0) and short-form video (Veo 3) prompts are optimized to generate assets.">확정된 스크립트 기반으로 광고 이미지(Imagen 4.0)와 숏폼 영상(Veo 3) 프롬프트 자동 최적화 및 에셋 생성</p>
+                            </div>
+                            <div class="workflow-box border-l-4 border-l-emerald-500 bg-emerald-50/30">
+                                <h5 class="font-bold text-emerald-900 flex items-center mb-2" data-ko="<span class='step-number bg-emerald-500'>5</span> 완성형 패키지 출력" data-en="<span class='step-number bg-emerald-500'>5</span> Final Package Export"><span class='step-number bg-emerald-500'>5</span> 완성형 패키지 출력</h5>
+                                <p class="text-sm" data-ko="텍스트와 시각자료가 결합된 즉시 게시 가능한(Ready-to-use) 상태의 마케팅 에셋 세트 배포" data-en="Export a set of ready-to-use marketing assets combining optimized text and high-quality visuals.">텍스트와 시각자료가 결합된 즉시 게시 가능한(Ready-to-use) 상태의 마케팅 에셋 세트 배포</p>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- 3. Key Design -->
+                <section id="key-design" class="scroll-mt-24">
+                    <div class="flex items-center mb-2">
+                        <div class="bg-indigo-100 p-2 rounded-lg mr-4">
+                            <svg class="w-7 h-7 text-indigo-600" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
+                        </div>
+                        <h2 class="text-3xl font-extrabold m-0" data-ko="3. Architecture" data-en="3. Architecture">3. Architecture</h2>
+                    </div>
+                    
+                    <p class="text-slate-500 font-medium mb-6 max-w-4xl" data-ko="작업 특화 에이전트(Multi-Agent)와 선행 문맥 추출을 결합한 유연한 구조" data-en="Flexible structure combining Task-Specific Agents with pre-emptive context extraction.">
+                        작업 특화 에이전트(Multi-Agent)와 선행 문맥 추출을 결합한 유연한 구조
+                    </p>
+
+                    <div class="bg-white p-6 rounded-xl border border-slate-200 shadow-sm mb-6 max-w-4xl">
+                        <h4 class="font-bold text-slate-900 border-b pb-2 mb-4" data-ko="의사 결정: 상태(State) 기반 지능형 파이프라인" data-en="Decision: State-based Intelligent Pipeline">의사 결정: 상태(State) 기반 지능형 파이프라인</h4>
+                        <div class="space-y-3">
+                            <p data-ko="개별 API 호출을 단순 나열하는 대신, LangGraph 프레임워크를 활용하여 <strong>DAG(Directed Acyclic Graph) 구조</strong>로 엮었습니다." data-en="Instead of listing individual API calls, we used the LangGraph framework to wire them into a <strong>DAG (Directed Acyclic Graph) structure</strong>.">
+                                개별 API 호출을 단순 나열하는 대신, LangGraph 프레임워크를 활용하여 <strong>DAG(Directed Acyclic Graph) 구조</strong>로 엮었습니다.
+                            </p>
+                            <p data-ko="한 파트의 결과(예: 추출된 키워드)가 다음 에이전트의 프롬프트에 자동으로 주입(Injection)되어, 채널이 달라도 톤앤매너가 유지되도록 설계했습니다." data-en="Results from one part (e.g., extracted keywords) are automatically injected into the next agent's prompt, ensuring tone consistency across all channels.">
+                                한 파트의 결과(예: 추출된 키워드)가 다음 에이전트의 프롬프트에 자동으로 주입(Injection)되어, 채널이 달라도 톤앤매너가 유지되도록 설계했습니다.
+                            </p>
+                        </div>
+                    </div>
+
+                    <div class="bg-white p-6 rounded-xl border border-slate-200 shadow-sm max-w-4xl">
+                        <h4 class="font-bold text-slate-900 border-b pb-2 mb-4" data-ko="아키텍처 비교 (단일 프롬프팅 vs 에이전트 분할)" data-en="Architecture Comparison (Monolithic vs. Multi-Agent)">아키텍처 비교 (단일 프롬프팅 vs 에이전트 분할)</h4>
+                        <div class="grid md:grid-cols-2 gap-6">
+                            <div>
+                                <h5 class="font-semibold text-slate-500 line-through mb-2" data-ko="옵션 A: 단일 거대 프롬프팅" data-en="Option A: Monolithic Prompting">옵션 A: 단일 거대 프롬프팅</h5>
+                                <ul class="list-disc list-inside text-sm text-slate-500 space-y-1">
+                                    <li data-ko="구조: <em>'이 URL을 읽고 블로그, 인스타, 유튜브 대본 다 써줘'</em>" data-en="Structure: <em>'Read this URL and write a blog, Insta, and YT script.'</em>">구조: <em>'이 URL을 읽고 블로그, 인스타, 유튜브 대본 다 써줘'</em></li>
+                                    <li data-ko="문제: 환각(Hallucination)이 심하고 매체 서식이 뭉개짐." data-en="Issue: High hallucination and broken media formats.">문제: 환각(Hallucination)이 심하고 매체 서식이 뭉개짐.</li>
+                                </ul>
+                            </div>
+                            <div class="bg-indigo-50 p-4 rounded-lg">
+                                <h5 class="font-bold text-indigo-700 mb-2" data-ko="옵션 B: 멀티 에이전트 분할 (선택)" data-en="Option B: Multi-Agent Split (Selected)">옵션 B: 멀티 에이전트 분할 (선택)</h5>
+                                <ul class="list-disc list-inside text-sm text-indigo-900/80 space-y-1">
+                                    <li data-ko="구조: 1) 컨텍스트 요약 &rarr; 2) USP 추출 &rarr; 3) 채널별 병렬 서브-에이전트" data-en="Structure: 1) Context Summary &rarr; 2) USP Extractor &rarr; 3) Parallel channel sub-agents.">구조: 1) 컨텍스트 요약 &rarr; 2) USP 추출 &rarr; 3) 채널별 병렬 서브-에이전트</li>
+                                    <li data-ko="강점: <strong>채널별 퀄리티(Quality)와 제어권 확보</strong> 가능" data-en="Strength: Enables <strong>channel-specific quality and full steerability</strong>.">강점: <strong>채널별 퀄리티(Quality)와 제어권 확보</strong> 가능</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- 4. Trade-off -->
+                <section id="trade-off" class="scroll-mt-24">
+                    <div class="flex items-center mb-2">
+                        <div class="bg-indigo-100 p-2 rounded-lg mr-4">
+                            <svg class="w-7 h-7 text-indigo-600" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 6l3 1m0 0l-3 9a5.002 5.002 0 006.001 0M6 7l3 9M6 7l6-2m6 2l3-1m-3 1l-3 9a5.002 5.002 0 006.001 0M18 7l3 9m-3-9l-6-2m0-2v2m0 16V5m0 16H9m3 0h3"></path></svg>
+                        </div>
+                        <h2 class="text-3xl font-extrabold m-0" data-ko="4. Technical Decisions" data-en="4. Technical Decisions">4. Technical Decisions</h2>
+                    </div>
+
+                    <p class="text-slate-500 font-medium mb-6 max-w-4xl" data-ko="실제 프로덕트 수준의 품질을 확보하기 위해 거쳤던 치열한 실무적 고민" data-en="Intense practical considerations to secure production-level quality.">
+                        실제 프로덕트 수준의 품질을 확보하기 위해 거쳤던 치열한 실무적 고민
+                    </p>
+
+                    <div class="space-y-6 max-w-4xl">
+                        <!-- Trade-off 1 -->
+                        <div class="border border-slate-200 rounded-xl overflow-hidden">
+                            <div class="bg-slate-50 px-6 py-4 border-b border-slate-200">
+                                <h4 class="font-bold text-lg m-0 flex items-center" data-ko="정확도/품질 (Accuracy) <span class='text-slate-400 mx-3'>vs</span> 비용/속도 (Cost & Latency)" data-en="Accuracy vs Cost & Latency">
+                                    정확도/품질 (Accuracy) <span class='text-slate-400 mx-3'>vs</span> 비용/속도 (Cost & Latency)
+                                </h4>
+                            </div>
+                            <div class="p-6 bg-white text-slate-700">
+                                <p class="mb-4" data-ko="모든 과정에 무거운 모델(Gemini 2.5 Pro)을 사용하면 품질은 보장되나, API 비용과 사용자 대기 시간(Latency)이 감당하기 힘든 수준으로 길어집니다." data-en="Using heavy models (Gemini 2.5 Pro) for everything guarantees quality, but API costs and user wait times become unmanageable.">
+                                    모든 과정에 무거운 모델(Gemini 2.5 Pro)을 사용하면 품질은 보장되나, API 비용과 사용자 대기 시간(Latency)이 감당하기 힘든 수준으로 길어집니다.
+                                </p>
+                                <div class="bg-slate-100 p-4 rounded-lg border-l-4 border-yellow-500">
+                                    <strong class="text-slate-900 block mb-1" data-ko="결론: LLM 라우팅(Routing) 최적화 도입" data-en="Conclusion: Introduced LLM Routing Optimization">결론: LLM 라우팅(Routing) 최적화 도입</strong>
+                                    <span class="text-sm" data-ko="단순 요약에는 가성비 좋은 <strong>Flash 모델</strong>을, 정밀한 추론/프롬프트 작성에는 <strong>Pro 모델</strong>을 선택 배치하여 성능과 비용의 밸런스를 확보했습니다." data-en="Used the cost-effective <strong>Flash model</strong> for simple summaries, and the <strong>Pro model</strong> for complex reasoning, balancing performance and cost.">단순 요약에는 가성비 좋은 <strong>Flash 모델</strong>을, 정밀한 추론/프롬프트 작성에는 <strong>Pro 모델</strong>을 선택 배치하여 성능과 비용의 밸런스를 확보했습니다.</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Trade-off 2 -->
+                        <div class="border border-slate-200 rounded-xl overflow-hidden">
+                            <div class="bg-slate-50 px-6 py-4 border-b border-slate-200">
+                                <h4 class="font-bold text-lg m-0 flex items-center" data-ko="완전 자동화 (1-Click) <span class='text-slate-400 mx-3'>vs</span> UX 복잡도 (Steerability)" data-en="1-Click Automation vs Steerability">
+                                    완전 자동화 (1-Click) <span class='text-slate-400 mx-3'>vs</span> UX 복잡도 (Steerability)
+                                </h4>
+                            </div>
+                            <div class="p-6 bg-white text-slate-700">
+                                <p class="mb-4" data-ko="'버튼 한 번 클릭'은 초기 사용성은 좋지만, 마케터의 기획 의도와 조금이라도 엇나가면 실무에서 외면받습니다." data-en="'One-click' has good initial usability, but if it deviates from the marketer's intent, it gets rejected in practice.">
+                                    '버튼 한 번 클릭'은 초기 사용성은 좋지만, 마케터의 기획 의도와 조금이라도 엇나가면 실무에서 외면받습니다.
+                                </p>
+                                <div class="bg-slate-100 p-4 rounded-lg border-l-4 border-indigo-500">
+                                    <strong class="text-slate-900 block mb-1" data-ko="결론: Human-in-the-Loop 단계 명시화" data-en="Conclusion: Explicit Human-in-the-Loop Stage">결론: Human-in-the-Loop 단계 명시화</strong>
+                                    <span class="text-sm" data-ko="초안을 바로 내보내지 않고, 마케터가 <strong>AI의 제안(키워드, 방향)을 수정하고 확정하는 단계</strong>를 두어 최종 배포율(Ready-to-use)을 획기적으로 끌어올렸습니다." data-en="Instead of exporting immediately, added a step where marketers can <strong>steer and confirm AI's proposals</strong>, drastically improving the final deployment rate.">초안을 바로 내보내지 않고, 마케터가 <strong>AI의 제안(키워드, 방향)을 수정하고 확정하는 단계</strong>를 두어 최종 배포율(Ready-to-use)을 획기적으로 끌어올렸습니다.</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- 5. Impact -->
+                <section id="impact" class="scroll-mt-24 mb-10">
+                    <div class="flex items-center mb-6">
+                        <div class="bg-indigo-100 p-2 rounded-lg mr-4">
+                            <svg class="w-7 h-7 text-indigo-600" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"></path></svg>
+                        </div>
+                        <h2 class="text-3xl font-extrabold m-0" data-ko="5. Business Impact" data-en="5. Business Impact">5. Business Impact</h2>
+                    </div>
+
+                    <div class="grid md:grid-cols-2 gap-6 mt-6">
+                        <!-- Impact: Cross-Modality Pipeline -->
+                        <div class="bg-indigo-600 text-white p-8 rounded-2xl shadow-lg relative overflow-hidden">
+                            <!-- Decorative Circle -->
+                            <div class="absolute -right-10 -top-10 w-40 h-40 bg-white opacity-10 rounded-full"></div>
+                            <h4 class="text-indigo-100 font-bold mb-4" data-ko="크로스 모달리티 파이프라인의 증명" data-en="Validation of Cross-Modality Pipeline">크로스 모달리티 파이프라인의 증명</h4>
+                            <p class="text-indigo-50 font-medium text-lg leading-relaxed mt-2" data-ko="파편화된 원시 데이터(영상, 문서, 이미지)를 하나의 일관된 전략(USP)으로 취합한 뒤, 다시 멀티미디어(텍스트, 이미지, 숏폼)로 출력하는 <strong>End-to-End 자동화 파이프라인의 기술적 타당성(PoC)을 성공적으로 입증</strong>했습니다." data-en="Successfully <strong>proven the technical viability (PoC) of an End-to-End automation pipeline</strong> that aggregates fragmented raw data (videos, documents, images) into a single consistent strategy (USP) and outputs it back into multimedia assets (text, images, short-form videos).">
+                                파편화된 원시 데이터(영상, 문서, 이미지)를 하나의 일관된 전략(USP)으로 취합한 뒤, 다시 멀티미디어(텍스트, 이미지, 숏폼)로 출력하는 <strong>End-to-End 자동화 파이프라인의 기술적 타당성(PoC)을 성공적으로 입증</strong>했습니다.
+                            </p>
+                        </div>
+
+                        <!-- Impact: Extensibility & Control -->
+                        <div class="bg-white p-8 rounded-2xl border border-indigo-100 shadow-sm flex flex-col justify-center">
+                            <h4 class="text-slate-900 font-bold mb-4" data-ko="아키텍처 확장성 및 제어권 확보" data-en="Architectural Extensibility & Control">아키텍처 확장성 및 제어권 확보</h4>
+                            <ul class="space-y-4">
+                                <li class="flex items-start">
+                                    <svg class="w-6 h-6 text-emerald-500 mr-2 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+                                    <span class="text-slate-700" data-ko="<strong>유연한 도메인 이식성 (Portability)</strong>: 이 아키텍처는 마케팅뿐 아니라 커머스 자동화, 사내 문서 배포 등 여러 산업 도메인으로 빠르게 이식될 수 있는 모듈형(Multi-Agent) 구조를 갖추었습니다." data-en="<strong>Flexible Domain Portability</strong>: This architecture features a modular (Multi-Agent) structure that can be rapidly ported to various industries, such as e-commerce automation and internal document distribution, beyond just marketing.">
+                                        <strong>유연한 도메인 이식성 (Portability)</strong>: 이 아키텍처는 마케팅뿐 아니라 커머스 자동화, 사내 문서 배포 등 여러 산업 도메인으로 빠르게 이식될 수 있는 모듈형(Multi-Agent) 구조를 갖추었습니다.
+                                    </span>
+                                </li>
+                                <li class="flex items-start">
+                                    <svg class="w-6 h-6 text-emerald-500 mr-2 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+                                    <span class="text-slate-700" data-ko="<strong>엔터프라이즈 환경에 적합한 신뢰성</strong>: 단순 생성형 AI 모델의 한계를 넘어, Human-in-the-Loop 구조를 통해 결과물의 퀄리티와 전략적 방향성을 사용자가 직접 제어할 수 있습니다." data-en="<strong>Enterprise-Ready Reliability</strong>: Going beyond the limitations of simple generative AI models, the Human-in-the-Loop structure ensures that users can directly control the quality and strategic direction of the outputs.">
+                                        <strong>엔터프라이즈 환경에 적합한 신뢰성</strong>: 단순 생성형 AI 모델의 한계를 넘어, Human-in-the-Loop 구조를 통해 결과물의 퀄리티와 전략적 방향성을 사용자가 직접 제어할 수 있습니다.
+                                    </span>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </section>
+                
+            </main>
+        </div>
+        
+        <!-- Footer -->
+        <footer class="text-center mt-20 pt-8 border-t border-slate-200 text-slate-500 text-sm">
+            <p>&copy; 2025 AI Marketing Content Factory. Built for showcasing technical architecture and problem-solving.</p>
+        </footer>
+    </div>
+
+    <script>
+        // Mobile TOC Toggle
+        const mobileMenuBtn = document.getElementById('mobile-menu-btn');
+        const mobileToc = document.getElementById('mobile-toc');
+        
+        mobileMenuBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            mobileToc.classList.toggle('hidden');
+            mobileToc.classList.toggle('open');
+        });
+
+        // Close TOC when clicking outside or clicking a link
+        document.addEventListener('click', (e) => {
+            if (!mobileToc.contains(e.target) && !mobileMenuBtn.contains(e.target)) {
+                mobileToc.classList.add('hidden');
+                mobileToc.classList.remove('open');
+            }
+        });
+
+        mobileToc.querySelectorAll('a').forEach(link => {
+            link.addEventListener('click', () => {
+                mobileToc.classList.add('hidden');
+                mobileToc.classList.remove('open');
+            });
+        });
+
+        // Function to switch language
+        function switchLanguage(lang) {
+            document.querySelectorAll('[data-ko]').forEach(el => {
+                if (el.dataset[lang]) {
+                    el.innerHTML = el.dataset[lang];
+                }
+            });
+            document.documentElement.lang = lang;
+            document.title = document.querySelector('title').dataset[lang];
+
+            // Update button active state
+            document.getElementById('btn-ko').classList.toggle('active', lang === 'ko');
+            document.getElementById('btn-ko').classList.toggle('text-slate-600', lang !== 'ko');
+            document.getElementById('btn-ko').classList.toggle('bg-white', lang !== 'ko');
+            
+            document.getElementById('btn-en').classList.toggle('active', lang === 'en');
+            document.getElementById('btn-en').classList.toggle('text-slate-600', lang !== 'en');
+            document.getElementById('btn-en').classList.toggle('bg-white', lang !== 'en');
+        }
+
+        // Set initial language
+        document.addEventListener('DOMContentLoaded', () => {
+            const userLang = navigator.language || navigator.userLanguage;
+            if (userLang.startsWith('en')) {
+                switchLanguage('en');
+            } else {
+                switchLanguage('ko');
+            }
+        });
+    </script>
+</body>
+</html>
