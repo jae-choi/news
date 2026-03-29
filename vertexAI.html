@@ -37,15 +37,8 @@
     .sidebar-link:hover,
     .sidebar-link.active { background-color: #374151; color: #f9fafb; transform: translateX(4px); }
 
-    /* Mermaid / Zoom helpers */
+    /* Mermaid helpers */
     .mermaid text { fill: #d1d5db !important; }
-    pre.mermaid,
-    .zoomable-image { transition: transform 0.3s ease-in-out; cursor: zoom-in; }
-    pre.mermaid:hover {
-      transform: scale(1.8); transform-origin: left center;
-      z-index: 10; position: relative;
-    }
-    .zoomable-image:hover { transform: scale(1.5); z-index: 10; position: relative; }
 
     /* Section separators */
     main section:not(:first-child) { /* border-top: 1px solid #374151; */ padding-top: 2.0rem; margin-top: 4rem; }
@@ -135,7 +128,7 @@
         <a href="#rag"                class="sidebar-link flex items-center px-4 py-2 rounded-lg text-gray-400">RAG Engine</a>
         <a href="#gen-ai-overview"    class="sidebar-link flex items-center px-4 py-2 rounded-lg text-gray-400"><span class="lang lang-ko">BigQuery 연동</span><span class="lang lang-en">BigQuery Integration</span></a>
         <a href="#use-cases"          class="sidebar-link flex items-center px-4 py-2 rounded-lg text-gray-400">Use Cases</a>
-        <a href="adk.html" target="_blank" class="sidebar-link flex items-center px-4 py-2 rounded-lg text-gray-400"><span class="lang lang-ko">ADK실습_1</span><span class="lang lang-en">ADK Workshop 1</span></a>
+        <a href="ADK.html" target="_blank" class="sidebar-link flex items-center px-4 py-2 rounded-lg text-gray-400"><span class="lang lang-ko">ADK실습_1</span><span class="lang lang-en">ADK Workshop 1</span></a>
         <a href="Semantic_Lexical_latest.html" target="_blank" class="sidebar-link flex items-center px-4 py-2 rounded-lg text-gray-400"><span class="lang lang-ko">ADK실습_2</span><span class="lang lang-en">ADK Workshop 2</span></a>
         <a href="ADKvs.html" target="_blank" class="sidebar-link flex items-center px-4 py-2 rounded-lg text-gray-400">ADK vs Langraph</a>
     </aside>
@@ -153,381 +146,590 @@
       <div class="prose prose-lg max-w-none">
 
         <!-- ============== SECTION 1 ============== -->
-        <section id="overview">
-          <h2 class="text-3xl font-bold border-b pb-2"><span class="lang lang-ko">Vertex AI 핵심 구성 요소</span><span class="lang lang-en">Vertex AI Core Components</span></h2>
-          <p><strong><span class="lang lang-ko">GCP 콘솔 접속:</span><span class="lang lang-en">GCP Console Access:</span></strong> <a href="https://console.cloud.google.com/vertex-ai" target="_blank">Vertex AI</a></p>
-          <p class="mt-4"><span class="lang lang-ko">Vertex AI는 <strong>머신러닝 모델</strong>의 개발부터 배포, 관리에 이르기까지 전 과정을 가속화하는 <strong>통합 AI 플랫폼</strong>입니다. 플랫폼은 크게 세 가지 핵심 요소로 구성되어 시너지를 발휘합니다.</span><span class="lang lang-en">Vertex AI is an <strong>integrated AI platform</strong> that accelerates the entire process from development to deployment and management of <strong>machine learning models</strong>. The platform consists of three core components that work in synergy.</span></p>
-          <div class="grid md:grid-cols-3 gap-8 mt-8 not-prose">
-            <a href="comtomML.html" class="block bg-gray-800 rounded-xl p-8 border border-gray-700 hover:border-blue-500 transition-all duration-300 text-center flex flex-col items-center">
-              <span class="text-6xl mb-4">⚙️</span>
-              <h3 class="text-xl font-bold mb-2 text-gray-100">Custom ML Platform</h3>
-              <p class="text-gray-400"><span class="lang lang-ko"><strong>관리형 도구, 워크플로우, 인프라</strong>를 통해 ML 모델 개발 및 배포를 가속화합니다.</span><span class="lang lang-en">Accelerates ML model development and deployment through <strong>managed tools, workflows, and infrastructure</strong>.</span></p>
+        <section id="overview" class="mt-12">
+          <h2 class="text-3xl font-bold border-b border-gray-700 pb-2 text-gray-100">
+            <span class="lang lang-ko">Vertex AI 핵심 아키텍처 구성 요소</span>
+            <span class="lang lang-en">Vertex AI Core Architecture Components</span>
+          </h2>
+          <p class="mt-4 text-gray-300">
+            <strong><span class="lang lang-ko">GCP 콘솔 접속:</span><span class="lang lang-en">GCP Console Access:</span></strong> 
+            <a href="https://console.cloud.google.com/vertex-ai" target="_blank" class="text-blue-400 hover:text-blue-300">Vertex AI Overview</a>
+          </p>
+          <p class="mt-2 text-gray-400">
+            <span class="lang lang-ko">Vertex AI는 데이터 준비부터 머신러닝 모델의 학습, 배포, 모니터링까지 전체 엔드투엔드 파이프라인을 지원하는 완전 관리형 AI 플랫폼입니다. MLOps 및 LLMOps 워크플로우를 구성하는 세 가지 주요 인프라 컴포넌트가 있습니다.</span>
+            <span class="lang lang-en">Vertex AI is a fully managed AI platform that supports the entire end-to-end pipeline, from data preparation to machine learning model training, deployment, and monitoring. It consists of three main infrastructure components that form MLOps and LLMOps workflows.</span>
+          </p>
+          
+          <div class="grid md:grid-cols-3 gap-6 mt-8 not-prose">
+            <!-- Custom ML Platform -->
+            <a href="customML.html" class="block bg-gray-800 rounded-xl p-6 border border-gray-700 flex flex-col items-start hover:border-blue-500 transition-colors">
+              <div class="w-12 h-12 rounded-lg bg-blue-900/30 flex items-center justify-center text-blue-400 mb-4">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
+              </div>
+              <h3 class="text-lg font-bold mb-2 text-gray-100 flex items-center justify-between w-full">
+                Custom ML Platform
+                <svg class="w-4 h-4 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"></path></svg>
+              </h3>
+              <p class="text-sm text-gray-400 leading-relaxed">
+                <span class="lang lang-ko">데이터 과학자와 엔지니어가 자체적인 ML 모델을 학습, 평가 및 배포할 수 있도록 컨테이너 기반 런타임, GPU/TPU 프로비저닝 및 MLOps 파이프라인 도구 세트를 제공합니다.</span>
+                <span class="lang lang-en">Provides a container-based runtime, GPU/TPU provisioning, and MLOps pipeline toolset for data scientists and engineers to train, evaluate, and deploy their own custom ML models.</span>
+              </p>
             </a>
-            <a href="https://console.cloud.google.com/vertex-ai/model-garden" target="_blank" class="block bg-gray-800 rounded-xl p-8 border border-gray-700 hover:border-blue-500 transition-all duration-300 text-center flex flex-col items-center">
-              <span class="text-6xl mb-4">📚</span>
-              <h3 class="text-xl font-bold mb-2 text-gray-100">Model Garden</h3>
-              <p class="text-gray-400"><span class="lang lang-ko">Google 및 파트너사의 최신 <strong>파운데이션 모델</strong>을 탐색하고 활용하여 ML 프로젝트를 빠르게 시작합니다.</span><span class="lang lang-en">Explore and leverage the latest <strong>foundation models</strong> from Google and its partners to quickly start ML projects.</span></p>
+            
+            <!-- Model Garden -->
+            <a href="https://console.cloud.google.com/vertex-ai/model-garden" target="_blank" class="block bg-gray-800 rounded-xl p-6 border border-gray-700 flex flex-col items-start hover:border-blue-500 transition-colors">
+              <div class="w-12 h-12 rounded-lg bg-green-900/30 flex items-center justify-center text-green-400 mb-4">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 7v10c0 2.21 3.582 4 8 4s8-1.79 8-4V7M4 7c0 2.21 3.582 4 8 4s8-1.79 8-4M4 7c0-2.21 3.582-4 8-4s8 1.79 8 4m0 5c0 2.21-3.582 4-8 4s-8-1.79-8-4"></path></svg>
+              </div>
+              <h3 class="text-lg font-bold mb-2 text-gray-100 flex items-center justify-between w-full">
+                Model Garden
+                <svg class="w-4 h-4 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"></path></svg>
+              </h3>
+              <p class="text-sm text-gray-400 leading-relaxed">
+                <span class="lang lang-ko">Google 자사 모델(Gemini, PaLM 등)과 타사/오픈소스 파운데이션 모델(Llama, Claude 등)의 중앙 저장소로, 사전 학습된 모델을 탐색하고 즉시 인프라에 프로비저닝할 수 있습니다.</span>
+                <span class="lang lang-en">A central repository for Google's proprietary models (Gemini, PaLM, etc.) and third-party/open-source foundation models (Llama, Claude, etc.), allowing exploration and instant provisioning of pre-trained models.</span>
+              </p>
             </a>
-            <a href="https://console.cloud.google.com/vertex-ai/generative" target="_blank" class="block bg-gray-800 rounded-xl p-8 border border-gray-700 hover:border-blue-500 transition-all duration-300 text-center flex flex-col items-center">
-              <span class="text-6xl mb-4">✨</span>
-              <h3 class="text-xl font-bold mb-2 text-gray-100">Generative AI Studio</h3>
-              <p class="text-gray-400"><span class="lang lang-ko"><strong>로우코드 도구</strong>를 사용하여 대규모 모델을 튜닝하고 배포하여 <strong>GenAI 프로덕션</strong>을 가속화합니다.</span><span class="lang lang-en">Use <strong>low-code tools</strong> to tune and deploy large-scale models to accelerate <strong>GenAI production</strong>.</span></p>
+
+            <!-- Generative AI Studio -->
+            <a href="https://console.cloud.google.com/vertex-ai/generative" target="_blank" class="block bg-gray-800 rounded-xl p-6 border border-gray-700 flex flex-col items-start hover:border-blue-500 transition-colors">
+              <div class="w-12 h-12 rounded-lg bg-purple-900/30 flex items-center justify-center text-purple-400 mb-4">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z"></path></svg>
+              </div>
+              <h3 class="text-lg font-bold mb-2 text-gray-100 flex items-center justify-between w-full">
+                Generative AI Studio
+                <svg class="w-4 h-4 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"></path></svg>
+              </h3>
+              <p class="text-sm text-gray-400 leading-relaxed">
+                <span class="lang lang-ko">파운데이션 모델의 프롬프트(Prompt) 엔지니어링, 매개변수 조정 및 PEFT(Parameter-Efficient Fine-Tuning)를 지원하여 신속한 LLM 프로토타이핑을 돕는 통합 콘솔입니다.</span>
+                <span class="lang lang-en">An integrated console supporting prompt engineering, parameter tuning, and PEFT (Parameter-Efficient Fine-Tuning) for foundation models to enable rapid LLM prototyping.</span>
+              </p>
             </a>
           </div>
         </section>
 
         <!-- ============== SECTION 2 ============== -->
-        <section id="agent-builder" class="mt-12">
-          <h2 class="text-3xl font-bold border-b pb-2">Vertex AI Applications</h2>
-          <p><strong><span class="lang lang-ko">GCP 콘솔 접속:</span><span class="lang lang-en">GCP Console Access:</span></strong> <a href="https://console.cloud.google.com/gen-app-builder/engines/create" target="_blank">AI Applications</a></p>
-          <p class="mt-4"><span class="lang lang-ko">코딩 경험이 거의 없어도 <strong>생성형 AI</strong> 기반 <strong>검색 및 대화형 에이전트</strong>를 쉽게 구축할 수 있습니다. 다양한 내/외부 데이터 소스를 <strong>커넥터</strong>로 연결하여 강력한 AI 에이전트를 만드세요.</span><span class="lang lang-en">Even with little to no coding experience, you can easily build <strong>generative AI</strong>-powered <strong>search and conversational agents</strong>. Connect to various internal and external data sources using <strong>connectors</strong> to create powerful AI agents.</span></p>
+        <section id="agent-builder" class="mt-16">
+          <h2 class="text-3xl font-bold border-b border-gray-700 pb-2 text-gray-100">Vertex AI Agent Applications</h2>
+          <p class="mt-4 text-gray-300">
+            <strong><span class="lang lang-ko">GCP 콘솔 접속:</span><span class="lang lang-en">GCP Console Access:</span></strong> 
+            <a href="https://console.cloud.google.com/gen-app-builder/engines/create" target="_blank" class="text-blue-400 hover:text-blue-300">Agent Builder & Applications</a>
+          </p>
+          <p class="mt-2 text-gray-400">
+            <span class="lang lang-ko">사용자 의도를 파악하고, 엔터프라이즈 데이터베이스나 외부 API와 연동해 다중 턴(Multi-turn) 과업을 수행하는 자율형 에이전트(Autonomous Agent) 개발 아키텍처입니다.</span>
+            <span class="lang lang-en">An architecture for developing autonomous agents that understand user intent and integrate with enterprise databases or external APIs to execute multi-turn tasks.</span>
+          </p>
 
-          <div class="not-prose mt-8 space-y-8">
-            <div class="bg-gray-800 rounded-xl p-4 md:p-8 border border-gray-700">
-              <h3 class="text-2xl font-bold text-center mb-6 text-gray-100">AI Applications</h3>
-              <pre class="mermaid" style="text-align:center">
+          <div class="mt-8 bg-gray-800/50 rounded-xl border border-gray-700 overflow-hidden p-6">
+            <h3 class="text-xl font-semibold mb-6 text-gray-200 text-center">Application Ecosystem Hierarchy</h3>
+            
+            <!-- Mermaid Diagram -->
+            <pre class="mermaid bg-transparent p-4 flex justify-center text-center">
 graph TD
-    A[Vertex AI] --> B[Vertex AI Search];
-    A --> C[Vertex AI Agents];
+    A[Vertex AI Platform] --> B[Search Engine];
+    A --> C[Agent Engine];
 
-    subgraph Search Apps
-        B --> D[Search apps];
-        D --> D1[Generic];
-        D --> D2[Media];
-        D --> D3[Healthcare];
+    subgraph "Information Retrieval"
+        B --> D[Unstructured Search];
+        B --> E[Recommendation Engine];
+        D -.-> D1(Website/Cloud Storage/PDF/JSON);
+        E -.-> E1(Retail/Media Personalization);
     end
 
-    subgraph Recommendation Apps
-        B --> E[Recommendation apps];
-        E --> E1[Media];
-        E --> E2[Retail];
-        E --> E3[Generic];
+    subgraph "Task Execution"
+        C --> F[Chatbots];
+        C --> G[Autonomous Agents];
+        F -.-> F1(DialogFlow CX Integration);
+        G -.-> G1(API/Database Action Execution);
     end
 
-    subgraph Agent Apps
-        C --> F[Chat apps];
-        C --> G[Agent apps];
-        F --> F1[DialogFlow];
-    end
+    style A fill:#1e293b,stroke:#3b82f6,stroke-width:2px,color:#fff
+    style B fill:#334155,stroke:#475569,color:#fff
+    style C fill:#334155,stroke:#475569,color:#fff
+    style D fill:#475569,stroke:none,color:#e2e8f0
+    style E fill:#475569,stroke:none,color:#e2e8f0
+    style F fill:#475569,stroke:none,color:#e2e8f0
+    style G fill:#475569,stroke:none,color:#e2e8f0
+    style D1 fill:none,stroke:#64748b,stroke-dasharray: 5 5,color:#94a3b8
+    style E1 fill:none,stroke:#64748b,stroke-dasharray: 5 5,color:#94a3b8
+    style F1 fill:none,stroke:#64748b,stroke-dasharray: 5 5,color:#94a3b8
+    style G1 fill:none,stroke:#64748b,stroke-dasharray: 5 5,color:#94a3b8
+            </pre>
 
-    D1 --> D1_Desc["From Website / BigQuery / Cloud Storage / gDrive<br/>& Cloud SQL / Spanner / Firestore / Bigtable / JSONs<br/>& Confluence / Jira / Salesforce / ServiceNow / Sharepoint<br/>Online / Slack / Dropbox / Box / OneDrive"];
-    D2 --> D2_Desc["Find media to view or listen (movies, videos, and music)"];
-    D3 --> D3_Desc["Query healthcare records stored in FHIR* data stores"];
-
-    E1 --> E1_Desc["Discover personalized content such as videos, news, and music"];
-    E2 --> E2_Desc["Recommendations for e-commerce applications"];
-    E3 --> E3_Desc["(Preview) recommendations for non-media content."];
-
-    F1 --> F1_Desc["DialogFlow"];
-
-    style A fill:#2d3748,stroke:#60a5fa,stroke-width:2px
-    style B fill:#2d3748,stroke:#60a5fa,stroke-width:2px
-    style C fill:#2d3748,stroke:#60a5fa,stroke-width:2px
-              </pre>
-            </div>
-
-            <div class="bg-gray-800 rounded-xl p-4 md:p-8 border border-gray-700">
-              <img src="https://cloud.google.com/static/agentspace/agentspace-enterprise/docs/images/connectors-overview.png" alt="Vertex AI Agent의 커넥터 아키텍처" class="w-full h-auto rounded-md shadow-lg mx-auto max-w-5xl bg-gray-200 p-1">
-              <div class="mt-12 border-t border-gray-700 pt-8">
-                <h3 class="text-2xl font-bold text-center mb-6 text-gray-100">Agent Development Kit & Engine</h3>
-                <div class="text-left max-w-5xl mx-auto">
-                  <img src="https://cloud.google.com/static/vertex-ai/generative-ai/docs/agent-engine/images/agent-engine.png?hl=ko&dcb_=0.5667919699931829" alt="Vertex AI Agent Engine" class="w-full h-auto rounded-md shadow-lg mx-auto mb-8 max-w-4xl bg-gray-200 p-1 zoomable-image">
-                  <p class="mb-6 text-center text-gray-300">
-                    <span class="lang lang-ko"><strong>Vertex AI Agent Engine</strong>은 개발자가 AI 에이전트를 프로덕션 환경에서 쉽게 배포, 관리, 확장할 수 있도록 돕는 완전 관리형 Google Cloud 서비스입니다. 인프라 관리를 자동화하여 개발자는 지능적인 애플리케이션 구축에만 집중할 수 있습니다.</span>
-                    <span class="lang lang-en">The <strong>Vertex AI Agent Engine</strong> is a fully managed Google Cloud service that helps developers easily deploy, manage, and scale AI agents in a production environment. It automates infrastructure management, allowing developers to focus solely on building intelligent applications.</span>
-                  </p>
-                  <div class="grid md:grid-cols-2 gap-6">
-                    <div class="bg-gray-700/50 p-4 rounded-lg border-l-4 border-blue-400">
-                      <h4 class="font-bold text-lg mb-2 text-gray-100"><span class="lang lang-ko">완전 관리형</span><span class="lang lang-en">Fully Managed</span></h4>
-                      <p class="text-sm text-gray-400"><span class="lang lang-ko">VPC-SC 규정 준수 등 강력한 보안 기능을 갖춘 런타임으로 에이전트를 배포하고, Google Cloud Trace를 통해 성능을 모니터링합니다.</span><span class="lang lang-en">Deploy agents in a runtime with robust security features like VPC-SC compliance, and monitor performance through Google Cloud Trace.</span></p>
-                    </div>
-                    <div class="bg-gray-700/50 p-4 rounded-lg border-l-4 border-blue-400">
-                      <h4 class="font-bold text-lg mb-2 text-gray-100"><span class="lang lang-ko">품질 및 평가</span><span class="lang lang-en">Quality and Evaluation</span></h4>
-                      <p class="text-sm text-gray-400"><span class="lang lang-ko">통합된 Gen AI Evaluation Service를 사용하여 에이전트의 품질을 체계적으로 보장하고 관리합니다.</span><span class="lang lang-en">Systematically ensure and manage agent quality using the integrated Gen AI Evaluation Service.</span></p>
-                    </div>
-                    <div class="bg-gray-700/50 p-4 rounded-lg border-l-4 border-blue-400">
-                      <h4 class="font-bold text-lg mb-2 text-gray-100"><span class="lang lang-ko">간소화된 개발</span><span class="lang lang-en">Simplified Development</span></h4>
-                      <p class="text-sm text-gray-400"><span class="lang lang-ko">애플리케이션 서버 개발, 인증 등 하위 수준의 작업을 추상화하여 에이전트의 핵심 기능 개발에 집중할 수 있습니다.</span><span class="lang lang-en">Abstract away low-level tasks like application server development and authentication to focus on core agent functionality.</span></p>
-                    </div>
-                    <div class="bg-gray-700/50 p-4 rounded-lg border-l-4 border-blue-400">
-                      <h4 class="font-bold text-lg mb-2 text-gray-100"><span class="lang lang-ko">프레임워크 독립형</span><span class="lang lang-en">Framework Agnostic</span></h4>
-                      <p class="text-sm text-gray-400"><span class="lang lang-ko">LangGraph, LangChain 등 다양한 Python 프레임워크로 빌드된 에이전트를 유연하게 배포할 수 있습니다.</span><span class="lang lang-en">Flexibly deploy agents built with various Python frameworks like LangGraph and LangChain.</span></p>
-                    </div>
-                  </div>
-                </div>
+            <div class="grid md:grid-cols-2 gap-6 mt-10 border-t border-gray-700 pt-8">
+              <div class="bg-gray-800 rounded-lg p-5 border border-gray-700">
+                <h4 class="font-bold text-gray-200 mb-2 border-l-4 border-blue-500 pl-3">Managed Infrastructure</h4>
+                <p class="text-sm text-gray-400">
+                  <span class="lang lang-ko">VPC-SC 호환성, IAM 권한 제어 등 보안 요소가 통합된 서버리스 환경 위에서 에이전트를 배포하고 Cloud Trace와 연동하여 상태를 모니터링합니다.</span>
+                  <span class="lang lang-en">Deploys agents in a serverless environment integrated with security features like VPC-SC compatibility and IAM access control, monitoring their status via Cloud Trace.</span>
+                </p>
+              </div>
+              <div class="bg-gray-800 rounded-lg p-5 border border-gray-700">
+                <h4 class="font-bold text-gray-200 mb-2 border-l-4 border-indigo-500 pl-3">Framework Agnostic</h4>
+                <p class="text-sm text-gray-400">
+                  <span class="lang lang-ko">LangChain, LlamaIndex 또는 자체 커스텀 Python 스크립트로 구현된 다양한 에이전트 구조를 코드 변경 없이 패키징하여 배포할 수 있습니다.</span>
+                  <span class="lang lang-en">Allows packaging and deploying diverse agent structures implemented with LangChain, LlamaIndex, or custom Python scripts without requiring code changes.</span>
+                </p>
               </div>
             </div>
           </div>
         </section>
 
         <!-- ============== SECTION 3 ============== -->
-        <section id="search" class="mt-12">
-          <h2 class="text-3xl font-bold border-b pb-2">
-            <a href="https://app.diagrams.net/#G1UfnuyIOcGjFyddFmr7AJfg2C7Qt4ZsT0#%7B%22pageId%22%3A%22vOT3yyev5pXtjBHes9Gv%22%7D" target="_blank" rel="noopener noreferrer">Vertex AI Search</a>
-          </h2>
-          <p><strong><span class="lang lang-ko">GCP 콘솔 접속:</span><span class="lang lang-en">GCP Console Access:</span></strong> <a href="https://console.cloud.google.com/vertex-ai/search" target="_blank">Vertex AI Search</a></p>
-          <p class="mt-4"><span class="lang lang-ko">Google의 <strong>검색 전문성</strong>을 활용하여 <strong>키워드</strong>와 <strong>시맨틱 검색</strong>을 결합, 사용자 의도를 파악하고 고품질의 맞춤형 검색 결과를 제공합니다. 데이터에 기반한 <strong>AI 답변</strong>으로 차세대 검색 환경을 구축하세요.</span><span class="lang lang-en">Leverage Google's <strong>search expertise</strong> to combine <strong>keyword</strong> and <strong>semantic search</strong>, understand user intent, and deliver high-quality, personalized search results. Build the next-generation search experience with <strong>AI-powered answers</strong> grounded in your data.</span></p>
+        <section id="search" class="mt-16">
+          <h2 class="text-3xl font-bold border-b border-gray-700 pb-2 text-gray-100">Vertex AI Search</h2>
+          <p class="mt-4 text-gray-300">
+            <strong><span class="lang lang-ko">GCP 콘솔 접속:</span><span class="lang lang-en">GCP Console Access:</span></strong> 
+            <a href="https://console.cloud.google.com/vertex-ai/search" target="_blank" class="text-blue-400 hover:text-blue-300">Vertex AI Search</a>
+          </p>
+          <p class="mt-2 text-gray-400 max-w-4xl">
+            <span class="lang lang-ko">기존 키워드 기반 시스템과 의미론적 검색(Semantic Search)을 결합하여, 기업 내 흩어진 데이터를 자동으로 색인하고 지능적인 질의응답을 제공하는 완전 관리형 엔터프라이즈 검색 엔진 아키텍처입니다.</span>
+            <span class="lang lang-en">A fully managed enterprise search engine architecture that combines traditional keyword systems with semantic search to automatically index scattered enterprise data and provide intelligent Q&A.</span>
+          </p>
 
-          <div class="not-prose mt-8 bg-gray-800 rounded-xl p-8 border border-gray-700">
-            <div class="mb-8">
-              <img src="https://cloud.google.com/generative-ai-app-builder/images/generic-search-overview.svg?hl=ko" alt="Vertex AI Search 개요" class="w-full h-auto rounded-md shadow-lg mx-auto max-w-4xl bg-white p-4">
-            </div>
-            <div class="mb-8">
-              <img src="https://cloud.google.com/generative-ai-app-builder/images/generic-search-features.svg?hl=ko" alt="Vertex AI Search 기능" class="w-full h-auto rounded-md shadow-lg mx-auto max-w-4xl bg-white p-4">
-            </div>
-            <div class="grid md:grid-cols-2 gap-6">
-              <div class="bg-gray-700/50 border-l-4 border-blue-400 p-6 rounded-lg h-full">
-                <h3 class="font-bold text-lg mb-2 text-gray-100"><span class="lang lang-ko">고품질 검색</span><span class="lang lang-en">High-Quality Search</span></h3>
-                <p class="text-sm text-gray-400"><span class="lang lang-ko">복잡한 <strong>자연어 검색어</strong>에서도 사용자 의도를 파악하고, <strong>키워드</strong>와 <strong>시맨틱 검색</strong>을 결합하여 최적의 결과를 제공합니다.</span><span class="lang lang-en">Understands user intent even in complex <strong>natural language queries</strong> and delivers optimal results by combining <strong>keyword</strong> and <strong>semantic search</strong>.</span></p>
+          <div class="mt-8 bg-gray-800/50 rounded-xl border border-gray-700 p-6">
+            <h3 class="text-xl font-semibold mb-6 text-gray-200 text-center">Search Pipeline Architecture</h3>
+            <pre class="mermaid bg-transparent p-4 flex justify-center text-center">
+graph TD
+    A[End User] -->|Query| B{Vertex AI Search API};
+    
+    subgraph "Indexing & Processing Pipeline"
+        C1(Websites) -->|Crawling| D[Data Ingestion];
+        C2(GCS / Cloud Storage) -->|Unstructured Data| D;
+        C3(BigQuery / Cloud SQL) -->|Structured Data| D;
+        
+        D --> E[Document Parsing & Chunking];
+        E --> F[Embedding Model];
+        F --> G[(Vector Index)];
+        E --> H[(Keyword/Lexical Index)];
+    end
+    
+    B -->|Search| G;
+    B -->|Search| H;
+    
+    subgraph "Retrieval & Ranking"
+        G -.-> I[Hybrid Search Engine];
+        H -.-> I;
+        I --> J[LLM Reranker];
+    end
+    
+    J -->|Top-K Results| K[Gemini Model];
+    K -->|Generates Answer with Citations| B;
+
+    style A fill:#1e293b,stroke:#e2e8f0,color:#fff
+    style B fill:#2d3748,stroke:#60a5fa,stroke-width:2px,color:#fff
+    style D fill:#475569,stroke:none,color:#e2e8f0
+    style E fill:#475569,stroke:none,color:#e2e8f0
+    style F fill:#475569,stroke:none,color:#e2e8f0
+    style G fill:#334155,stroke:#475569,color:#fff
+    style H fill:#334155,stroke:#475569,color:#fff
+    style I fill:#374151,stroke:#60a5fa,stroke-dasharray: 5 5,color:#fff
+    style J fill:#374151,stroke:#60a5fa,stroke-dasharray: 5 5,color:#fff
+    style K fill:#2d3748,stroke:#2dd4bf,stroke-width:2px,color:#fff
+            </pre>
+
+            <div class="grid md:grid-cols-2 gap-6 mt-10 border-t border-gray-700 pt-8">
+              <div class="bg-gray-800 rounded-lg p-5 border border-gray-700">
+                <h4 class="font-bold text-gray-200 mb-2 border-l-4 border-blue-500 pl-3"><span class="lang lang-ko">데이터 수집 파이프라인 내장</span><span class="lang lang-en">Built-in Ingestion Pipeline</span></h4>
+                <p class="text-sm text-gray-400">
+                  <span class="lang lang-ko">정형(BigQuery, DB) 데이터부터 비정형(PDF, 웹사이트 크롤링, 이미지) 데이터까지 별도의 외부 파서(Parser)를 구축할 필요 없이, Vertex AI 내부 파이프라인에서 자동으로 Chunking, OCR 및 벡터라이제이션을 수행합니다.</span>
+                  <span class="lang lang-en">Automatically performs Chunking, OCR, and Vectorization within the Vertex AI internal pipeline for both structured (BigQuery, DB) and unstructured (PDF, websites, images) data, removing the need for external parsers.</span>
+                </p>
               </div>
-              <div class="bg-gray-700/50 border-l-4 border-blue-400 p-6 rounded-lg h-full">
-                <h3 class="font-bold text-lg mb-2 text-gray-100"><span class="lang lang-ko">맞춤 탐색</span><span class="lang lang-en">Personalized Browsing</span></h3>
-                <p class="text-sm text-gray-400"><span class="lang lang-ko">사용자의 <strong>컨텍스트</strong>와 <strong>탐색 패턴</strong>을 기반으로 검색어 없이도 맞춤설정된 카테고리 페이지와 홈 피드를 제공합니다.</span><span class="lang lang-en">Provides personalized category pages and home feeds based on user <strong>context</strong> and <strong>browsing patterns</strong>, even without a search query.</span></p>
-              </div>
-              <div class="bg-gray-700/50 border-l-4 border-blue-400 p-6 rounded-lg h-full">
-                <h3 class="font-bold text-lg mb-2 text-gray-100"><span class="lang lang-ko">데이터 기반 AI 답변</span><span class="lang lang-en">Data-Driven AI Answers</span></h3>
-                <p class="text-sm text-gray-400"><span class="lang lang-ko">소스 문서에 대한 <strong>인용</strong>과 함께 데이터에 기반한 <strong>AI 답변</strong>을 생성하고, <strong>후속 질문</strong>과 관련 검색어를 제안합니다.</span><span class="lang lang-en">Generates <strong>AI-powered answers</strong> grounded in your data with <strong>citations</strong> to source documents, and suggests <strong>follow-up questions</strong> and related queries.</span></p>
-              </div>
-              <div class="bg-gray-700/50 border-l-4 border-blue-400 p-6 rounded-lg h-full">
-                <h3 class="font-bold text-lg mb-2 text-gray-100"><span class="lang lang-ko">다양한 데이터 소스 지원</span><span class="lang lang-en">Diverse Data Source Support</span></h3>
-                <ul class="text-sm list-disc list-inside space-y-1 mt-2 text-gray-400">
-                  <li><b><span class="lang lang-ko">웹사이트:</span><span class="lang lang-en">Websites:</span></b> <span class="lang lang-ko">공개 웹사이트 색인 생성</span><span class="lang lang-en">Index public websites</span></li>
-                  <li><b><span class="lang lang-ko">정형 데이터:</span><span class="lang lang-en">Structured Data:</span></b> <span class="lang lang-ko">데이터베이스, JSON, BigQuery 테이블</span><span class="lang lang-en">Databases, JSON, BigQuery tables</span></li>
-                  <li><b><span class="lang lang-ko">비정형 데이터:</span><span class="lang lang-en">Unstructured Data:</span></b> <span class="lang lang-ko">PDF, HTML, 이미지 파일</span><span class="lang lang-en">PDF, HTML, image files</span></li>
-                  <li><b><span class="lang lang-ko">혼합 검색:</span><span class="lang lang-en">Mixed Search:</span></b> <span class="lang lang-ko">모든 콘텐츠를 한 번에 검색</span><span class="lang lang-en">Search across all content at once</span></li>
-                </ul>
+              <div class="bg-gray-800 rounded-lg p-5 border border-gray-700">
+                <h4 class="font-bold text-gray-200 mb-2 border-l-4 border-blue-500 pl-3"><span class="lang lang-ko">하이브리드 랭킹(Hybrid Reranking)</span><span class="lang lang-en">Hybrid Reranking</span></h4>
+                <p class="text-sm text-gray-400">
+                  <span class="lang lang-ko">희소(Sparse, 키워드 매칭) 검색과 밀집(Dense, 시맨틱 벡터) 검색의 결과를 결합합니다. 이후 LLM 기반의 강력한 Reranker 모델을 통과시켜, 사용자 의도에 가장 완벽히 부합하는 최상위(Top-K) 문서를 생성 모델에 전달합니다.</span>
+                  <span class="lang lang-en">Combines Sparse (keyword) and Dense (semantic vector) search results. It then passes through a powerful LLM-based Reranker to deliver the most intent-accurate Top-K documents to the generative model.</span>
+                </p>
               </div>
             </div>
           </div>
         </section>
 
         <!-- ============== SECTION 4 ============== -->
-        <section id="rag" class="mt-12">
-          <h2 class="text-3xl font-bold border-b pb-2">Vertex AI RAG Engine</h2>
-          <p><strong><span class="lang lang-ko">GCP 콘솔 접속:</span><span class="lang lang-en">GCP Console Access:</span></strong> <a href="https://console.cloud.google.com/vertex-ai/rag/corpus" target="_blank">RAG Engine</a></p>
-          <div class="mt-4 space-y-4">
-            <p><span class="lang lang-ko">Vertex AI <strong>RAG Engine</strong>은 <strong>검색 증강 생성(RAG)</strong>을 용이하게 하는 데이터 프레임워크로, LLM이 조직의 비공개 데이터를 이해하고 활용하도록 돕습니다.</span><span class="lang lang-en">The Vertex AI <strong>RAG Engine</strong> is a data framework that facilitates <strong>Retrieval-Augmented Generation (RAG)</strong>, helping LLMs understand and utilize your organization's private data.</span></p>
-            <ul class="text-left list-disc list-inside bg-gray-800 p-6 rounded-lg border border-gray-700">
-              <li class="mb-2"><strong><span class="lang lang-ko">컨텍스트 보강:</span><span class="lang lang-en">Context Enrichment:</span></strong> <span class="lang lang-ko">조직의 내부 정보를 LLM의 <strong>컨텍스트</strong>에 추가하여 답변의 정확도를 높입니다.</span><span class="lang lang-en">Adds your organization's internal information to the LLM's <strong>context</strong> to improve answer accuracy.</span></li>
-              <li class="mb-2"><strong><span class="lang lang-ko">할루시네이션 감소:</span><span class="lang lang-en">Hallucination Reduction:</span></strong> <span class="lang lang-ko">모델이 사실에 기반하지 않은 정보를 생성하는 <strong>할루시네이션</strong> 현상을 줄입니다.</span><span class="lang lang-en">Reduces the phenomenon of <strong>hallucination</strong>, where the model generates information not based on facts.</span></li>
-              <li><strong><span class="lang lang-ko">품질 높은 답변:</span><span class="lang lang-en">High-Quality Answers:</span></strong> <span class="lang lang-ko">추가된 지식과 기존 지식을 결합하여 더 신뢰할 수 있는 답변을 생성합니다.</span><span class="lang lang-en">Generates more reliable answers by combining the added knowledge with its existing knowledge.</span></li>
-            </ul>
-          </div>
-          <div class="not-prose mt-8 bg-gray-800 rounded-xl p-4 md:p-8 border border-gray-700">
-            <img src="https://cloud.google.com/static/vertex-ai/images/Vertex-RAG-Diagram.png?hl=ko" alt="Vertex AI RAG Engine 아키텍처" class="w-full h-auto rounded-md shadow-lg mx-auto max-w-5xl bg-gray-200 p-1">
+        <section id="rag" class="mt-16">
+          <h2 class="text-3xl font-bold border-b border-gray-700 pb-2 text-gray-100">Vertex AI RAG Engine</h2>
+          <p class="mt-4 text-gray-300">
+            <strong><span class="lang lang-ko">GCP 콘솔 접속:</span><span class="lang lang-en">GCP Console Access:</span></strong> 
+            <a href="https://console.cloud.google.com/vertex-ai/rag/corpus" target="_blank" class="text-blue-400 hover:text-blue-300">Vertex AI RAG Engine</a>
+          </p>
+          <p class="mt-2 text-gray-400 max-w-4xl">
+            <span class="lang lang-ko">환각(Hallucination) 현상을 원천적으로 차단하기 위해, 자체 언어 모델 외부에 기업의 독점적인(Proprietary) 정보 저장소(Corpus)를 구축하여 LLM 추론 과정에 실시간으로 매핑하는 아키텍처입니다. Search와 유사하나 개발자 친화적인 세밀한 파이프라인 제어를 허용합니다.</span>
+            <span class="lang lang-en">To fundamentally prevent hallucinations, this architecture builds a proprietary enterprise information repository (Corpus) external to the language model, mapping it into the LLM inference process in real-time. Similar to Search but allows for fine-grained, developer-friendly pipeline control.</span>
+          </p>
+
+          <div class="mt-8 bg-gray-800/50 rounded-xl border border-gray-700 p-6">
+            <h3 class="text-xl font-semibold mb-6 text-gray-200 text-center">RAG (Retrieval-Augmented Generation) Architecture</h3>
+            <pre class="mermaid bg-transparent p-4 flex justify-center text-center">
+graph LR
+    A(User Query) --> B[Embedding API];
+    B --> C[Vertex Vector Search];
+    
+    subgraph "Knowledge Corpus (Data Sync)"
+        G(Private Docs/Data) --> H[Chunking Strategy];
+        H --> I[Embedding API];
+        I -->|Upsert Embeddings| C;
+    end
+
+    C -.->|Retrieve KNN Docs| D[Context Assembler];
+    A --> D;
+    
+    D -->|Prompt + Context| E[Gemini Models];
+    E --> F((Grounded Response<br/>w/ Citations));
+    
+    style A fill:#1e293b,stroke:#e2e8f0,color:#fff
+    style B fill:#334155,stroke:#475569,color:#fff
+    style C fill:#334155,stroke:#475569,color:#fff
+    style D fill:#374151,stroke:#60a5fa,stroke-dasharray: 5 5,color:#fff
+    style E fill:#2d3748,stroke:#60a5fa,stroke-width:2px,color:#fff
+    style F fill:#1e293b,stroke:#2dd4bf,stroke-width:2px,color:#fff
+    style G fill:#475569,stroke:none,color:#e2e8f0
+    style H fill:#475569,stroke:none,color:#e2e8f0
+    style I fill:#475569,stroke:none,color:#e2e8f0
+            </pre>
+
+            <div class="grid md:grid-cols-2 gap-6 mt-10 border-t border-gray-700 pt-8">
+              <div class="bg-gray-800 rounded-lg p-5 border border-gray-700">
+                <h4 class="font-bold text-gray-200 mb-2 border-l-4 border-indigo-500 pl-3"><span class="lang lang-ko">독립적인 RAG 코퍼스 관리</span><span class="lang lang-en">Independent RAG Corpus Management</span></h4>
+                <p class="text-sm text-gray-400">
+                  <span class="lang lang-ko">기존 LlamaIndex나 LangChain을 이용해 개발자가 직접 벡터 DB를 띄우고 임베딩을 관리해야 했던 복잡함을 추상화했습니다. <code>Vertex AI Corpus API</code>를 통해 문서를 밀어넣기만 하면, 시스템이 백그라운드에서 임베딩과 청킹(Chunking)을 수행합니다.</span>
+                  <span class="lang lang-en">Abstracts the complexity of developers manually spinning up vector DBs and managing embeddings using LlamaIndex or LangChain. By simply pushing documents via the <code>Vertex AI Corpus API</code>, the system performs embedding and chunking in the background.</span>
+                </p>
+              </div>
+              <div class="bg-gray-800 rounded-lg p-5 border border-gray-700">
+                <h4 class="font-bold text-gray-200 mb-2 border-l-4 border-indigo-500 pl-3"><span class="lang lang-ko">사실 기반 생성(Grounding)과 출처 명시</span><span class="lang lang-en">Grounding and Citations</span></h4>
+                <p class="text-sm text-gray-400">
+                  <span class="lang lang-ko">LLM이 오직 RAG 시스템에서 검색해 온 컨텍스트(Context) 내에서만 대답하도록 강제합니다. 그 결과, 답변에 사용된 원본 파일명과 페이지, 구체적인 텍스트 스니펫을 인용구(Citation) 형태로 추적할 수 있어 정보의 신뢰도를 보장합니다.</span>
+                  <span class="lang lang-en">Forces the LLM to answer solely based on the context retrieved by the RAG system. Consequently, original file names, pages, and specific text snippets used in the answer can be tracked as citations, guaranteeing information reliability.</span>
+                </p>
+              </div>
+            </div>
           </div>
         </section>
 
         <!-- ============== SECTION 5 ============== -->
-        <section id="gen-ai-overview" class="mt-12">
-          <h2 class="text-3xl font-bold border-b pb-2"><span class="lang lang-ko">BigQuery ML을 활용한 생성형 AI 워크플로</span><span class="lang lang-en">Generative AI Workflow with BigQuery ML</span></h2>
-          <p><strong><span class="lang lang-ko">GCP 콘솔 접속:</span><span class="lang lang-en">GCP Console Access:</span></strong> <a href="https://console.cloud.google.com/bigquery" target="_blank">BigQuery</a></p>
-          <div class="mt-4 space-y-4">
-            <p><span class="lang lang-ko"><strong>BigQuery ML</strong>은 Vertex AI의 <strong>생성형 모델</strong>을 활용하여 <strong>구조화된 데이터</strong>와 <strong>비구조화된 데이터</strong>를 모두 처리하는 강력한 워크플로를 제공합니다.</span><span class="lang lang-en"><strong>BigQuery ML</strong> provides a powerful workflow that leverages Vertex AI's <strong>generative models</strong> to process both <strong>structured</strong> and <strong>unstructured data</strong>.</span></p>
-            <ul class="text-left list-disc list-inside bg-gray-800 p-6 rounded-lg border border-gray-700">
-              <li class="mb-2"><strong><span class="lang lang-ko">데이터 결합:</span><span class="lang lang-en">Data Combination:</span></strong> <span class="lang lang-ko">Google Cloud Storage의 <strong>비정형 데이터</strong>와 BigQuery의 <strong>정형 데이터</strong>를 통합합니다.</span><span class="lang lang-en">Integrates <strong>unstructured data</strong> from Google Cloud Storage with <strong>structured data</strong> in BigQuery.</span></li>
-              <li class="mb-2"><strong><span class="lang lang-ko">AI 함수 활용:</span><span class="lang lang-en">Leverage AI Functions:</span></strong> <span class="lang lang-ko">SQL 쿼리 내에서 <code><strong>ML.GENERATE_TEXT</strong></code>, <code><strong>ML.GENERATE_EMBEDDING</strong></code>과 같은 함수를 직접 사용합니다.</span><span class="lang lang-en">Directly use functions like <code><strong>ML.GENERATE_TEXT</strong></code> and <code><strong>ML.GENERATE_EMBEDDING</strong></code> within SQL queries.</span></li>
-              <li><strong><span class="lang lang-ko">다양한 작업 수행:</span><span class="lang lang-en">Perform Various Tasks:</span></strong> <span class="lang lang-ko"><strong>텍스트 요약, 감성 분석, 임베딩 생성</strong> 등의 AI 작업을 SQL로 간편하게 처리합니다.</span><span class="lang lang-en">Easily handle AI tasks such as <strong>text summarization, sentiment analysis, and embedding generation</strong> with SQL.</span></li>
-            </ul>
-            <p><span class="lang lang-ko">이러한 워크플로를 통해 복잡한 <strong>데이터 분석</strong> 및 <strong>인사이트 도출</strong> 과정을 크게 간소화할 수 있습니다.</span><span class="lang lang-en">This workflow can significantly simplify complex <strong>data analysis</strong> and <strong>insight derivation</strong> processes.</span></p>
-          </div>
-          <div class="not-prose mt-8 bg-gray-800 rounded-xl p-4 md:p-8 border border-gray-700">
-            <img src="https://cloud.google.com/static/bigquery/images/gen-ai-workflow.png?hl=ko" alt="BigQuery ML을 사용한 생성형 AI 워크플로" class="w-full h-auto rounded-md shadow-lg mx-auto max-w-4xl bg-gray-200 p-1">
+        <section id="gen-ai-overview" class="mt-16">
+          <h2 class="text-3xl font-bold border-b border-gray-700 pb-2 text-gray-100">
+            <span class="lang lang-ko">BigQuery 기반 AI 연동 및 데이터 에이전트</span>
+            <span class="lang lang-en">BigQuery AI Integration & Data Agents</span>
+          </h2>
+          <p class="mt-4 text-gray-300">
+            <strong><span class="lang lang-ko">GCP 콘솔 접속:</span><span class="lang lang-en">GCP Console Access:</span></strong> 
+            <a href="https://console.cloud.google.com/bigquery" target="_blank" class="text-blue-400 hover:text-blue-300">BigQuery SQL Workspace</a>
+          </p>
+          <p class="mt-2 text-gray-400 max-w-4xl">
+            <span class="lang lang-ko">데이터 이동 없는(Zero-ETL) In-database ML 추론부터 최신 Conversational Analytics(대화형 분석 에이전트)까지, 데이터 웨어하우스 자체를 지능형 분석 플랫폼으로 확장하는 최신 아키텍처 패턴입니다.</span>
+            <span class="lang lang-en">A modern architecture pattern expanding the data warehouse itself into an intelligent analytics platform—ranging from Zero-ETL In-database ML inference to the latest Conversational Analytics agents.</span>
+          </p>
+
+          <div class="mt-8 bg-gray-800/50 rounded-xl border border-gray-700 p-6">
+            <h3 class="text-xl font-semibold mb-6 text-gray-200 text-center">In-Database AI & Agent Workflow</h3>
+            <pre class="mermaid bg-transparent p-4 flex justify-center text-center">
+graph TD
+    subgraph "BigQuery Environment"
+        A[Petabytes Structured Data] --> B{SQL Query Execution};
+        A -.-> J[BigQuery Agents <br/>Preview];
+        B -->|AI.GENERATE_TEXT / TABLE| C[LLM Remote Connection];
+        B -->|AI.EMBED & SIMILARITY| D[Embedding Remote Connection];
+        J -->|Conversational NL2SQL| B;
+        C --> E[In-place Analysis & Schema Extraction];
+        D --> F[In-place Vectorization & Search];
+        E --> G[(Target BQ Table)];
+        F --> G;
+    end
+    
+    subgraph "Vertex AI Platform"
+        C -.-> H(Gemini Models);
+        D -.-> I(Text/Multimodal Embeddings);
+    end
+    
+    style A fill:#1e293b,stroke:#e2e8f0,color:#fff
+    style B fill:#2d3748,stroke:#60a5fa,stroke-width:2px,color:#fff
+    style C fill:#334155,stroke:#475569,color:#fff
+    style D fill:#334155,stroke:#475569,color:#fff
+    style E fill:#475569,stroke:none,color:#e2e8f0
+    style F fill:#475569,stroke:none,color:#e2e8f0
+    style G fill:#1e293b,stroke:#2dd4bf,stroke-width:2px,color:#fff
+    style H fill:#1e293b,stroke:#a855f7,stroke-dasharray: 5 5,color:#fff
+    style I fill:#1e293b,stroke:#a855f7,stroke-dasharray: 5 5,color:#fff
+    style J fill:#4c1d95,stroke:#c084fc,stroke-width:2px,color:#fff
+            </pre>
+
+            <div class="grid md:grid-cols-2 gap-6 mt-10 border-t border-gray-700 pt-8">
+               <div class="bg-gray-800 rounded-lg p-5 border border-gray-700">
+                  <h4 class="font-bold text-gray-200 mb-3 border-l-4 border-emerald-500 pl-3">Zero-ETL 대규모 추론 및 구조화 (AI Functions)</h4>
+                  <p class="text-sm text-gray-400 mb-4">
+                    <span class="lang lang-ko">외부 시스템으로의 데이터 전송(ETL) 없이 스토리지 레이어 내부에서 즉각적으로 최신 <code>AI.*</code> 함수를 호출합니다. 기존 복잡했던 JSON 파싱 대신 <code>AI.GENERATE_TEXT</code>로 직관적인 결과를 얻거나, <code>AI.GENERATE_TABLE</code>을 활용해 비정형 로그에서 특정 스키마(날짜, 감성 등) 형태의 정형 데이터를 즉시 추출하여 네트워크 비용과 보안 리스크를 원천 차단합니다.</span>
+                    <span class="lang lang-en">Calls modern <code>AI.*</code> functions instantly within the storage layer, completely bypassing ETL data transfer to external systems. Use <code>AI.GENERATE_TEXT</code> for intuitive outputs instead of complex JSON parsing, or <code>AI.GENERATE_TABLE</code> to instantly extract structured schemas from unstructured logs, inherently blocking network costs and security risks.</span>
+                  </p>
+                  <div class="bg-gray-900 rounded p-3 text-xs text-gray-300 font-mono border border-gray-700 overflow-x-auto">
+                    SELECT text_content, status<br>
+                    FROM AI.GENERATE_TEXT(<br>
+                    &nbsp;&nbsp;MODEL `my_dataset.gemini_pro`,<br>
+                    &nbsp;&nbsp;(SELECT customer_feedback AS prompt FROM logs),<br>
+                    &nbsp;&nbsp;STRUCT(0.7 AS temperature, 1024 AS max_output_tokens)<br>
+                    );
+                  </div>
+              </div>
+              
+              <div class="bg-gray-800 rounded-lg p-5 border border-gray-700 flex flex-col justify-between">
+                <div>
+                  <h4 class="font-bold text-gray-200 mb-3 border-l-4 border-fuchsia-500 pl-3">BigQuery Data Agents (Preview)</h4>
+                  <p class="text-sm text-gray-400 mb-4">
+                    <span class="lang lang-ko">복잡한 NL2SQL 파이프라인을 구축할 필요 없이, BigQuery 콘솔에 네이티브로 통합된 <strong>Conversational Analytics API</strong>를 통해 자연어로 데이터를 즉시 쿼리하고 시각화 차트를 그릴 수 있는 최신 에이전트 솔루션입니다.</span>
+                    <span class="lang lang-en">A modern agent solution natively integrated into the BigQuery console via the <strong>Conversational Analytics API</strong>. It allows instant natural language data querying and visualization charting, negating the need to build complex custom NL2SQL pipelines.</span>
+                  </p>
+                </div>
+                <div>
+                  <h4 class="font-bold text-gray-200 mb-3 mt-4 border-l-4 border-emerald-500 pl-3">경량화된 벡터 검색 (AI.EMBED & SIMILARITY)</h4>
+                  <p class="text-sm text-gray-400">
+                    <span class="lang lang-ko">최신 <code>AI.EMBED</code> 함수를 활용해 텍스트를 즉각 벡터화하고, 새로 도입된 <code>AI.SIMILARITY</code> 함수와 결합하여 두 벡터 간의 유사도를 매우 짧은 쿼리로 밀리초 내에 계산합니다. 외부의 복잡한 벡터 데이터베이스 파이프라인 구축을 웨어하우스 수준의 시맨틱 검색으로 완벽히 대체합니다.</span>
+                    <span class="lang lang-en">Instantly vectorize text using the streamlined <code>AI.EMBED</code> function, and combine it with the newly introduced <code>AI.SIMILARITY</code> function to calculate vector similarities in milliseconds via ultra-short queries. This perfectly substitutes complex external Vector DB pipelines with native semantic search.</span>
+                  </p>
+                </div>
+              </div>
+            </div>
           </div>
         </section>
 
         <!-- ============== SECTION 6 ============== -->
-        <section id="use-cases" class="mt-12">
-          <h2 class="text-3xl font-bold border-b pb-2">Vertex AI Use Cases</h2>
-          <p><strong><span class="lang lang-ko">GCP 콘솔 접속:</span><span class="lang lang-en">GCP Console Access:</span></strong> <a href="https://console.cloud.google.com/vertex-ai" target="_blank">Vertex AI</a></p>
-          <div class="grid gap-10 mt-8 not-prose">
+        <section id="use-cases" class="mt-20">
+          <h2 class="text-3xl font-bold border-b border-gray-700 pb-2 text-gray-100">Industry Use Cases (POC)</h2>
+          <p class="mt-4 text-gray-300">
+            <strong><span class="lang lang-ko">GCP 콘솔 접속:</span><span class="lang lang-en">GCP Console Access:</span></strong> 
+            <a href="https://console.cloud.google.com/vertex-ai" target="_blank" class="text-blue-400 hover:text-blue-300">Vertex AI Workspace</a>
+          </p>
+          <p class="mt-2 text-gray-400 mb-10">
+            <span class="lang lang-ko">다양한 산업군에서 발생한 엔터프라이즈 데이터 병목 및 검색 한계를 Vertex AI 생태계를 활용하여 해결한 개념 증명(POC) 아키텍처 사례입니다.</span>
+            <span class="lang lang-en">Proof of Concept (POC) architecture use cases resolving enterprise data bottlenecks and search limitations across various industries using the Vertex AI ecosystem.</span>
+          </p>
 
-            <h4 class="text-2xl font-bold text-gray-200 mb-3 mt-8 border-t border-gray-700 pt-8"><span class="lang lang-ko">AI 기반 검색 및 분석</span><span class="lang lang-en">AI-Powered Search and Analysis</span></h4>
-            <!-- === 카드 1 === -->
-            <div class="bg-gray-800 rounded-xl border border-gray-700 overflow-hidden md:flex">
-              <div class="md:w-1/3 bg-gradient-to-r from-blue-800 to-blue-700 p-8 flex flex-col justify-center items-center text-white">
-                <div class="text-6xl mb-4">👗</div>
-                <h3 class="text-2xl font-bold"><span class="lang lang-ko">패션 분야</span><span class="lang lang-en">Fashion</span></h3>
+          <!-- 1. AI 기반 검색 및 분석 -->
+          <h3 class="text-xl font-bold text-gray-200 mb-4 mt-8 border-l-4 border-blue-500 pl-3" data-ko="AI 기반 검색 및 분석" data-en="AI-Powered Search and Analysis">AI 기반 검색 및 분석</h3>
+          <div class="grid lg:grid-cols-2 gap-6 mb-12">
+            <!-- Fashion -->
+            <div class="bg-gray-800 rounded-xl border border-gray-700 flex flex-col h-full overflow-hidden hover:border-blue-500 transition-colors">
+              <div class="bg-blue-900/30 px-4 py-2 border-b border-gray-700 flex justify-between items-center">
+                <span class="text-blue-400 font-bold text-sm">Fashion</span>
+                <span class="text-lg">👗</span>
               </div>
-              <div class="md:w-2/3 p-8">
-                <h4 class="text-xl font-bold text-gray-200 mb-3"><span class="lang lang-ko">고성능 검색 및 정보 제공 시스템</span><span class="lang lang-en">High-Performance Search and Information Delivery System</span></h4>
-                <p class="text-gray-400 mb-4 leading-relaxed"><strong>Challenge:</strong> <span class="lang lang-ko">기존 키워드 기반 검색에서 벗어나 사용자 의도를 정확히 파악하는 자연어 검색으로 고도화하고, 풍부하고 개인화된 서비스 경험 제공 필요</span><span class="lang lang-en">Need to move beyond traditional keyword-based search to an advanced natural language search that accurately understands user intent and provides a rich, personalized service experience.</span></p>
-                <p class="text-gray-400 mb-4 leading-relaxed"><strong>Solution:</strong> <span class="lang lang-ko">Elasticsearch, Cloud Run, Vertex AI를 활용하여 확장 가능하고 비용 효율적인 서버리스 아키텍처 구축. Hybrid Search와 Rerank 기능으로 정확하고 신뢰도 높은 답변 제공</span><span class="lang lang-en">Built a scalable and cost-effective serverless architecture using Elasticsearch, Cloud Run, and Vertex AI. Provided accurate and reliable answers with Hybrid Search and Rerank features.</span></p>
-                <p class="text-xs text-gray-500 mt-4">Products: VertexAI, Gemini model Pro/Flash, Cloud Run, Cloud Armor</p>
+              <div class="p-5 flex-1 flex flex-col">
+                <h4 class="text-md font-bold text-gray-100 mb-2" data-ko="고성능 검색 및 정보 제공 시스템" data-en="High-Performance Search System">고성능 검색 및 정보 제공 시스템</h4>
+                <p class="text-sm text-gray-400 mb-2"><strong class="text-gray-300">Challenge:</strong> <span data-ko="기존 키워드 기반 검색에서 벗어나 사용자 의도를 정확히 파악하는 자연어 검색 고도화 필요" data-en="Need to move beyond keyword search to natural language search that understands user intent.">기존 키워드 기반 검색에서 벗어나 사용자 의도를 정확히 파악하는 자연어 검색 고도화 필요</span></p>
+                <p class="text-sm text-gray-400 mb-4 flex-1"><strong class="text-gray-300">Solution:</strong> <span data-ko="Elasticsearch, Cloud Run, Vertex AI를 활용하여 확장 가능한 서버리스 아키텍처 구축. Hybrid Search와 Rerank 기능으로 정확도 향상" data-en="Built a serverless architecture using Elasticsearch, Cloud Run, and Vertex AI. Improved accuracy with Hybrid Search and Rerank.">Elasticsearch, Cloud Run, Vertex AI를 활용하여 확장 가능한 서버리스 아키텍처 구축. Hybrid Search와 Rerank 기능으로 정확도 향상</span></p>
+                <div class="flex flex-wrap gap-2 mt-auto pt-3 border-t border-gray-700">
+                  <span class="px-2 py-1 bg-gray-700 text-gray-300 text-xs rounded">VertexAI</span>
+                  <span class="px-2 py-1 bg-gray-700 text-gray-300 text-xs rounded">Gemini Pro/Flash</span>
+                  <span class="px-2 py-1 bg-gray-700 text-gray-300 text-xs rounded">Cloud Run</span>
+                </div>
               </div>
             </div>
 
-            <!-- === 카드 2 === -->
-            <div class="bg-gray-800 rounded-xl border border-gray-700 overflow-hidden md:flex">
-              <div class="md:w-2/3 p-8">
-                <h4 class="text-xl font-bold text-gray-200 mb-3"><span class="lang lang-ko">멀티 에이전트 기반 전문 정보 검색</span><span class="lang lang-en">Multi-Agent Based Expert Information Retrieval</span></h4>
-                <p class="text-gray-400 mb-4 leading-relaxed"><strong>Challenge:</strong> <span class="lang lang-ko">사용자의 숨겨진 의도를 파악하여 사내 지식 기반에서 필요한 정보를 효율적으로 제공하는 시스템 구축 필요</span><span class="lang lang-en">Need to build a system that understands users' hidden intents to efficiently provide necessary information from the internal knowledge base.</span></p>
-                <p class="text-gray-400 mb-4 leading-relaxed"><strong>Solution:</strong> <span class="lang lang-ko">의도 분류 모델과 의미 검색을 결합한 하이브리드 방식으로 의도를 추출하고, 전문 분야별 에이전트(인사, AS 등) 호출</span><span class="lang lang-en">Extracted intent using a hybrid approach combining an intent classification model and semantic search, and invoked specialized agents (e.g., HR, Customer Service).</span></p>
-                <p class="text-xs text-gray-500 mt-4">Products: VertexAI, Gemini model Pro/Flash, Cloud Run, Cloud Armor</p>
+            <!-- Home Appliances -->
+            <div class="bg-gray-800 rounded-xl border border-gray-700 flex flex-col h-full overflow-hidden hover:border-teal-500 transition-colors">
+              <div class="bg-teal-900/30 px-4 py-2 border-b border-gray-700 flex justify-between items-center">
+                <span class="text-teal-400 font-bold text-sm">Home Appliances</span>
+                <span class="text-lg">💧</span>
               </div>
-              <div class="md:w-1/3 bg-gradient-to-r from-teal-700 to-teal-600 p-8 flex flex-col justify-center items-center text-white">
-                <div class="text-6xl mb-4">💧</div>
-                <h3 class="text-2xl font-bold"><span class="lang lang-ko">환경가전 분야</span><span class="lang lang-en">Home Appliances</span></h3>
-              </div>
-            </div>
-
-            <!-- === 카드 4 === -->
-            <div class="bg-gray-800 rounded-xl border border-gray-700 overflow-hidden md:flex">
-              <div class="md:w-2/3 p-8">
-                <h4 class="text-xl font-bold text-gray-200 mb-3"><span class="lang lang-ko">자연어 기반 데이터 분석 시스템</span><span class="lang lang-en">Natural Language-Based Data Analysis System</span></h4>
-                <p class="text-gray-400 mb-4 leading-relaxed"><strong>Challenge:</strong> <span class="lang lang-ko">방대한 데이터를 일반 사용자가 자연어 질의로 쉽게 분석하여 데이터 활용도를 극대화하고 의사결정 과정 효율화</span><span class="lang lang-en">Enable general users to easily analyze vast amounts of data with natural language queries to maximize data utilization and streamline decision-making.</span></p>
-                <p class="text-gray-400 mb-4 leading-relaxed"><strong>Solution:</strong> <span class="lang lang-ko">Vertex AI의 NLP 기능으로 데이터 스키마와 컨텍스트를 이해하고, 사용자의 질의에 맞는 SQL 쿼리 생성</span><span class="lang lang-en">Used Vertex AI's NLP capabilities to understand data schema and context, and generate appropriate SQL queries for user questions.</span></p>
-                <p class="text-xs text-gray-500 mt-4">Products: VertexAI, Gemini model Pro/Flash, Vertex Colab CPU, BigQuery</p>
-              </div>
-              <div class="md:w-1/3 bg-gradient-to-r from-green-800 to-green-700 p-8 flex flex-col justify-center items-center text-white">
-                <div class="text-6xl mb-4">💹</div>
-                <h3 class="text-2xl font-bold"><span class="lang lang-ko">핀테크 분야</span><span class="lang lang-en">Fintech</span></h3>
+              <div class="p-5 flex-1 flex flex-col">
+                <h4 class="text-md font-bold text-gray-100 mb-2" data-ko="멀티 에이전트 기반 전문 정보 검색" data-en="Multi-Agent Expert Search">멀티 에이전트 기반 전문 정보 검색</h4>
+                <p class="text-sm text-gray-400 mb-2"><strong class="text-gray-300">Challenge:</strong> <span data-ko="사용자의 숨겨진 의도를 파악하여 사내 지식 기반에서 필요한 정보를 효율적으로 제공하는 시스템 구축 필요" data-en="Need to efficiently provide info from internal knowledge bases by understanding hidden user intents.">사용자의 숨겨진 의도를 파악하여 사내 지식 기반에서 필요한 정보를 효율적으로 제공하는 시스템 구축 필요</span></p>
+                <p class="text-sm text-gray-400 mb-4 flex-1"><strong class="text-gray-300">Solution:</strong> <span data-ko="의도 분류 모델과 의미 검색을 결합한 하이브리드 방식으로 의도를 추출하고, 전문 분야별 에이전트(인사, AS 등) 호출" data-en="Extracted intent via hybrid approach (intent classification + semantic search), routing to expert agents (HR, AS).">의도 분류 모델과 의미 검색을 결합한 하이브리드 방식으로 의도를 추출하고, 전문 분야별 에이전트(인사, AS 등) 호출</span></p>
+                <div class="flex flex-wrap gap-2 mt-auto pt-3 border-t border-gray-700">
+                  <span class="px-2 py-1 bg-gray-700 text-gray-300 text-xs rounded">VertexAI</span>
+                  <span class="px-2 py-1 bg-gray-700 text-gray-300 text-xs rounded">Gemini Pro/Flash</span>
+                  <span class="px-2 py-1 bg-gray-700 text-gray-300 text-xs rounded">Cloud Run</span>
+                </div>
               </div>
             </div>
 
-            <!-- === 카드 10 === -->
-            <div class="bg-gray-800 rounded-xl border border-gray-700 overflow-hidden md:flex">
-              <div class="md:w-2/3 p-8">
-                <h4 class="text-xl font-bold text-gray-200 mb-3"><span class="lang lang-ko">NL2SQL 및 RAG 기반 데이터 분석</span><span class="lang lang-en">NL2SQL and RAG-Based Data Analysis</span></h4>
-                <p class="text-gray-400 mb-4 leading-relaxed"><strong>Challenge:</strong> <span class="lang lang-ko">비전문가도 자연어를 통해 손쉽게 게임 데이터를 분석할 수 있는 시스템 구축.</span><span class="lang lang-en">Build a system that allows non-experts to easily analyze game data through natural language.</span></p>
-                <p class="text-gray-400 mb-4 leading-relaxed"><strong>Solution:</strong> <span class="lang lang-ko">자연어 질의를 SQL로 변환하고, RAG 기술로 게임 용어집을 참조하여 분석 정확도를 높이는 POC 실행.</span><span class="lang lang-en">Executed a POC to improve analysis accuracy by converting natural language queries to SQL and referencing a game glossary with RAG technology.</span></p>
-                <p class="text-xs text-gray-500 mt-4">Products: VertexAI, Gemini model Pro/Flash, BigQuery</p>
+            <!-- Fintech -->
+            <div class="bg-gray-800 rounded-xl border border-gray-700 flex flex-col h-full overflow-hidden hover:border-green-500 transition-colors">
+              <div class="bg-green-900/30 px-4 py-2 border-b border-gray-700 flex justify-between items-center">
+                <span class="text-green-400 font-bold text-sm">Fintech</span>
+                <span class="text-lg">💹</span>
               </div>
-              <div class="md:w-1/3 bg-gradient-to-r from-amber-700 to-amber-600 p-8 flex flex-col justify-center items-center text-white">
-                <div class="text-6xl mb-4">🕹️</div>
-                <h3 class="text-2xl font-bold"><span class="lang lang-ko">게임 분야</span><span class="lang lang-en">Gaming</span></h3>
-              </div>
-            </div>
-
-            <h4 class="text-2xl font-bold text-gray-200 mb-3 mt-8 border-t border-gray-700 pt-8"><span class="lang lang-ko">지능형 자동화 및 챗봇</span><span class="lang lang-en">Intelligent Automation & Chatbots</span></h4>
-            <!-- === 카드 3 === -->
-            <div class="bg-gray-800 rounded-xl border border-gray-700 overflow-hidden md:flex">
-              <div class="md:w-1/3 bg-gradient-to-r from-purple-800 to-purple-700 p-8 flex flex-col justify-center items-center text-white">
-                <div class="text-6xl mb-4">📚</div>
-                <h3 class="text-2xl font-bold"><span class="lang lang-ko">교육 분야</span><span class="lang lang-en">Education</span></h3>
-              </div>
-              <div class="md:w-2/3 p-8">
-                <h4 class="text-xl font-bold text-gray-200 mb-3"><span class="lang lang-ko">교육용 AI 챗봇 앱</span><span class="lang lang-en">Educational AI Chatbot App</span></h4>
-                <p class="text-gray-400 mb-4 leading-relaxed"><strong>Challenge:</strong> <span class="lang lang-ko">AI 기술을 활용한 맞춤형 학습 경험 제공 및 신뢰도 높은 백과사전 콘텐츠 기반의 정확한 정보 제공 필요</span><span class="lang lang-en">Need to provide personalized learning experiences using AI and deliver accurate information based on reliable encyclopedia content.</span></p>
-                <p class="text-gray-400 mb-4 leading-relaxed"><strong>Solution:</strong> <span class="lang lang-ko">Gemini를 활용하여 사용자의 연령과 학습 목적에 따라 맞춤형 답변을 제공하는 챗봇 개발. 다국어 및 멀티모달 지원으로 접근성 향상</span><span class="lang lang-en">Developed a chatbot using Gemini that provides customized answers based on user's age and learning objectives. Enhanced accessibility with multilingual and multimodal support.</span></p>
-                <p class="text-xs text-gray-500 mt-4">Products: VertexAI, Gemini model Pro/Flash, Cloud Run, Cloud Armor, BigQuery</p>
+              <div class="p-5 flex-1 flex flex-col">
+                <h4 class="text-md font-bold text-gray-100 mb-2" data-ko="자연어 기반 데이터 분석 시스템" data-en="Natural Language Data Analysis">자연어 기반 데이터 분석 시스템</h4>
+                <p class="text-sm text-gray-400 mb-2"><strong class="text-gray-300">Challenge:</strong> <span data-ko="방대한 데이터를 일반 사용자가 자연어 질의로 쉽게 분석하여 의사결정 과정을 효율화" data-en="Allow general users to analyze vast data via natural language to streamline decision-making.">방대한 데이터를 일반 사용자가 자연어 질의로 쉽게 분석하여 의사결정 과정을 효율화</span></p>
+                <p class="text-sm text-gray-400 mb-4 flex-1"><strong class="text-gray-300">Solution:</strong> <span data-ko="Vertex AI의 NLP 기능으로 데이터 스키마와 컨텍스트를 이해하고, 사용자의 질의에 맞는 SQL 쿼리 자동 생성" data-en="Used Vertex AI NLP to understand schema/context and generate dynamic SQL matching user queries.">Vertex AI의 NLP 기능으로 데이터 스키마와 컨텍스트를 이해하고, 사용자의 질의에 맞는 SQL 쿼리 자동 생성</span></p>
+                <div class="flex flex-wrap gap-2 mt-auto pt-3 border-t border-gray-700">
+                  <span class="px-2 py-1 bg-gray-700 text-gray-300 text-xs rounded">VertexAI</span>
+                  <span class="px-2 py-1 bg-gray-700 text-gray-300 text-xs rounded">Vertex Colab CPU</span>
+                  <span class="px-2 py-1 bg-gray-700 text-gray-300 text-xs rounded">BigQuery</span>
+                </div>
               </div>
             </div>
 
-            <!-- === 카드 8 === -->
-            <div class="bg-gray-800 rounded-xl border border-gray-700 overflow-hidden md:flex">
-              <div class="md:w-2/3 p-8">
-                <h4 class="text-xl font-bold text-gray-200 mb-3"><span class="lang lang-ko">GenAI RAG 챗봇 구축</span><span class="lang lang-en">Building a GenAI RAG Chatbot</span></h4>
-                <p class="text-gray-400 mb-4 leading-relaxed"><strong>Challenge:</strong> <span class="lang lang-ko">BigQuery의 데이터를 기반으로 신뢰도 높은 답변을 제공하는 지능형 챗봇 구축 필요.</span><span class="lang lang-en">Need to build an intelligent chatbot that provides reliable answers based on data in BigQuery.</span></p>
-                <p class="text-gray-400 mb-4 leading-relaxed"><strong>Solution:</strong> <span class="lang lang-ko">RAG(검색 증강 생성) 기술을 활용하여 BigQuery 데이터를 기반으로 정확한 답변을 제공하는 챗봇 구축.</span><span class="lang lang-en">Built a chatbot that provides accurate answers based on BigQuery data using Retrieval-Augmented Generation (RAG) technology.</span></p>
-                <p class="text-xs text-gray-500 mt-4">Products: VertexAI, Gemini model Pro/Flash, BigQuery</p>
+            <!-- Gaming -->
+            <div class="bg-gray-800 rounded-xl border border-gray-700 flex flex-col h-full overflow-hidden hover:border-amber-500 transition-colors">
+              <div class="bg-amber-900/30 px-4 py-2 border-b border-gray-700 flex justify-between items-center">
+                <span class="text-amber-400 font-bold text-sm">Gaming</span>
+                <span class="text-lg">🕹️</span>
               </div>
-              <div class="md:w-1/3 bg-gradient-to-r from-indigo-700 to-indigo-600 p-8 flex flex-col justify-center items-center text-white">
-                <div class="text-6xl mb-4">🎓</div>
-                <h3 class="text-2xl font-bold"><span class="lang lang-ko">디지털 교육 분야</span><span class="lang lang-en">Digital Education</span></h3>
+              <div class="p-5 flex-1 flex flex-col">
+                <h4 class="text-md font-bold text-gray-100 mb-2" data-ko="NL2SQL 및 RAG 기반 데이터 분석" data-en="NL2SQL & RAG Data Analysis">NL2SQL 및 RAG 기반 데이터 분석</h4>
+                <p class="text-sm text-gray-400 mb-2"><strong class="text-gray-300">Challenge:</strong> <span data-ko="비전문가도 자연어를 통해 손쉽게 게임 데이터를 분석할 수 있는 시스템 구축 필요" data-en="Build a system for non-experts to easily analyze game data via natural language.">비전문가도 자연어를 통해 손쉽게 게임 데이터를 분석할 수 있는 시스템 구축 필요</span></p>
+                <p class="text-sm text-gray-400 mb-4 flex-1"><strong class="text-gray-300">Solution:</strong> <span data-ko="자연어 질의를 SQL로 변환하고, RAG 기술로 게임 용어집을 참조하여 분석 정확도를 높이는 파이프라인 구성" data-en="Converted natural language to SQL and referenced game glossaries using RAG to increase accuracy.">자연어 질의를 SQL로 변환하고, RAG 기술로 게임 용어집을 참조하여 분석 정확도를 높이는 파이프라인 구성</span></p>
+                <div class="flex flex-wrap gap-2 mt-auto pt-3 border-t border-gray-700">
+                  <span class="px-2 py-1 bg-gray-700 text-gray-300 text-xs rounded">VertexAI</span>
+                  <span class="px-2 py-1 bg-gray-700 text-gray-300 text-xs rounded">Gemini Pro/Flash</span>
+                  <span class="px-2 py-1 bg-gray-700 text-gray-300 text-xs rounded">BigQuery</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- 2. 지능형 자동화 및 챗봇 -->
+          <h3 class="text-xl font-bold text-gray-200 mb-4 mt-8 border-l-4 border-purple-500 pl-3" data-ko="지능형 자동화 및 챗봇" data-en="Intelligent Automation & Chatbots">지능형 자동화 및 챗봇</h3>
+          <div class="grid lg:grid-cols-2 gap-6 mb-12">
+            <!-- Education -->
+            <div class="bg-gray-800 rounded-xl border border-gray-700 flex flex-col h-full overflow-hidden hover:border-purple-500 transition-colors">
+              <div class="bg-purple-900/30 px-4 py-2 border-b border-gray-700 flex justify-between items-center">
+                <span class="text-purple-400 font-bold text-sm">Education</span>
+                <span class="text-lg">📚</span>
+              </div>
+              <div class="p-5 flex-1 flex flex-col">
+                <h4 class="text-md font-bold text-gray-100 mb-2" data-ko="교육용 AI 챗봇 앱" data-en="Educational AI Chatbot">교육용 AI 챗봇 앱</h4>
+                <p class="text-sm text-gray-400 mb-2"><strong class="text-gray-300">Challenge:</strong> <span data-ko="AI 기술을 활용한 맞춤형 학습 경험 제공 및 신뢰도 높은 백과사전 콘텐츠 기반의 정확한 정보 제공" data-en="Provide personalized learning and accurate info based on reliable encyclopedias.">AI 기술을 활용한 맞춤형 학습 경험 제공 및 신뢰도 높은 백과사전 콘텐츠 기반의 정확한 정보 제공</span></p>
+                <p class="text-sm text-gray-400 mb-4 flex-1"><strong class="text-gray-300">Solution:</strong> <span data-ko="Gemini를 활용하여 사용자의 연령과 학습 목적에 따라 맞춤형 답변을 제공. 다국어/멀티모달 지원" data-en="Developed a Gemini-based chatbot offering tailored answers by user age and purpose, with multimodal support.">Gemini를 활용하여 사용자의 연령과 학습 목적에 따라 맞춤형 답변을 제공. 다국어/멀티모달 지원</span></p>
+                <div class="flex flex-wrap gap-2 mt-auto pt-3 border-t border-gray-700">
+                  <span class="px-2 py-1 bg-gray-700 text-gray-300 text-xs rounded">VertexAI</span>
+                  <span class="px-2 py-1 bg-gray-700 text-gray-300 text-xs rounded">Cloud Run</span>
+                  <span class="px-2 py-1 bg-gray-700 text-gray-300 text-xs rounded">BigQuery</span>
+                </div>
               </div>
             </div>
 
-            <!-- === 카드 14 === -->
-            <div class="bg-gray-800 rounded-xl border border-gray-700 overflow-hidden md:flex">
-              <div class="md:w-2/3 p-8">
-                <h4 class="text-xl font-bold text-gray-200 mb-3"><span class="lang lang-ko">Slack 연동 NL2SQL 프로토타입 개발</span><span class="lang lang-en">Slack-Integrated NL2SQL Prototype Development</span></h4>
-                <p class="text-gray-400 mb-4 leading-relaxed"><strong>Challenge:</strong> <span class="lang lang-ko">임직원들이 일상 업무 도구에서 손쉽게 데이터 기반 의사결정을 내릴 수 있는 환경 구축.</span><span class="lang lang-en">Create an environment where employees can easily make data-driven decisions from their daily work tools.</span></p>
-                <p class="text-gray-400 mb-4 leading-relaxed"><strong>Solution:</strong> <span class="lang lang-ko">NL2SQL 프로토타입을 개발하고 Slack과 연동하여 데이터 분석 접근성 향상.</span><span class="lang lang-en">Developed an NL2SQL prototype and integrated it with Slack to improve data analysis accessibility.</span></p>
-                <p class="text-xs text-gray-500 mt-4">Products: VertexAI, Gemini model Pro/Flash, Slack API</p>
+            <!-- Digital Education -->
+            <div class="bg-gray-800 rounded-xl border border-gray-700 flex flex-col h-full overflow-hidden hover:border-indigo-500 transition-colors">
+              <div class="bg-indigo-900/30 px-4 py-2 border-b border-gray-700 flex justify-between items-center">
+                <span class="text-indigo-400 font-bold text-sm">Digital Education</span>
+                <span class="text-lg">🎓</span>
               </div>
-              <div class="md:w-1/3 bg-gradient-to-r from-fuchsia-700 to-fuchsia-600 p-8 flex flex-col justify-center items-center text-white">
-                <div class="text-6xl mb-4">🎤</div>
-                <h3 class="text-2xl font-bold"><span class="lang lang-ko">엔터테인먼트 분야</span><span class="lang lang-en">Entertainment</span></h3>
-              </div>
-            </div>
-
-            <h4 class="text-2xl font-bold text-gray-200 mb-3 mt-8 border-t border-gray-700 pt-8"><span class="lang lang-ko">멀티모달 응용</span><span class="lang lang-en">Multimodal Applications</span></h4>
-            <!-- === 카드 5 === -->
-            <div class="bg-gray-800 rounded-xl border border-gray-700 overflow-hidden md:flex">
-              <div class="md:w-1/3 bg-gradient-to-r from-red-800 to-red-700 p-8 flex flex-col justify-center items-center text-white">
-                <div class="text-6xl mb-4">📺</div>
-                <h3 class="text-2xl font-bold"><span class="lang lang-ko">방송 분야</span><span class="lang lang-en">Broadcasting</span></h3>
-              </div>
-              <div class="md:w-2/3 p-8">
-                <h4 class="text-xl font-bold text-gray-200 mb-3"><span class="lang lang-ko">영상 분석 기반 재난 상황 분석</span><span class="lang lang-en">Video Analysis-Based Disaster Situation Analysis</span></h4>
-                <p class="text-gray-400 mb-4 leading-relaxed"><strong>Challenge:</strong> <span class="lang lang-ko">재난 상황을 신속하게 파악하고 대응하기 위해 실시간 영상 분석 및 기사 생성 자동화 필요</span><span class="lang lang-en">Need for real-time video analysis and automatic article generation to quickly identify and respond to disaster situations.</span></p>
-                <p class="text-gray-400 mb-4 leading-relaxed"><strong>Solution:</strong> <span class="lang lang-ko">Gemini model Pro/Flash로 영상을 분석하여 재난 상황을 파악하고, 텍스트 기반 기사 자동 생성</span><span class="lang lang-en">Analyzed videos with Gemini model Pro/Flash to understand disaster situations and automatically generate text-based articles.</span></p>
-                <p class="text-xs text-gray-500 mt-4">Products: VertexAI, Gemini model Pro/Flash, Cloud Run, Cloud Armor</p>
+              <div class="p-5 flex-1 flex flex-col">
+                <h4 class="text-md font-bold text-gray-100 mb-2" data-ko="GenAI RAG 챗봇 구축" data-en="GenAI RAG Chatbot">GenAI RAG 챗봇 구축</h4>
+                <p class="text-sm text-gray-400 mb-2"><strong class="text-gray-300">Challenge:</strong> <span data-ko="BigQuery의 데이터를 기반으로 신뢰도 높은 답변을 제공하는 지능형 챗봇 구축 필요" data-en="Build an intelligent chatbot providing reliable answers based on BigQuery data.">BigQuery의 데이터를 기반으로 신뢰도 높은 답변을 제공하는 지능형 챗봇 구축 필요</span></p>
+                <p class="text-sm text-gray-400 mb-4 flex-1"><strong class="text-gray-300">Solution:</strong> <span data-ko="RAG(검색 증강 생성) 기술을 활용하여 BigQuery 데이터를 실시간으로 참조해 답변 정확성을 확보" data-en="Utilized RAG technology to reference BigQuery data in real-time, ensuring high accuracy.">RAG(검색 증강 생성) 기술을 활용하여 BigQuery 데이터를 실시간으로 참조해 답변 정확성을 확보</span></p>
+                <div class="flex flex-wrap gap-2 mt-auto pt-3 border-t border-gray-700">
+                  <span class="px-2 py-1 bg-gray-700 text-gray-300 text-xs rounded">VertexAI</span>
+                  <span class="px-2 py-1 bg-gray-700 text-gray-300 text-xs rounded">Gemini Pro/Flash</span>
+                  <span class="px-2 py-1 bg-gray-700 text-gray-300 text-xs rounded">BigQuery</span>
+                </div>
               </div>
             </div>
 
-            <!-- === 카드 6 === -->
-            <div class="bg-gray-800 rounded-xl border border-gray-700 overflow-hidden md:flex">
-              <div class="md:w-2/3 p-8">
-                <h4 class="text-xl font-bold text-gray-200 mb-3"><span class="lang lang-ko">영상 분석 기반 오류 검출 시스템</span><span class="lang lang-en">Video Analysis-Based Error Detection System</span></h4>
-                <p class="text-gray-400 mb-4 leading-relaxed"><strong>Challenge:</strong> <span class="lang lang-ko">영상 내 오류(자막, 배너 등)를 감지하여 상품 정보 신뢰도를 높이고, 문제 해결 시간 및 재촬영 비용 절감 필요</span><span class="lang lang-en">Need to detect errors in videos (subtitles, banners, etc.) to increase product information reliability, reduce problem-solving time, and cut reshooting costs.</span></p>
-                <p class="text-gray-400 mb-4 leading-relaxed"><strong>Solution:</strong> <span class="lang lang-ko">Gemini model Pro/Flash를 이용해 영상을 프레임 단위로 분석하고, 기준서 텍스트 정보와 비교하여 오류 검출</span><span class="lang lang-en">Used Gemini model Pro/Flash to analyze videos frame by frame and compare with reference text information to detect errors.</span></p>
-                <p class="text-xs text-gray-500 mt-4">Products: VertexAI, Gemini model Pro/Flash, Vertex Colab CPU</p>
+            <!-- Entertainment (Slack) -->
+            <div class="bg-gray-800 rounded-xl border border-gray-700 flex flex-col h-full overflow-hidden hover:border-fuchsia-500 transition-colors">
+              <div class="bg-fuchsia-900/30 px-4 py-2 border-b border-gray-700 flex justify-between items-center">
+                <span class="text-fuchsia-400 font-bold text-sm">Entertainment</span>
+                <span class="text-lg">🎤</span>
               </div>
-              <div class="md:w-1/3 bg-gradient-to-r from-orange-800 to-orange-700 p-8 flex flex-col justify-center items-center text-white">
-                <div class="text-6xl mb-4">🛒</div>
-                <h3 class="text-2xl font-bold"><span class="lang lang-ko">홈쇼핑 분야</span><span class="lang lang-en">Home Shopping</span></h3>
+              <div class="p-5 flex-1 flex flex-col">
+                <h4 class="text-md font-bold text-gray-100 mb-2" data-ko="Slack 연동 NL2SQL 프로토타입" data-en="Slack NL2SQL Prototype">Slack 연동 NL2SQL 프로토타입</h4>
+                <p class="text-sm text-gray-400 mb-2"><strong class="text-gray-300">Challenge:</strong> <span data-ko="임직원들이 일상 업무 도구에서 손쉽게 데이터 기반 의사결정을 내릴 수 있는 환경 구축" data-en="Create an environment where employees can make data-driven decisions via daily tools.">임직원들이 일상 업무 도구에서 손쉽게 데이터 기반 의사결정을 내릴 수 있는 환경 구축</span></p>
+                <p class="text-sm text-gray-400 mb-4 flex-1"><strong class="text-gray-300">Solution:</strong> <span data-ko="NL2SQL 프로토타입을 개발하고 사내 메신저(Slack)와 연동하여 데이터 분석 접근성을 대폭 향상" data-en="Developed an NL2SQL prototype integrated with Slack to vastly improve data accessibility.">NL2SQL 프로토타입을 개발하고 사내 메신저(Slack)와 연동하여 데이터 분석 접근성을 대폭 향상</span></p>
+                <div class="flex flex-wrap gap-2 mt-auto pt-3 border-t border-gray-700">
+                  <span class="px-2 py-1 bg-gray-700 text-gray-300 text-xs rounded">VertexAI</span>
+                  <span class="px-2 py-1 bg-gray-700 text-gray-300 text-xs rounded">Slack API</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- 3. 멀티모달 응용 -->
+          <h3 class="text-xl font-bold text-gray-200 mb-4 mt-8 border-l-4 border-red-500 pl-3" data-ko="멀티모달 응용" data-en="Multimodal Applications">멀티모달 응용</h3>
+          <div class="grid lg:grid-cols-2 gap-6 mb-12">
+            <!-- Broadcasting -->
+            <div class="bg-gray-800 rounded-xl border border-gray-700 flex flex-col h-full overflow-hidden hover:border-red-500 transition-colors">
+              <div class="bg-red-900/30 px-4 py-2 border-b border-gray-700 flex justify-between items-center">
+                <span class="text-red-400 font-bold text-sm">Broadcasting</span>
+                <span class="text-lg">📺</span>
+              </div>
+              <div class="p-5 flex-1 flex flex-col">
+                <h4 class="text-md font-bold text-gray-100 mb-2" data-ko="영상 분석 기반 재난 상황 파악" data-en="Video-based Disaster Analysis">영상 분석 기반 재난 상황 파악</h4>
+                <p class="text-sm text-gray-400 mb-2"><strong class="text-gray-300">Challenge:</strong> <span data-ko="재난 상황을 신속하게 파악하고 대응하기 위해 실시간 영상 분석 및 기사 생성 자동화 필요" data-en="Automate real-time video analysis and article generation to respond quickly to disasters.">재난 상황을 신속하게 파악하고 대응하기 위해 실시간 영상 분석 및 기사 생성 자동화 필요</span></p>
+                <p class="text-sm text-gray-400 mb-4 flex-1"><strong class="text-gray-300">Solution:</strong> <span data-ko="Gemini Pro/Flash 모델로 영상을 프레임 단위로 분석하여 재난 상황을 인지, 텍스트 초안 자동 생성" data-en="Analyzed videos frame-by-frame with Gemini to detect disasters and auto-generate text drafts.">Gemini Pro/Flash 모델로 영상을 프레임 단위로 분석하여 재난 상황을 인지, 텍스트 초안 자동 생성</span></p>
+                <div class="flex flex-wrap gap-2 mt-auto pt-3 border-t border-gray-700">
+                  <span class="px-2 py-1 bg-gray-700 text-gray-300 text-xs rounded">Gemini Vision</span>
+                  <span class="px-2 py-1 bg-gray-700 text-gray-300 text-xs rounded">Cloud Run</span>
+                </div>
               </div>
             </div>
 
-            <!-- === 카드 17 === -->
-            <div class="bg-gray-800 rounded-xl border border-gray-700 overflow-hidden md:flex">
-              <div class="md:w-1/3 bg-gradient-to-r from-stone-800 to-stone-700 p-8 flex flex-col justify-center items-center text-white">
-                <div class="text-6xl mb-4">🏗️</div>
-                <h3 class="text-2xl font-bold"><span class="lang lang-ko">중공업 분야</span><span class="lang lang-en">Heavy Industry</span></h3>
+            <!-- Home Shopping -->
+            <div class="bg-gray-800 rounded-xl border border-gray-700 flex flex-col h-full overflow-hidden hover:border-orange-500 transition-colors">
+              <div class="bg-orange-900/30 px-4 py-2 border-b border-gray-700 flex justify-between items-center">
+                <span class="text-orange-400 font-bold text-sm">Home Shopping</span>
+                <span class="text-lg">🛒</span>
               </div>
-              <div class="md:w-2/3 p-8">
-                <h4 class="text-xl font-bold text-gray-200 mb-3"><span class="lang lang-ko">Veo 2 기반 영상 생성 POC</span><span class="lang lang-en">Veo 2-Based Video Generation POC</span></h4>
-                <p class="text-gray-400 mb-4 leading-relaxed"><strong>Challenge:</strong> <span class="lang lang-ko">산업 현장 시뮬레이션 및 교육 자료 제작을 위한 고품질 영상 자동 생성 기술 확보.</span><span class="lang lang-en">Secure high-quality automatic video generation technology for industrial site simulations and training materials.</span></p>
-                <p class="text-gray-400 mb-4 leading-relaxed"><strong>Solution:</strong> <span class="lang lang-ko">Google의 Veo 2 모델을 활용하여 텍스트 프롬프트 기반 영상 생성 기술 POC 진행.</span><span class="lang lang-en">Conducted a POC for text prompt-based video generation technology using Google's Veo 2 model.</span></p>
-                <p class="text-xs text-gray-500 mt-4">Products: VertexAI, Veo 2</p>
-              </div>
-            </div>
-
-            <h4 class="text-2xl font-bold text-gray-200 mb-3 mt-8 border-t border-gray-700 pt-8"><span class="lang lang-ko">데이터 플랫폼 현대화</span><span class="lang lang-en">Data Platform Modernization</span></h4>
-            <!-- === 카드 11 === -->
-            <div class="bg-gray-800 rounded-xl border border-gray-700 overflow-hidden md:flex">
-              <div class="md:w-1/3 bg-gradient-to-r from-sky-800 to-sky-700 p-8 flex flex-col justify-center items-center text-white">
-                <div class="text-6xl mb-4">⚙️</div>
-                <h3 class="text-2xl font-bold"><span class="lang lang-ko">제조 분야</span><span class="lang lang-en">Manufacturing</span></h3>
-              </div>
-              <div class="md:w-2/3 p-8">
-                <h4 class="text-xl font-bold text-gray-200 mb-3"><span class="lang lang-ko">SAP 데이터 BigQuery 이전 및 NL2SQL 분석</span><span class="lang lang-en">SAP Data to BigQuery Migration and NL2SQL Analysis</span></h4>
-                <p class="text-gray-400 mb-4 leading-relaxed"><strong>Challenge:</strong> <span class="lang lang-ko">SAP의 핵심 비즈니스 데이터 분석 환경을 현대화하고 데이터 접근성 향상.</span><span class="lang lang-en">Modernize the core business data analysis environment of SAP and improve data accessibility.</span></p>
-                <p class="text-gray-400 mb-4 leading-relaxed"><strong>Solution:</strong> <span class="lang lang-ko">SAP 데이터를 BigQuery로 이전하고, NL2SQL을 통해 데이터 분석을 용이하게 하는 POC 실행.</span><span class="lang lang-en">Executed a POC to facilitate data analysis through NL2SQL after migrating SAP data to BigQuery.</span></p>
-                <p class="text-xs text-gray-500 mt-4">Products: VertexAI, Gemini model Pro/Flash, BigQuery, SAP</p>
+              <div class="p-5 flex-1 flex flex-col">
+                <h4 class="text-md font-bold text-gray-100 mb-2" data-ko="영상 분석 기반 오류 검출 시스템" data-en="Video Error Detection System">영상 분석 기반 오류 검출 시스템</h4>
+                <p class="text-sm text-gray-400 mb-2"><strong class="text-gray-300">Challenge:</strong> <span data-ko="영상 내 오류(자막, 배너 등) 감지로 상품 정보 신뢰도 상승 및 재촬영 비용 절감" data-en="Detect video errors (subtitles, banners) to increase trust and reduce reshoot costs.">영상 내 오류(자막, 배너 등) 감지로 상품 정보 신뢰도 상승 및 재촬영 비용 절감</span></p>
+                <p class="text-sm text-gray-400 mb-4 flex-1"><strong class="text-gray-300">Solution:</strong> <span data-ko="Gemini 모델로 영상을 분석하고, 기준서의 텍스트 정보와 매칭하여 실시간으로 오류를 검출" data-en="Analyzed videos with Gemini and matched against reference texts to detect errors in real-time.">Gemini 모델로 영상을 분석하고, 기준서의 텍스트 정보와 매칭하여 실시간으로 오류를 검출</span></p>
+                <div class="flex flex-wrap gap-2 mt-auto pt-3 border-t border-gray-700">
+                  <span class="px-2 py-1 bg-gray-700 text-gray-300 text-xs rounded">VertexAI</span>
+                  <span class="px-2 py-1 bg-gray-700 text-gray-300 text-xs rounded">Gemini Vision</span>
+                </div>
               </div>
             </div>
 
-            <!-- === 카드 18 === -->
-            <div class="bg-gray-800 rounded-xl border border-gray-700 overflow-hidden md:flex">
-              <div class="md:w-2/3 p-8">
-                <h4 class="text-xl font-bold text-gray-200 mb-3"><span class="lang lang-ko">BigQuery 데이터 환경 구축</span><span class="lang lang-en">Building a BigQuery Data Environment</span></h4>
-                <p class="text-gray-400 mb-4 leading-relaxed"><strong>Challenge:</strong> <span class="lang lang-ko">안전하고 효율적인 데이터 분석 및 AI 모델 개발을 위한 중앙화된 데이터 환경 구축.</span><span class="lang lang-en">Establish a centralized data environment for secure and efficient data analysis and AI model development.</span></p>
-                <p class="text-gray-400 mb-4 leading-relaxed"><strong>Solution:</strong> <span class="lang lang-ko">BigQuery를 중심으로 데이터 웨어하우스를 구축하고 데이터 거버넌스 체계 수립.</span><span class="lang lang-en">Built a data warehouse centered on BigQuery and established a data governance framework.</span></p>
-                <p class="text-xs text-gray-500 mt-4">Products: VertexAI, BigQuery</p>
+            <!-- Heavy Industry -->
+            <div class="bg-gray-800 rounded-xl border border-gray-700 flex flex-col h-full overflow-hidden hover:border-stone-500 transition-colors">
+              <div class="bg-stone-800/80 px-4 py-2 border-b border-gray-700 flex justify-between items-center">
+                <span class="text-stone-400 font-bold text-sm">Heavy Industry</span>
+                <span class="text-lg">🏗️</span>
               </div>
-              <div class="md:w-1/3 bg-gradient-to-r from-emerald-700 to-emerald-600 p-8 flex flex-col justify-center items-center text-white">
-                <div class="text-6xl mb-4">💳</div>
-                <h3 class="text-2xl font-bold"><span class="lang lang-ko">금융 분야</span><span class="lang lang-en">Finance</span></h3>
+              <div class="p-5 flex-1 flex flex-col">
+                <h4 class="text-md font-bold text-gray-100 mb-2" data-ko="Veo 2 기반 영상 생성" data-en="Veo 2 Video Generation">Veo 2 기반 영상 생성</h4>
+                <p class="text-sm text-gray-400 mb-2"><strong class="text-gray-300">Challenge:</strong> <span data-ko="산업 현장 시뮬레이션 및 안전 교육 자료 제작을 위한 고품질 영상 자동 생성 기술 확보" data-en="Secure high-quality video generation for industrial simulations and safety training.">산업 현장 시뮬레이션 및 안전 교육 자료 제작을 위한 고품질 영상 자동 생성 기술 확보</span></p>
+                <p class="text-sm text-gray-400 mb-4 flex-1"><strong class="text-gray-300">Solution:</strong> <span data-ko="Google의 Veo 2 모델을 도입하여 텍스트 프롬프트만으로 정밀한 산업 현장 시뮬레이션 영상 렌더링" data-en="Introduced Google's Veo 2 model to render precise industrial simulation videos from text prompts.">Google의 Veo 2 모델을 도입하여 텍스트 프롬프트만으로 정밀한 산업 현장 시뮬레이션 영상 렌더링</span></p>
+                <div class="flex flex-wrap gap-2 mt-auto pt-3 border-t border-gray-700">
+                  <span class="px-2 py-1 bg-gray-700 text-gray-300 text-xs rounded">VertexAI</span>
+                  <span class="px-2 py-1 bg-gray-700 text-gray-300 text-xs rounded">Veo 2</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- 4. 데이터 플랫폼 현대화 -->
+          <h3 class="text-xl font-bold text-gray-200 mb-4 mt-8 border-l-4 border-sky-500 pl-3" data-ko="데이터 플랫폼 현대화" data-en="Data Platform Modernization">데이터 플랫폼 현대화</h3>
+          <div class="grid lg:grid-cols-2 gap-6 mb-12">
+            <!-- Manufacturing -->
+            <div class="bg-gray-800 rounded-xl border border-gray-700 flex flex-col h-full overflow-hidden hover:border-sky-500 transition-colors">
+              <div class="bg-sky-900/30 px-4 py-2 border-b border-gray-700 flex justify-between items-center">
+                <span class="text-sky-400 font-bold text-sm">Manufacturing</span>
+                <span class="text-lg">⚙️</span>
+              </div>
+              <div class="p-5 flex-1 flex flex-col">
+                <h4 class="text-md font-bold text-gray-100 mb-2" data-ko="SAP 데이터 BigQuery 연동 및 분석" data-en="SAP to BigQuery & NL2SQL">SAP 데이터 BigQuery 연동 및 분석</h4>
+                <p class="text-sm text-gray-400 mb-2"><strong class="text-gray-300">Challenge:</strong> <span data-ko="폐쇄적인 SAP 핵심 비즈니스 데이터 환경을 현대화하여 데이터 활용성 증대 필요" data-en="Modernize the closed SAP core business data environment to increase utilization.">폐쇄적인 SAP 핵심 비즈니스 데이터 환경을 현대화하여 데이터 활용성 증대 필요</span></p>
+                <p class="text-sm text-gray-400 mb-4 flex-1"><strong class="text-gray-300">Solution:</strong> <span data-ko="SAP 데이터를 BigQuery로 안전하게 이전하고, NL2SQL 파이프라인을 구축해 일반 직원도 분석 가능하도록 설계" data-en="Migrated SAP data to BigQuery safely and built an NL2SQL pipeline for broader employee access.">SAP 데이터를 BigQuery로 안전하게 이전하고, NL2SQL 파이프라인을 구축해 일반 직원도 분석 가능하도록 설계</span></p>
+                <div class="flex flex-wrap gap-2 mt-auto pt-3 border-t border-gray-700">
+                  <span class="px-2 py-1 bg-gray-700 text-gray-300 text-xs rounded">VertexAI</span>
+                  <span class="px-2 py-1 bg-gray-700 text-gray-300 text-xs rounded">BigQuery</span>
+                  <span class="px-2 py-1 bg-gray-700 text-gray-300 text-xs rounded">SAP</span>
+                </div>
               </div>
             </div>
 
-            <!-- === 카드 19 === -->
-            <div class="bg-gray-800 rounded-xl border border-gray-700 overflow-hidden md:flex">
-              <div class="md:w-1/3 bg-gradient-to-r from-fuchsia-800 to-fuchsia-700 p-8 flex flex-col justify-center items-center text-white">
-                <div class="text-6xl mb-4">🎤</div>
-                <h3 class="text-2xl font-bold"><span class="lang lang-ko">엔터테인먼트 분야</span><span class="lang lang-en">Entertainment</span></h3>
+            <!-- Finance -->
+            <div class="bg-gray-800 rounded-xl border border-gray-700 flex flex-col h-full overflow-hidden hover:border-emerald-500 transition-colors">
+              <div class="bg-emerald-900/30 px-4 py-2 border-b border-gray-700 flex justify-between items-center">
+                <span class="text-emerald-400 font-bold text-sm">Finance</span>
+                <span class="text-lg">💳</span>
               </div>
-              <div class="md:w-2/3 p-8">
-                <h4 class="text-xl font-bold text-gray-200 mb-3"><span class="lang lang-ko">Databricks to BigQuery 마이그레이션</span><span class="lang lang-en">Databricks to BigQuery Migration</span></h4>
-                <p class="text-gray-400 mb-4 leading-relaxed"><strong>Challenge:</strong> <span class="lang lang-ko">데이터 분석 환경의 확장성과 효율성 증대.</span><span class="lang lang-en">Increase the scalability and efficiency of the data analysis environment.</span></p>
-                <p class="text-gray-400 mb-4 leading-relaxed"><strong>Solution:</strong> <span class="lang lang-ko">Databricks의 데이터를 Google BigQuery로 이전하여 데이터 분석 환경을 고도화.</span><span class="lang lang-en">Advanced the data analysis environment by migrating data from Databricks to Google BigQuery.</span></p>
-                <p class="text-xs text-gray-500 mt-4">Products: BigQuery, Databricks</p>
+              <div class="p-5 flex-1 flex flex-col">
+                <h4 class="text-md font-bold text-gray-100 mb-2" data-ko="BigQuery 중심 데이터 웨어하우스 구축" data-en="BigQuery Data Warehouse Setup">BigQuery 중심 데이터 웨어하우스 구축</h4>
+                <p class="text-sm text-gray-400 mb-2"><strong class="text-gray-300">Challenge:</strong> <span data-ko="안전하고 효율적인 데이터 분석 및 AI 모델 학습을 위한 중앙화된 보안 데이터 환경 필요" data-en="Need a centralized, secure data environment for efficient analysis and AI model training.">안전하고 효율적인 데이터 분석 및 AI 모델 학습을 위한 중앙화된 보안 데이터 환경 필요</span></p>
+                <p class="text-sm text-gray-400 mb-4 flex-1"><strong class="text-gray-300">Solution:</strong> <span data-ko="BigQuery를 백본으로 삼아 데이터 거버넌스 체계를 수립하고, Vertex AI와 직접 연동하는 In-database ML 아키텍처 완성" data-en="Established a data governance framework backed by BigQuery, completing an In-database ML architecture directly linked to Vertex AI.">BigQuery를 백본으로 삼아 데이터 거버넌스 체계를 수립하고, Vertex AI와 직접 연동하는 In-database ML 아키텍처 완성</span></p>
+                <div class="flex flex-wrap gap-2 mt-auto pt-3 border-t border-gray-700">
+                  <span class="px-2 py-1 bg-gray-700 text-gray-300 text-xs rounded">BigQuery</span>
+                  <span class="px-2 py-1 bg-gray-700 text-gray-300 text-xs rounded">Vertex AI</span>
+                </div>
               </div>
             </div>
-
           </div>
         </section>
       </div>
