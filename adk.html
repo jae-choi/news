@@ -51,9 +51,26 @@
         }
         .yt-card .play-badge svg { width: 22px; height: 22px; fill: #fff; margin-left: 2px; }
         .yt-card:hover .play-badge { transform: scale(1.05); background: rgba(0,0,0,.7); }
+        .mermaid { display: flex; justify-content: center; margin-top: 2rem; margin-bottom: 2rem; }
     </style>
 </head>
 <body class="bg-gray-50 text-gray-800">
+
+    <!-- Mermaid -->
+    <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+    <script>
+      mermaid.initialize({
+        startOnLoad: true,
+        theme: "default",
+        themeVariables: {
+            primaryColor: "#eff6ff",
+            primaryBorderColor: "#3b82f6",
+            lineColor: "#64748b",
+            secondaryColor: "#f8fafc",
+            tertiaryColor: "#f1f5f9"
+        }
+      });
+    </script>
 
     <div class="container mx-auto px-4 sm:px-6 lg:px-8">
         <header class="py-12 text-center">
@@ -106,7 +123,32 @@
                         </div>
                         <p class="text-lg"><span class="lang lang-ko">AI 에이전트는 복잡한 질문에 답하고 작업을 완료하는 데 도움을 주는 대화형 파트너입니다. Google Agent Development Kit(ADK)는 개발자가 다중 에이전트 시스템을 신속하게 구축하고 맞춤설정할 수 있도록 지원하는 클라이언트 측 Python SDK입니다.</span><span class="lang lang-en" style="display:none;">An AI agent is a conversational partner that helps answer complex questions and complete tasks. The Google Agent Development Kit (ADK) is a client-side Python SDK that enables developers to quickly build and customize multi-agent systems.</span></p>
                         <p class="text-lg mt-4"><span class="lang lang-ko">ADK는 복잡한 다중 에이전트 시스템의 개발을 간소화하도록 설계되었습니다. 에이전트 간의 통신, 대화 기록, 상태 공유와 같은 어려운 문제들을 처리해주므로, 개발자는 인프라에 대한 고민 없이 에이전트의 핵심 로직과 상호작용을 구축하는 데 집중할 수 있습니다.</span><span class="lang lang-en" style="display:none;">ADK is designed to simplify the development of complex multi-agent systems. It handles challenging issues like inter-agent communication, conversation history, and state sharing, allowing developers to focus on building the core logic and interactions of their agents without worrying about infrastructure.</span></p>
-                        <img src="https://google.github.io/adk-docs/assets/adk-components.png" alt="ADK Components" class="mt-6">
+                        
+                        <div class="mt-8 mb-10 bg-white border border-gray-200 rounded-xl p-6 shadow-sm">
+                            <h4 class="text-center font-bold text-gray-700 mb-4"><span class="lang lang-ko">ADK 핵심 아키텍처 흐름</span><span class="lang lang-en" style="display:none;">ADK Core Architecture Flow</span></h4>
+                            <pre class="mermaid bg-transparent p-4 flex justify-center text-center">
+graph TD
+    A([User Query / Interaction]) --> B[Agent Orchestrator];
+    subgraph ADK Framework
+        B --> C[(Session Memory / History)];
+        B --> D{Decision Engine};
+        D --> E[Tools & Plugins];
+        D -.-> F(Multi-Agent Routing);
+    end
+    E --> G((External APIs <br/> Search, DB, etc.));
+    D --> H[LLM Models <br/> Gemini etc.];
+    
+    style A fill:#f8fafc,stroke:#94a3b8,stroke-width:1px
+    style B fill:#eff6ff,stroke:#3b82f6,stroke-width:2px
+    style C fill:#f1f5f9,stroke:#64748b
+    style D fill:#eff6ff,stroke:#3b82f6
+    style E fill:#f1f5f9,stroke:#64748b
+    style F fill:#f8fafc,stroke:#94a3b8,stroke-dasharray: 5 5
+    style G fill:#fefce8,stroke:#eab308
+    style H fill:#fefce8,stroke:#eab308
+                            </pre>
+                        </div>
+                        
                         <h3 class="text-2xl font-bold mt-8 mb-4"><span class="lang lang-ko">주요 특징</span><span class="lang lang-en" style="display:none;">Key Features</span></h3>
                         <ul class="list-disc list-inside text-lg space-y-2">
                             <li><b><span class="lang lang-ko">코드 중심 접근 방식:</span><span class="lang lang-en" style="display:none;">Code-centric Approach:</span></b> <span class="lang lang-ko">별도의 AI 전문 지식 없이도 Python 개발자라면 누구나 쉽게 에이전트를 개발할 수 있습니다.</span><span class="lang lang-en" style="display:none;">Any Python developer can easily develop agents without needing specialized AI expertise.</span></li>
@@ -127,7 +169,30 @@
                                     <li><strong><span class="lang lang-ko">프레임워크 독립성:</span><span class="lang lang-en" style="display:none;">Framework Agnostic:</span></strong> <span class="lang lang-ko">LangGraph, LangChain, AG2, CrewAI 등 다양한 Python 프레임워크를 지원하여 유연한 배포가 가능합니다.</span><span class="lang lang-en" style="display:none;">Supports various Python frameworks like LangGraph, LangChain, AG2, and CrewAI for flexible deployment.</span></li>
                                 </ul>
                             </div>
-                            <img src="https://cloud.google.com/static/vertex-ai/generative-ai/docs/agent-engine/images/agent-engine.png?hl=ko&dcb_=0.43273794684805855" alt="Agent Engine Architecture" class="mt-6">
+                            
+                            <div class="mt-8 mb-10 bg-white border border-gray-200 rounded-xl p-6 shadow-sm">
+                                <h4 class="text-center font-bold text-gray-700 mb-4"><span class="lang lang-ko">Vertex AI Agent Engine 배포 아키텍처</span><span class="lang lang-en" style="display:none;">Vertex AI Agent Engine Deployment Architecture</span></h4>
+                                <pre class="mermaid bg-transparent p-4 flex justify-center text-center">
+graph TD
+    subgraph "Vertex AI Agent Engine (Fully Managed)"
+        A[Managed Serverless Runtime] --> B{Framework Agnostic Layer};
+        B --> C[ADK Agents];
+        B --> D[LangGraph / LangChain / CrewAI];
+        
+        A -.-> E[Security & IAM / VPC-SC];
+        A -.-> F[Google Cloud Trace Monitoring];
+        A -.-> G[Gen AI Evaluation Service];
+    end
+    
+    style A fill:#eff6ff,stroke:#3b82f6,stroke-width:2px
+    style B fill:#f1f5f9,stroke:#64748b
+    style C fill:#fefce8,stroke:#eab308
+    style D fill:#fefce8,stroke:#eab308
+    style E fill:#f8fafc,stroke:#94a3b8,stroke-dasharray: 5 5
+    style F fill:#f8fafc,stroke:#94a3b8,stroke-dasharray: 5 5
+    style G fill:#f8fafc,stroke:#94a3b8,stroke-dasharray: 5 5
+                                </pre>
+                            </div>
                         </div>
                     </section>
 
