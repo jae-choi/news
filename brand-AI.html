@@ -444,6 +444,19 @@
             });
         });
 
+        // Function to update internal links with current language
+        function updateLinksWithLang(lang) {
+            document.querySelectorAll('a').forEach(link => {
+                const href = link.getAttribute('href');
+                // Target only local HTML files or index.html
+                if (href && !href.startsWith('http') && !href.startsWith('#') && (href.includes('.html') || href === '/')) {
+                    const url = new URL(link.href);
+                    url.searchParams.set('lang', lang);
+                    link.href = url.pathname + url.search + url.hash;
+                }
+            });
+        }
+
         // Function to switch language
         function switchLanguage(lang) {
             document.querySelectorAll('[data-ko]').forEach(el => {
@@ -453,6 +466,9 @@
             });
             document.documentElement.lang = lang;
             document.title = document.querySelector('title').dataset[lang];
+            
+            // Save preference
+            localStorage.setItem('language', lang);
 
             // Update button active state
             document.getElementById('btn-ko').classList.toggle('active', lang === 'ko');
@@ -462,16 +478,20 @@
             document.getElementById('btn-en').classList.toggle('active', lang === 'en');
             document.getElementById('btn-en').classList.toggle('text-slate-600', lang !== 'en');
             document.getElementById('btn-en').classList.toggle('bg-white', lang !== 'en');
+
+            // Update all internal links with the selected language
+            updateLinksWithLang(lang);
         }
 
         // Set initial language
         document.addEventListener('DOMContentLoaded', () => {
-            const userLang = navigator.language || navigator.userLanguage;
-            if (userLang.startsWith('en')) {
-                switchLanguage('en');
-            } else {
-                switchLanguage('ko');
-            }
+            const urlParams = new URLSearchParams(window.location.search);
+            const langFromUrl = urlParams.get('lang');
+            const langFromStorage = localStorage.getItem('language');
+            const browserLang = (navigator.language || navigator.userLanguage).startsWith('en') ? 'en' : 'ko';
+            
+            const initialLang = langFromUrl || langFromStorage || browserLang;
+            switchLanguage(initialLang);
         });
     </script>
 </body>
