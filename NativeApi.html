@@ -1,0 +1,402 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" href="https://avatars.githubusercontent.com/u/35217573?v=4" type="image/x-icon">
+    <title data-ko="Native Multimodal 기반 대규모 음성 챗봇 아키텍처" data-en="Native Multimodal Voice Chatbot Architecture">Native Multimodal 기반 대규모 음성 챗봇 아키텍처</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Noto+Sans+KR:wght@400;500;700;900&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', 'Noto Sans KR', sans-serif;
+            background-color: #f8fafc; /* slate-50 */
+        }
+        html { scroll-behavior: smooth; }
+        section { scroll-margin-top: 5rem; }
+        main section:not(:first-child) { margin-top: 4rem; }
+        h2 {
+            font-size: 1.875rem; font-weight: 800; margin-bottom: 1.5rem; letter-spacing: -0.025em; color: #0f172a;
+        }
+        h3 {
+            font-size: 1.5rem; font-weight: 700; margin-top: 2rem; margin-bottom: 1rem; color: #1e293b;
+        }
+        p, ul, ol, li { color: #475569; line-height: 1.75; }
+        main a { color: #2563eb; text-decoration: none; font-weight: 600; }
+        main a:hover { text-decoration: underline; color: #1d4ed8; }
+        strong { color: #1e293b; }
+        
+        .lang-toggle button.active { background-color: #4f46e5; color: white; }
+        
+        .workflow-box {
+            background: linear-gradient(to right bottom, #ffffff, #f8fafc);
+            border: 1px solid #e2e8f0; border-radius: 1rem; padding: 1.5rem;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05); transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+        .workflow-box:hover { transform: translateY(-2px); box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1); }
+        .step-number {
+            display: inline-flex; align-items: center; justify-content: center;
+            width: 2rem; height: 2rem; border-radius: 9999px; background-color: #4f46e5;
+            color: white; font-weight: 700; margin-right: 0.75rem;
+        }
+        
+        /* Mobile TOC Override */
+        #mobile-toc.open {
+            display: block !important; animation: slideUp 0.3s ease-out forwards;
+        }
+        @keyframes slideUp {
+            from { transform: translateY(10px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+        .mermaid { display: flex; justify-content: center; margin-top: 1.5rem; margin-bottom: 1.5rem;}
+    </style>
+</head>
+<body class="text-slate-800 relative pb-24 md:pb-0">
+
+    <!-- Header Actions -->
+    <div class="fixed top-4 right-4 z-50 flex items-center space-x-2">
+        <div class="lang-toggle bg-white/80 backdrop-blur-md shadow border border-slate-200 rounded-full p-1 flex space-x-1">
+            <button id="btn-ko" class="px-4 py-1.5 text-sm font-semibold rounded-full transition-all duration-200 active" onclick="switchLanguage('ko')">한국어</button>
+            <button id="btn-en" class="px-4 py-1.5 text-sm font-semibold rounded-full transition-all duration-200" onclick="switchLanguage('en')">English</button>
+        </div>
+        <button id="mobile-menu-btn" class="md:hidden bg-indigo-600 text-white p-2.5 rounded-full shadow-lg" aria-label="Toggle Table of Contents">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h7"></path></svg>
+        </button>
+    </div>
+
+    <!-- Mobile TOC Dropdown -->
+    <nav id="mobile-toc" class="hidden fixed top-16 right-4 z-40 bg-white p-4 rounded-xl shadow-xl border border-slate-200 w-64">
+        <ul class="space-y-3 font-medium text-sm text-slate-600">
+            <li><a href="#why" class="block hover:text-indigo-600 transition-colors" data-ko="1. Problem" data-en="1. Problem">1. Problem</a></li>
+            <li><a href="#what" class="block hover:text-indigo-600 transition-colors" data-ko="2. Solution" data-en="2. Solution">2. Solution</a></li>
+            <li><a href="#key-design" class="block hover:text-indigo-600 transition-colors" data-ko="3. Architecture" data-en="3. Architecture">3. Architecture</a></li>
+            <li><a href="#trade-off" class="block hover:text-indigo-600 transition-colors" data-ko="4. Technical Decisions" data-en="4. Technical Decisions">4. Technical Decisions</a></li>
+            <li><a href="#impact" class="block hover:text-indigo-600 transition-colors" data-ko="5. Business Impact" data-en="5. Business Impact">5. Business Impact</a></li>
+        </ul>
+    </nav>
+
+    <div class="container mx-auto px-4 py-10 md:py-16 max-w-7xl">
+        <!-- Header -->
+        <header class="text-center mb-16 md:mb-20">
+            <div class="inline-block px-3 py-1 mb-4 text-xs font-semibold tracking-wider text-indigo-600 uppercase bg-indigo-100 rounded-full border border-indigo-200">Architecture & Cost Simulation</div>
+            <h1 class="text-3xl md:text-4xl lg:text-5xl font-extrabold text-slate-900 mb-6 tracking-tight leading-tight" data-ko="Native Multimodal 기반 음성 챗봇 아키텍처" data-en="Native Multimodal Voice Chatbot Architecture">
+                Native Multimodal 기반 음성 챗봇 아키텍처
+            </h1>
+            <p class="text-lg md:text-xl text-slate-600 font-medium max-w-3xl mx-auto mb-4" data-ko="STT 변환 과정 없이 오디오를 직접 이해하는 Gemini 2.5 Flash Native API를 도입하여, 5만 명 규모의 B2C 서비스에서 레이턴시를 없애고 인프라 비용을 85% 이상 절감한 아키텍처 시뮬레이션입니다." data-en="An architecture simulation that eliminates latency and cuts infrastructure costs by over 85% for a 50k-user B2C service, by directly understanding audio via the Gemini 2.5 Flash Native API without STT conversion.">
+                STT 변환 과정 없이 오디오를 직접 이해하는 Gemini 2.5 Flash Native API를 도입하여, 5만 명 규모의 B2C 서비스에서 레이턴시를 없애고 인프라 비용을 85% 이상 절감한 아키텍처 시뮬레이션입니다.
+            </p>
+            <p class="text-sm text-slate-500" data-ko="Architectural Implementation Reference (2025)" data-en="Architectural Implementation Reference (2025)">Architectural Implementation Reference (2025)</p>
+        </header>
+
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-10">
+            <!-- Sidebar Navigation -->
+            <aside class="lg:col-span-3 lg:sticky top-8 self-start hidden md:block">
+                <nav class="bg-white p-6 rounded-xl shadow-sm border border-slate-100">
+                    <h3 class="font-extrabold text-lg mb-5 text-slate-900 uppercase tracking-wider text-sm" data-ko="목차" data-en="Table of Contents">목차</h3>
+                    <ul class="space-y-3 font-medium text-slate-600">
+                        <li><a href="#why" class="flex items-center hover:text-indigo-600 transition-colors" data-ko="1. Problem" data-en="1. Problem">1. Problem</a></li>
+                        <li><a href="#what" class="flex items-center hover:text-indigo-600 transition-colors" data-ko="2. Solution" data-en="2. Solution">2. Solution</a></li>
+                        <li><a href="#key-design" class="flex items-center hover:text-indigo-600 transition-colors" data-ko="3. Architecture" data-en="3. Architecture">3. Architecture</a></li>
+                        <li><a href="#trade-off" class="flex items-center hover:text-indigo-600 transition-colors" data-ko="4. Technical Decisions" data-en="4. Technical Decisions">4. Technical Decisions</a></li>
+                        <li><a href="#impact" class="flex items-center hover:text-indigo-600 transition-colors" data-ko="5. Business Impact" data-en="5. Business Impact">5. Business Impact</a></li>
+                    </ul>
+                </nav>
+            </aside>
+
+            <!-- Main Content -->
+            <main class="lg:col-span-9 space-y-16">
+
+                <!-- 요약 개요 -->
+                <section class="bg-white p-8 md:p-10 rounded-2xl shadow-sm border border-slate-100">
+                    <div class="max-w-4xl space-y-4">
+                        <p class="text-lg leading-relaxed text-slate-700" data-ko="5만 명의 사용자가 일일 평균 15분, 월 3시간의 한도(Quota) 내에서 실시간으로 대화형 AI를 이용하는 B2C 음성 챗봇 서비스를 설계해야 했습니다." data-en="We needed to design a B2C voice chatbot service where 50,000 users interact with conversational AI in real-time, averaging 15 minutes daily within a monthly quota of 3 hours.">
+                            5만 명의 사용자가 일일 평균 15분, 월 3시간의 한도(Quota) 내에서 실시간으로 대화형 AI를 이용하는 B2C 음성 챗봇 서비스를 설계해야 했습니다.
+                        </p>
+                        <p class="text-lg leading-relaxed text-slate-700" data-ko="이 문서는 기존의 무거운 STT(Speech-to-Text) 파이프라인이 유발하는 막대한 API 과금과 응답 지연(Latency) 문제를, 오디오 네이티브(Native Audio) 모델 채택을 통해 어떻게 아키텍처 관점에서 최적화했는지 분석한 시뮬레이션 기록입니다." data-en="This document is a simulation record analyzing how the massive API costs and latency issues caused by the heavy legacy STT pipeline were architecturally optimized by adopting an Audio Native model.">
+                            이 문서는 기존의 무거운 STT(Speech-to-Text) 파이프라인이 유발하는 막대한 API 과금과 응답 지연(Latency) 문제를, 오디오 네이티브(Native Audio) 모델 채택을 통해 어떻게 아키텍처 관점에서 최적화했는지 분석한 시뮬레이션 기록입니다.
+                        </p>
+                    </div>
+                </section>
+
+                <!-- 1. Why -->
+                <section id="why" class="scroll-mt-24">
+                    <div class="flex items-center mb-2">
+                        <div class="bg-indigo-100 p-2 rounded-lg mr-4">
+                            <svg class="w-7 h-7 text-indigo-600" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                        </div>
+                        <h2 class="text-3xl font-extrabold m-0" data-ko="1. Problem" data-en="1. Problem">1. Problem</h2>
+                    </div>
+                    
+                    <p class="text-slate-500 font-medium mb-6 max-w-4xl" data-ko="레거시 STT 파이프라인의 예산 초과와 감정 손실" data-en="Budget overruns and loss of emotion in the legacy STT pipeline.">
+                        레거시 STT 파이프라인의 예산 초과와 감정 손실
+                    </p>
+                    
+                    <div class="grid md:grid-cols-2 gap-6">
+                        <div class="bg-red-50 p-6 rounded-xl border border-red-100">
+                            <h4 class="text-red-800 font-bold text-lg mb-3 flex items-center" data-ko="<svg class='w-5 h-5 mr-2' fill='none' viewBox='0 0 24 24' stroke='currentColor'><path stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z'></path></svg> 통제 불가능한 STT 비용 병목" data-en="<svg class='w-5 h-5 mr-2' fill='none' viewBox='0 0 24 24' stroke='currentColor'><path stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z'></path></svg> Uncontrollable STT Cost Bottleneck">
+                                <svg class='w-5 h-5 mr-2' fill='none' viewBox='0 0 24 24' stroke='currentColor'><path stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z'></path></svg> 통제 불가능한 STT 비용 병목
+                            </h4>
+                            <p class="text-red-900/80 mb-3" data-ko="사용자의 음성을 텍스트로 변환하여 LLM에 전달하는 전통적인 3단계(STT &rarr; LLM &rarr; TTS) 방식을 채택할 경우, 5만 명이 한도를 채워 사용할 때 <strong>STT(음성 인식) 비용만 연간 14만 4천 달러(약 2억 원)</strong>가 산출됩니다. 이는 전체 시스템 예산 상한선(Total Cap)을 심각하게 초과하는 수치입니다." data-en="Adopting the traditional 3-step method (STT &rarr; LLM &rarr; TTS) of converting user voice to text and sending it to the LLM results in <strong>STT (Speech-to-Text) costs alone hitting $144,000 (approx. 200M KRW) annually</strong> when 50,000 users max out their quota. This severely exceeds the overall system budget cap.">
+                                사용자의 음성을 텍스트로 변환하여 LLM에 전달하는 전통적인 3단계(STT &rarr; LLM &rarr; TTS) 방식을 채택할 경우, 5만 명이 한도를 채워 사용할 때 <strong>STT(음성 인식) 비용만 연간 14만 4천 달러(약 2억 원)</strong>가 산출됩니다. 이는 전체 시스템 예산 상한선(Total Cap)을 심각하게 초과하는 수치입니다.
+                            </p>
+                        </div>
+                        <div class="bg-orange-50 p-6 rounded-xl border border-orange-100">
+                            <h4 class="text-orange-800 font-bold text-lg mb-3 flex items-center" data-ko="<svg class='w-5 h-5 mr-2' fill='none' viewBox='0 0 24 24' stroke='currentColor'><path stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z'></path></svg> 컨텍스트(감정, 억양) 누락 및 지연" data-en="<svg class='w-5 h-5 mr-2' fill='none' viewBox='0 0 24 24' stroke='currentColor'><path stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z'></path></svg> Loss of Context & Delay">
+                                <svg class='w-5 h-5 mr-2' fill='none' viewBox='0 0 24 24' stroke='currentColor'><path stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z'></path></svg> 컨텍스트(감정, 억양) 누락 및 지연
+                            </h4>
+                            <p class="text-orange-900/80 mb-3" data-ko="STT API를 통과하면 사용자의 미세한 목소리 떨림이나 감정 상태 같은 오디오 고유의 컨텍스트(Context)가 평면적인 텍스트로 증발합니다. 또한 네트워크를 두 번(STT &rarr; LLM) 타면서 생기는 수 초의 지연 시간은 실시간 대화형 서비스의 몰입감을 크게 해칩니다." data-en="Passing through the STT API evaporates the user's subtle voice tremors and emotional states—audio's unique context—into flat text. Also, the multi-second delay caused by making two network hops (STT &rarr; LLM) severely degrades the immersion of a real-time conversational service.">
+                                STT API를 통과하면 사용자의 미세한 목소리 떨림이나 감정 상태 같은 오디오 고유의 컨텍스트(Context)가 평면적인 텍스트로 증발합니다. 또한 네트워크를 두 번(STT &rarr; LLM) 타면서 생기는 수 초의 지연 시간은 실시간 대화형 서비스의 몰입감을 크게 해칩니다.
+                            </p>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- 2. What -->
+                <section id="what" class="scroll-mt-24">
+                    <div class="flex items-center mb-2">
+                        <div class="bg-indigo-100 p-2 rounded-lg mr-4">
+                            <svg class="w-7 h-7 text-indigo-600" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
+                        </div>
+                        <h2 class="text-3xl font-extrabold m-0" data-ko="2. Solution" data-en="2. Solution">2. Solution</h2>
+                    </div>
+
+                    <p class="text-slate-500 font-medium mb-6 max-w-4xl" data-ko="Native Multimodal Audio 파이프라인 전면 도입" data-en="Adoption of a Native Multimodal Audio Pipeline.">
+                        Native Multimodal Audio 파이프라인 전면 도입
+                    </p>
+
+                    <div class="max-w-4xl mb-8 text-lg text-slate-700">
+                        <p data-ko="STT 미들웨어를 완전히 걷어내고, 오디오 스트림(Audio Stream) 자체를 직접 입력받아 이해하는 <strong>Gemini 2.5 Flash Native API</strong>를 아키텍처의 중심에 배치했습니다." data-en="We completely removed the STT middleware and centered the architecture on the <strong>Gemini 2.5 Flash Native API</strong>, which directly ingests and understands audio streams.">
+                            STT 미들웨어를 완전히 걷어내고, 오디오 스트림(Audio Stream) 자체를 직접 입력받아 이해하는 <strong>Gemini 2.5 Flash Native API</strong>를 아키텍처의 중심에 배치했습니다.
+                        </p>
+                        <p class="mt-2" data-ko="멀티모달 네이티브 모델이 소리를 텍스트 우회 없이 직접 분석함으로써, 사용자의 감정 톤을 잃지 않으면서 캐릭터 페르소나에 100% 동기화된 대답을 <strong>초저지연(Ultra-low Latency)</strong>으로 생성할 수 있게 되었습니다." data-en="Because the multimodal native model analyzes sound directly without textual detours, it can generate responses perfectly synchronized with the character persona at <strong>ultra-low latency</strong>, all without losing the user's emotional tone.">
+                            멀티모달 네이티브 모델이 소리를 텍스트 우회 없이 직접 분석함으로써, 사용자의 감정 톤을 잃지 않으면서 캐릭터 페르소나에 100% 동기화된 대답을 <strong>초저지연(Ultra-low Latency)</strong>으로 생성할 수 있게 되었습니다.
+                        </p>
+                    </div>
+                </section>
+
+                <!-- 3. Architecture -->
+                <section id="key-design" class="scroll-mt-24">
+                    <div class="flex items-center mb-2">
+                        <div class="bg-indigo-100 p-2 rounded-lg mr-4">
+                            <svg class="w-7 h-7 text-indigo-600" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
+                        </div>
+                        <h2 class="text-3xl font-extrabold m-0" data-ko="3. Architecture" data-en="3. Architecture">3. Architecture</h2>
+                    </div>
+                    
+                    <p class="text-slate-500 font-medium mb-6 max-w-4xl" data-ko="STT 분리형 아키텍처에서 Native Audio 직결 구조로의 진화" data-en="Evolution from a separated STT architecture to a direct Native Audio structure.">
+                        STT 분리형 아키텍처에서 Native Audio 직결 구조로의 진화
+                    </p>
+
+                    <div class="bg-white p-6 rounded-xl border border-slate-200 shadow-sm mb-6 max-w-4xl">
+                        <pre class="mermaid bg-transparent p-4 flex justify-center text-center">
+graph TD
+    subgraph "Legacy Pipeline (High Cost & High Latency)"
+        A1([User Voice Stream]) --> B1[STT Engine API <br/> $0.016 / min];
+        B1 -.->|Transcribed Flat Text| C1[LLM Engine];
+        C1 -.->|Text Response| D1[TTS Engine];
+        D1 --> E1([Character Voice Output]);
+    end
+    
+    subgraph "Native Multimodal Pipeline (Optimized)"
+        A2([User Voice Stream]) -->|Direct Raw Audio <br/> Context Intact| B2{Gemini 2.5 Flash <br/> Native API};
+        B2 -.->|Instant Text Stream| C2[TTS Engine <br/> Client Renderer];
+        C2 --> E2([Character Voice Output]);
+    end
+    
+    style B2 fill:#1e293b,stroke:#60a5fa,stroke-width:2px,color:#fff
+    style B1 fill:#fee2e2,stroke:#f87171
+    style C1 fill:#f1f5f9,stroke:#94a3b8
+    style A2 fill:#f8fafc,stroke:#94a3b8
+    style E2 fill:#f8fafc,stroke:#94a3b8
+                        </pre>
+                    </div>
+                </section>
+
+                <!-- 4. Trade-off -->
+                <section id="trade-off" class="scroll-mt-24">
+                    <div class="flex items-center mb-2">
+                        <div class="bg-indigo-100 p-2 rounded-lg mr-4">
+                            <svg class="w-7 h-7 text-indigo-600" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 6l3 1m0 0l-3 9a5.002 5.002 0 006.001 0M6 7l3 9M6 7l6-2m6 2l3-1m-3 1l-3 9a5.002 5.002 0 006.001 0M18 7l3 9m-3-9l-6-2m0-2v2m0 16V5m0 16H9m3 0h3"></path></svg>
+                        </div>
+                        <h2 class="text-3xl font-extrabold m-0" data-ko="4. Technical Decisions" data-en="4. Technical Decisions">4. Technical Decisions</h2>
+                    </div>
+
+                    <p class="text-slate-500 font-medium mb-6 max-w-4xl" data-ko="대규모 트래픽(Scalability) 방어 및 비용 최적화를 위한 아키텍처 전략" data-en="Architectural strategies for massive traffic scalability and cost optimization.">
+                        대규모 트래픽(Scalability) 방어 및 비용 최적화를 위한 아키텍처 전략
+                    </p>
+
+                    <div class="space-y-6 max-w-4xl">
+                        <!-- Trade-off 1 -->
+                        <div class="border border-slate-200 rounded-xl overflow-hidden">
+                            <div class="bg-slate-50 px-6 py-4 border-b border-slate-200">
+                                <h4 class="font-bold text-lg m-0 flex items-center" data-ko="순수 프롬프팅 <span class='text-slate-400 mx-3'>vs</span> Context Caching 활용" data-en="Pure Prompting vs Context Caching Utilization">
+                                    순수 프롬프팅 <span class='text-slate-400 mx-3'>vs</span> Context Caching 활용
+                                </h4>
+                            </div>
+                            <div class="p-6 bg-white text-slate-700">
+                                <p class="mb-4" data-ko="캐릭터 챗봇은 말투, 세계관, 금지어 등 방대한 페르소나 설정값(System Prompt)을 매 턴마다 모델에 전달해야 합니다. 이는 막대한 입력 토큰 비용 누수로 이어집니다." data-en="Character chatbots must transmit extensive persona settings (System Prompts) like tone, worldview, and banned words to the model every turn. This leads to massive input token cost leakage.">
+                                    캐릭터 챗봇은 말투, 세계관, 금지어 등 방대한 페르소나 설정값(System Prompt)을 매 턴마다 모델에 전달해야 합니다. 이는 막대한 입력 토큰 비용 누수로 이어집니다.
+                                </p>
+                                <div class="bg-slate-100 p-4 rounded-lg border-l-4 border-indigo-500">
+                                    <strong class="text-slate-900 block mb-1" data-ko="해결: 프롬프트 명시적 캐싱 도입" data-en="Solution: Introduced Explicit Prompt Caching">해결: 프롬프트 명시적 캐싱 도입</strong>
+                                    <span class="text-sm" data-ko="캐릭터 설정이 2,048 토큰을 넘어가는 경우, 이를 구글 클라우드 인프라 레벨에서 명시적으로 캐싱(Context Caching)하여 <strong>입력 비용을 90% 이상 절감</strong>하고 모델의 첫 번째 토큰 응답 시간(TTFT)을 극도로 단축시켰습니다." data-en="When character settings exceed 2,048 tokens, we explicitly cache them at the Google Cloud infrastructure level (Context Caching), <strong>cutting input costs by over 90%</strong> and drastically reducing the model's Time To First Token (TTFT).">
+                                        캐릭터 설정이 2,048 토큰을 넘어가는 경우, 이를 구글 클라우드 인프라 레벨에서 명시적으로 캐싱(Context Caching)하여 <strong>입력 비용을 90% 이상 절감</strong>하고 모델의 첫 번째 토큰 응답 시간(TTFT)을 극도로 단축시켰습니다.
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Trade-off 2 -->
+                        <div class="border border-slate-200 rounded-xl overflow-hidden">
+                            <div class="bg-slate-50 px-6 py-4 border-b border-slate-200">
+                                <h4 class="font-bold text-lg m-0 flex items-center" data-ko="Gemini 3.0 Flash <span class='text-slate-400 mx-3'>vs</span> 2.5 Flash 모델 선택" data-en="Gemini 3.0 Flash vs 2.5 Flash Model Selection">
+                                    Gemini 3.0 Flash <span class='text-slate-400 mx-3'>vs</span> 2.5 Flash 모델 선택
+                                </h4>
+                            </div>
+                            <div class="p-6 bg-white text-slate-700">
+                                <p class="mb-4" data-ko="3.0 버전이 더 진보된 모델이긴 하나, 프리뷰 단가 정책상 2.5 Flash 대비 텍스트/오디오 입출력 단가가 10~20% 더 높게 책정되어 B2C 트래픽 규모에서는 상당한 예산 차이를 유발합니다." data-en="While version 3.0 is more advanced, its preview pricing is 10-20% higher than 2.5 Flash for text/audio I/O, causing a substantial budget gap at B2C traffic scales.">
+                                    3.0 버전이 더 진보된 모델이긴 하나, 프리뷰 단가 정책상 2.5 Flash 대비 텍스트/오디오 입출력 단가가 10~20% 더 높게 책정되어 B2C 트래픽 규모에서는 상당한 예산 차이를 유발합니다.
+                                </p>
+                                <div class="bg-slate-100 p-4 rounded-lg border-l-4 border-indigo-500">
+                                    <strong class="text-slate-900 block mb-1" data-ko="해결: 가성비와 페르소나가 검증된 2.5 Flash 메인 배포" data-en="Solution: Main Deployment of the Proven & Cost-Effective 2.5 Flash">해결: 가성비와 페르소나가 검증된 2.5 Flash 메인 배포</strong>
+                                    <span class="text-sm" data-ko="5만 명 동시 접속(Total Cap 시나리오)에서 무음 감지 로직(VAD)과 함께, 현존 최고 수준의 가성비를 가진 <strong>2.5 Flash를 프로덕션 메인 모델로 확정</strong>하여 예산 최적화와 품질 사이의 밸런스를 잡았습니다. 또한 Global Endpoints 및 PT(예약 용량)를 사전에 할당받아 트래픽 폭주 시의 429 에러(Too Many Requests)를 원천 차단했습니다." data-en="For 50k concurrent users (Total Cap scenario), we coupled Voice Activity Detection (VAD) logic with <strong>2.5 Flash as the main production model</strong>—the most cost-effective model available—balancing budget optimization and quality. We also pre-allocated Global Endpoints and Provisioned Throughput (PT) to completely block 429 (Too Many Requests) errors during traffic spikes.">
+                                        5만 명 동시 접속(Total Cap 시나리오)에서 무음 감지 로직(VAD)과 함께, 현존 최고 수준의 가성비를 가진 <strong>2.5 Flash를 프로덕션 메인 모델로 확정</strong>하여 예산 최적화와 품질 사이의 밸런스를 잡았습니다. 또한 Global Endpoints 및 PT(예약 용량)를 사전에 할당받아 트래픽 폭주 시의 429 에러(Too Many Requests)를 원천 차단했습니다.
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- 5. Impact -->
+                <section id="impact" class="scroll-mt-24 mb-10">
+                    <div class="flex items-center mb-6">
+                        <div class="bg-indigo-100 p-2 rounded-lg mr-4">
+                            <svg class="w-7 h-7 text-indigo-600" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"></path></svg>
+                        </div>
+                        <h2 class="text-3xl font-extrabold m-0" data-ko="5. Business Impact" data-en="5. Business Impact">5. Business Impact</h2>
+                    </div>
+
+                    <div class="grid md:grid-cols-2 gap-6 mt-6 max-w-4xl">
+                        <!-- Impact 1 -->
+                        <div class="bg-indigo-600 text-white p-8 rounded-2xl shadow-lg relative overflow-hidden">
+                            <!-- Decorative Circle -->
+                            <div class="absolute -right-10 -top-10 w-40 h-40 bg-white opacity-10 rounded-full"></div>
+                            <h4 class="text-indigo-100 font-bold mb-4 text-xl" data-ko="인프라 운영 비용 85% 파격 절감" data-en="85% Drastic Reduction in Infrastructure OPEX">인프라 운영 비용 85% 파격 절감</h4>
+                            <p class="text-indigo-50 font-medium text-lg leading-relaxed mt-2" data-ko="시뮬레이션 결과, 사용자 5만 명이 부여된 한도(3시간)를 100% 소모했을 때 <strong>기존 STT 방식의 연간 예산 상한선 2.01억 원을 2,520만 원 수준으로 약 85% 압축</strong>했습니다." data-en="Simulation results show that when 50,000 users fully consume their 3-hour quota, the <strong>annual budget cap of 201 million KRW under the legacy STT method is slashed by ~85% down to 25.2 million KRW.</strong>">
+                                시뮬레이션 결과, 사용자 5만 명이 부여된 한도(3시간)를 100% 소모했을 때 <strong>기존 STT 방식의 연간 예산 상한선 2.01억 원을 2,520만 원 수준으로 약 85% 압축</strong>했습니다.
+                            </p>
+                        </div>
+
+                        <!-- Impact 2 -->
+                        <div class="bg-white p-8 rounded-2xl border border-indigo-100 shadow-sm flex flex-col justify-center">
+                            <h4 class="text-slate-900 font-bold mb-4 text-xl" data-ko="비용을 줄이면서도 UX는 혁신하다" data-en="Cutting Costs while Innovating UX">비용을 줄이면서도 UX는 혁신하다</h4>
+                            <ul class="space-y-4">
+                                <li class="flex items-start">
+                                    <svg class="w-6 h-6 text-indigo-500 mr-2 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+                                    <span class="text-slate-700 text-sm" data-ko="<strong>직관적 감정 교류 (Zero-Latency)</strong>: 두 번의 무거운 네트워크 점프(STT, LLM)를 하나로 합쳐 지연 시간을 소거했습니다. 사람과 대화하듯 반응하는 캐릭터를 통해 몰입도 높은 프로덕트 완성이 가능합니다." data-en="<strong>Intuitive Emotional Exchange (Zero-Latency)</strong>: Eradicated delay by merging two heavy network hops (STT, LLM) into one. Enables a highly immersive product through characters that react as naturally as conversing with a human.">
+                                        <strong>직관적 감정 교류 (Zero-Latency)</strong>: 두 번의 무거운 네트워크 점프(STT, LLM)를 하나로 합쳐 지연 시간을 소거했습니다. 사람과 대화하듯 반응하는 캐릭터를 통해 몰입도 높은 프로덕트 완성이 가능합니다.
+                                    </span>
+                                </li>
+                                <li class="flex items-start">
+                                    <svg class="w-6 h-6 text-indigo-500 mr-2 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+                                    <span class="text-slate-700 text-sm" data-ko="<strong>스케일 아웃 설계 완료</strong>: 단일 LLM에 종속되지 않고 Cloud Run 기반의 Global Endpoints로 앱 레이어를 구축해두어, 추후 수십만 단위 트래픽으로 서비스가 확장되어도 즉각적인 대응이 가능합니다." data-en="<strong>Scale-out Design Completed</strong>: By building the app layer with Cloud Run-based Global Endpoints rather than depending on a single LLM, it allows immediate response even if the service scales to hundreds of thousands of users.">
+                                        <strong>스케일 아웃 설계 완료</strong>: 단일 LLM에 종속되지 않고 Cloud Run 기반의 Global Endpoints로 앱 레이어를 구축해두어, 추후 수십만 단위 트래픽으로 서비스가 확장되어도 즉각적인 대응이 가능합니다.
+                                    </span>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </section>
+                
+            </main>
+        </div>
+        
+        <!-- Footer -->
+        <footer class="text-center mt-20 pt-8 border-t border-slate-200 text-slate-500 text-sm">
+            <p>&copy; 2025 Architectural Implementation Reference. Built for showcasing technical architecture.</p>
+        </footer>
+    </div>
+
+    <!-- Mermaid.js -->
+    <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+    <script>
+        mermaid.initialize({ startOnLoad: true, theme: 'neutral' });
+
+        // Mobile TOC Toggle
+        const mobileMenuBtn = document.getElementById('mobile-menu-btn');
+        const mobileToc = document.getElementById('mobile-toc');
+        
+        mobileMenuBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            mobileToc.classList.toggle('hidden');
+            mobileToc.classList.toggle('open');
+        });
+
+        // Close TOC when clicking outside or clicking a link
+        document.addEventListener('click', (e) => {
+            if (!mobileToc.contains(e.target) && !mobileMenuBtn.contains(e.target)) {
+                mobileToc.classList.add('hidden');
+                mobileToc.classList.remove('open');
+            }
+        });
+
+        mobileToc.querySelectorAll('a').forEach(link => {
+            link.addEventListener('click', () => {
+                mobileToc.classList.add('hidden');
+                mobileToc.classList.remove('open');
+            });
+        });
+
+        // Function to update internal links with current language
+        function updateLinksWithLang(lang) {
+            document.querySelectorAll('a').forEach(link => {
+                const href = link.getAttribute('href');
+                // Target only local HTML files or index.html
+                if (href && !href.startsWith('http') && !href.startsWith('#') && (href.includes('.html') || href === '/')) {
+                    const url = new URL(link.href, window.location.origin);
+                    url.searchParams.set('lang', lang);
+                    link.href = url.pathname + url.search + url.hash;
+                }
+            });
+        }
+
+        // Function to switch language
+        function switchLanguage(lang) {
+            document.querySelectorAll('[data-ko]').forEach(el => {
+                if (el.dataset[lang]) {
+                    el.innerHTML = el.dataset[lang];
+                }
+            });
+            document.documentElement.lang = lang;
+            document.title = document.querySelector('title').dataset[lang];
+            
+            // Save preference
+            localStorage.setItem('language', lang);
+
+            // Update button active state
+            document.getElementById('btn-ko').classList.toggle('active', lang === 'ko');
+            document.getElementById('btn-ko').classList.toggle('text-slate-600', lang !== 'ko');
+            document.getElementById('btn-ko').classList.toggle('bg-white', lang !== 'ko');
+            
+            document.getElementById('btn-en').classList.toggle('active', lang === 'en');
+            document.getElementById('btn-en').classList.toggle('text-slate-600', lang !== 'en');
+            document.getElementById('btn-en').classList.toggle('bg-white', lang !== 'en');
+
+            // Update all internal links with the selected language
+            updateLinksWithLang(lang);
+        }
+
+        // Set initial language
+        document.addEventListener('DOMContentLoaded', () => {
+            const urlParams = new URLSearchParams(window.location.search);
+            const langFromUrl = urlParams.get('lang');
+            const langFromStorage = localStorage.getItem('language');
+            const browserLang = (navigator.language || navigator.userLanguage).startsWith('en') ? 'en' : 'ko';
+            
+            const initialLang = langFromUrl || langFromStorage || browserLang;
+            switchLanguage(initialLang);
+        });
+    </script>
+</body>
+</html>
