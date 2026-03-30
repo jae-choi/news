@@ -799,6 +799,18 @@
         // Initialize Lucide Icons
         lucide.createIcons();
 
+        // Function to update internal links with current language
+        function updateLinksWithLang(lang) {
+            document.querySelectorAll('a').forEach(link => {
+                const href = link.getAttribute('href');
+                if (href && !href.startsWith('http') && !href.startsWith('#') && (href.includes('.html') || href === '/')) {
+                    const url = new URL(link.href, window.location.origin);
+                    url.searchParams.set('lang', lang);
+                    link.href = url.pathname + url.search + url.hash;
+                }
+            });
+        }
+
         // --- Language Switcher ---
         function switchLang(lang) {
             document.documentElement.lang = lang;
@@ -816,6 +828,8 @@
                     btn.classList.add('text-slate-400');
                 }
             });
+            
+            updateLinksWithLang(lang);
         }
 
         document.addEventListener('DOMContentLoaded', () => {
@@ -846,10 +860,12 @@
             });
 
             // --- Initial Language Setup ---
+            const urlParams = new URLSearchParams(window.location.search);
+            const langFromUrl = urlParams.get('lang');
             const langFromStorage = localStorage.getItem('language');
             const browserLang = (navigator.language || navigator.userLanguage).startsWith('en') ? 'en' : 'ko';
             
-            const initialLang = langFromStorage || browserLang;
+            const initialLang = langFromUrl || langFromStorage || browserLang;
             switchLang(initialLang);
 
             // --- Copyright Year ---
