@@ -1,0 +1,411 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" href="https://avatars.githubusercontent.com/u/35217573?v=4" type="image/x-icon">
+    <title data-ko="의도 분석 기반 멀티 에이전트 검색 시스템" data-en="Intent-Driven Multi-Agent Search System">의도 분석 기반 멀티 에이전트 검색 시스템 - KMS POC</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Noto+Sans+KR:wght@400;500;700;900&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', 'Noto Sans KR', sans-serif;
+            background-color: #f8fafc; /* slate-50 */
+        }
+        html { scroll-behavior: smooth; }
+        section { scroll-margin-top: 5rem; }
+        main section:not(:first-child) { margin-top: 4rem; }
+        h2 {
+            font-size: 1.875rem; font-weight: 800; margin-bottom: 1.5rem; letter-spacing: -0.025em; color: #0f172a;
+        }
+        h3 {
+            font-size: 1.5rem; font-weight: 700; margin-top: 2rem; margin-bottom: 1rem; color: #1e293b;
+        }
+        p, ul, ol, li { color: #475569; line-height: 1.75; }
+        main a { color: #2563eb; text-decoration: none; font-weight: 600; }
+        main a:hover { text-decoration: underline; color: #1d4ed8; }
+        strong { color: #1e293b; }
+        
+        .lang-toggle button.active { background-color: #4f46e5; color: white; }
+        
+        .workflow-box {
+            background: linear-gradient(to right bottom, #ffffff, #f8fafc);
+            border: 1px solid #e2e8f0; border-radius: 1rem; padding: 1.5rem;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05); transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+        .workflow-box:hover { transform: translateY(-2px); box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1); }
+        .step-number {
+            display: inline-flex; align-items: center; justify-content: center;
+            width: 2rem; height: 2rem; border-radius: 9999px; background-color: #4f46e5;
+            color: white; font-weight: 700; margin-right: 0.75rem;
+        }
+        
+        /* Mobile TOC Override */
+        #mobile-toc.open {
+            display: block !important; animation: slideUp 0.3s ease-out forwards;
+        }
+        @keyframes slideUp {
+            from { transform: translateY(10px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+        .mermaid { display: flex; justify-content: center; margin-top: 1.5rem; margin-bottom: 1.5rem;}
+    </style>
+</head>
+<body class="text-slate-800 relative pb-24 md:pb-0">
+
+    <!-- Header Actions -->
+    <div class="fixed top-4 right-4 z-50 flex items-center space-x-2">
+        <div class="lang-toggle bg-white/80 backdrop-blur-md shadow border border-slate-200 rounded-full p-1 flex space-x-1">
+            <button id="btn-ko" class="px-4 py-1.5 text-sm font-semibold rounded-full transition-all duration-200 active" onclick="switchLanguage('ko')">한국어</button>
+            <button id="btn-en" class="px-4 py-1.5 text-sm font-semibold rounded-full transition-all duration-200" onclick="switchLanguage('en')">English</button>
+        </div>
+        <button id="mobile-menu-btn" class="md:hidden bg-indigo-600 text-white p-2.5 rounded-full shadow-lg" aria-label="Toggle Table of Contents">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h7"></path></svg>
+        </button>
+    </div>
+
+    <!-- Mobile TOC Dropdown -->
+    <nav id="mobile-toc" class="hidden fixed top-16 right-4 z-40 bg-white p-4 rounded-xl shadow-xl border border-slate-200 w-64">
+        <ul class="space-y-3 font-medium text-sm text-slate-600">
+            <li><a href="#why" class="block hover:text-indigo-600 transition-colors" data-ko="1. Problem" data-en="1. Problem">1. Problem</a></li>
+            <li><a href="#what" class="block hover:text-indigo-600 transition-colors" data-ko="2. Solution" data-en="2. Solution">2. Solution</a></li>
+            <li><a href="#key-design" class="block hover:text-indigo-600 transition-colors" data-ko="3. Architecture" data-en="3. Architecture">3. Architecture</a></li>
+            <li><a href="#trade-off" class="block hover:text-indigo-600 transition-colors" data-ko="4. Technical Decisions" data-en="4. Technical Decisions">4. Technical Decisions</a></li>
+            <li><a href="#impact" class="block hover:text-indigo-600 transition-colors" data-ko="5. Business Impact" data-en="5. Business Impact">5. Business Impact</a></li>
+        </ul>
+    </nav>
+
+    <div class="container mx-auto px-4 py-10 md:py-16 max-w-7xl">
+        <!-- Header -->
+        <header class="text-center mb-16 md:mb-20">
+            <div class="inline-block px-3 py-1 mb-4 text-xs font-semibold tracking-wider text-indigo-600 uppercase bg-indigo-100 rounded-full border border-indigo-200">Proof of Concept (POC)</div>
+            <h1 class="text-3xl md:text-4xl lg:text-5xl font-extrabold text-slate-900 mb-6 tracking-tight leading-tight" data-ko="의도 분석 기반 멀티 에이전트 사내 검색 아키텍처" data-en="Intent-Driven Multi-Agent KMS Search Architecture">
+                의도 분석 기반 멀티 에이전트 사내 검색 아키텍처
+            </h1>
+            <p class="text-lg md:text-xl text-slate-600 font-medium max-w-3xl mx-auto mb-4" data-ko="사용자 질의 이면의 숨겨진 복합 의도를 파악하고, Vertex AI Search와 전문 에이전트 라우팅을 결합하여 사내지식기반(KMS)에서 최적의 답변을 생성하는 하이브리드 검색 POC" data-en="A hybrid search POC that uncovers hidden user intents and combines Vertex AI Search with expert agent routing to generate optimal answers from an internal knowledge base (KMS).">
+                사용자 질의 이면의 숨겨진 복합 의도를 파악하고, Vertex AI Search와 전문 에이전트 라우팅을 결합하여 사내지식기반(KMS)에서 최적의 답변을 생성하는 하이브리드 검색 POC
+            </p>
+            <p class="text-sm text-slate-500" data-ko="Architectural Implementation Reference (2025)" data-en="Architectural Implementation Reference (2025)">Architectural Implementation Reference (2025)</p>
+        </header>
+
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-10">
+            <!-- Sidebar Navigation -->
+            <aside class="lg:col-span-3 lg:sticky top-8 self-start hidden md:block">
+                <nav class="bg-white p-6 rounded-xl shadow-sm border border-slate-100">
+                    <h3 class="font-extrabold text-lg mb-5 text-slate-900 uppercase tracking-wider text-sm" data-ko="목차" data-en="Table of Contents">목차</h3>
+                    <ul class="space-y-3 font-medium text-slate-600">
+                        <li><a href="#why" class="flex items-center hover:text-indigo-600 transition-colors" data-ko="1. Problem" data-en="1. Problem">1. Problem</a></li>
+                        <li><a href="#what" class="flex items-center hover:text-indigo-600 transition-colors" data-ko="2. Solution" data-en="2. Solution">2. Solution</a></li>
+                        <li><a href="#key-design" class="flex items-center hover:text-indigo-600 transition-colors" data-ko="3. Architecture" data-en="3. Architecture">3. Architecture</a></li>
+                        <li><a href="#trade-off" class="flex items-center hover:text-indigo-600 transition-colors" data-ko="4. Technical Decisions" data-en="4. Technical Decisions">4. Technical Decisions</a></li>
+                        <li><a href="#impact" class="flex items-center hover:text-indigo-600 transition-colors" data-ko="5. Business Impact" data-en="5. Business Impact">5. Business Impact</a></li>
+                    </ul>
+                </nav>
+            </aside>
+
+            <!-- Main Content -->
+            <main class="lg:col-span-9 space-y-16">
+
+                <!-- 요약 개요 -->
+                <section class="bg-white p-8 md:p-10 rounded-2xl shadow-sm border border-slate-100">
+                    <div class="max-w-4xl space-y-4">
+                        <p class="text-lg leading-relaxed text-slate-700" data-ko="엔터프라이즈 환경에서 직원들은 매일 수천 건의 사내 문서를 검색하며 의사결정을 내립니다." data-en="In an enterprise environment, employees make decisions daily by searching through thousands of internal documents.">
+                            엔터프라이즈 환경에서 직원들은 매일 수천 건의 사내 문서를 검색하며 의사결정을 내립니다.
+                        </p>
+                        <p class="text-lg leading-relaxed text-slate-700" data-ko="이 문서(POC)는 방대한 데이터 크기와 다양한 질의 패턴을 가진 사내 지식 관리 시스템(KMS)에서 <strong>의도 분류 모델(Intent Model)과 멀티 에이전트 라우팅</strong>을 통해 전문가 수준의 검색 아키텍처를 어떻게 구축했는지 설명합니다." data-en="This POC explains how an expert-level search architecture was built in a massive Knowledge Management System (KMS) using an <strong>Intent Classification Model and Multi-Agent Routing.</strong>">
+                            이 문서(POC)는 방대한 데이터 크기와 다양한 질의 패턴을 가진 사내 지식 관리 시스템(KMS)에서 <strong>의도 분류 모델(Intent Model)과 멀티 에이전트 라우팅</strong>을 통해 전문가 수준의 검색 아키텍처를 어떻게 구축했는지 설명합니다.
+                        </p>
+                    </div>
+                </section>
+
+                <!-- 1. Why -->
+                <section id="why" class="scroll-mt-24">
+                    <div class="flex items-center mb-2">
+                        <div class="bg-indigo-100 p-2 rounded-lg mr-4">
+                            <svg class="w-7 h-7 text-indigo-600" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                        </div>
+                        <h2 class="text-3xl font-extrabold m-0" data-ko="1. Problem" data-en="1. Problem">1. Problem</h2>
+                    </div>
+                    
+                    <p class="text-slate-500 font-medium mb-6 max-w-4xl" data-ko="복잡한 사내 데이터 환경에서의 검색 정확도 저하와 의도 단절" data-en="Search accuracy degradation and intent disconnection in complex enterprise data environments.">
+                        복잡한 사내 데이터 환경에서의 검색 정확도 저하와 의도 단절
+                    </p>
+                    
+                    <div class="grid md:grid-cols-2 gap-6">
+                        <div class="bg-red-50 p-6 rounded-xl border border-red-100">
+                            <h4 class="text-red-800 font-bold text-lg mb-3 flex items-center" data-ko="<svg class='w-5 h-5 mr-2' fill='none' viewBox='0 0 24 24' stroke='currentColor'><path stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z'></path></svg> 복합 질의(Complex Query) 처리 불가" data-en="<svg class='w-5 h-5 mr-2' fill='none' viewBox='0 0 24 24' stroke='currentColor'><path stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z'></path></svg> Inability to Handle Complex Queries">
+                                <svg class='w-5 h-5 mr-2' fill='none' viewBox='0 0 24 24' stroke='currentColor'><path stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z'></path></svg> 복합 질의(Complex Query) 처리 불가
+                            </h4>
+                            <p class="text-red-900/80 mb-3" data-ko="사내 사용자는 '최신 프로젝트의 개발 아키텍처와 마케팅 일정을 요약해줘'와 같이 기획, 기술, 인사 등 여러 도메인의 의도가 섞인 질문을 던집니다. 기존 단일 검색기(Vector Search)는 이 문맥을 분리하지 못하고 무작위로 섞인 문서를 가져옵니다." data-en="Internal users often ask questions blending multiple intents across domains (e.g., 'Summarize the architecture and marketing schedule for the new project'). A standard single retriever fails to decouple these contexts, pulling randomly mixed documents.">
+                                사내 사용자는 '최신 프로젝트의 개발 아키텍처와 마케팅 일정을 요약해줘'와 같이 기획, 기술, 인사 등 여러 도메인의 의도가 섞인 질문을 던집니다. 기존 단일 검색기(Vector Search)는 이 문맥을 분리하지 못하고 무작위로 섞인 문서를 가져옵니다.
+                            </p>
+                        </div>
+                        <div class="bg-orange-50 p-6 rounded-xl border border-orange-100">
+                            <h4 class="text-orange-800 font-bold text-lg mb-3 flex items-center" data-ko="<svg class='w-5 h-5 mr-2' fill='none' viewBox='0 0 24 24' stroke='currentColor'><path stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z'></path></svg> 단일 LLM 프롬프트의 한계와 환각" data-en="<svg class='w-5 h-5 mr-2' fill='none' viewBox='0 0 24 24' stroke='currentColor'><path stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z'></path></svg> Limitations & Hallucinations of a Single LLM">
+                                <svg class='w-5 h-5 mr-2' fill='none' viewBox='0 0 24 24' stroke='currentColor'><path stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z'></path></svg> 단일 LLM 프롬프트의 한계와 환각
+                            </h4>
+                            <p class="text-orange-900/80 mb-3" data-ko="모든 사내 규정과 기술 문서를 하나의 프롬프트에 구겨 넣고 거대 모델 하나로 답변을 생성하려 하면, 토큰 비용이 낭비될 뿐만 아니라 관련 없는 부서의 문서가 검색되어 '환각(Hallucination)' 현상이 빈번하게 발생합니다." data-en="Cramming all internal policies and tech docs into a single prompt for one giant model wastes token costs and frequently causes 'hallucinations' by retrieving irrelevant departmental data.">
+                                모든 사내 규정과 기술 문서를 하나의 프롬프트에 구겨 넣고 거대 모델 하나로 답변을 생성하려 하면, 토큰 비용이 낭비될 뿐만 아니라 관련 없는 부서의 문서가 검색되어 '환각(Hallucination)' 현상이 빈번하게 발생합니다.
+                            </p>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- 2. What -->
+                <section id="what" class="scroll-mt-24">
+                    <div class="flex items-center mb-2">
+                        <div class="bg-indigo-100 p-2 rounded-lg mr-4">
+                            <svg class="w-7 h-7 text-indigo-600" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
+                        </div>
+                        <h2 class="text-3xl font-extrabold m-0" data-ko="2. Solution" data-en="2. Solution">2. Solution</h2>
+                    </div>
+
+                    <p class="text-slate-500 font-medium mb-6 max-w-4xl" data-ko="의도 분류 모델(Intent Model)과 멀티 에이전트 라우팅의 결합" data-en="Combining an Intent Model with Multi-Agent Routing.">
+                        의도 분류 모델(Intent Model)과 멀티 에이전트 라우팅의 결합
+                    </p>
+
+                    <div class="max-w-4xl mb-8 text-lg text-slate-700">
+                        <p data-ko="사용자의 질의를 1차적으로 <strong>'의도 분류 모델과 Gemini의 하이브리드 계층'</strong>에 통과시켜 핵심 의도(Intent Labels)를 분리 및 추출합니다." data-en="User queries are primarily passed through a <strong>'hybrid layer of an intent classification model and Gemini'</strong> to decouple and extract core intent labels.">
+                            사용자의 질의를 1차적으로 <strong>'의도 분류 모델과 Gemini의 하이브리드 계층'</strong>에 통과시켜 핵심 의도(Intent Labels)를 분리 및 추출합니다.
+                        </p>
+                        <p class="mt-2" data-ko="이후, 추출된 의도에 맞는 특화된 <strong>분야별 전문 에이전트(인사, 운영, 개발 등)</strong>를 동적으로 호출합니다. 각 에이전트는 자신만의 좁혀진 권한으로 Vertex AI Search의 데이터 스토어(Datastore)를 쿼리하여 가장 신뢰할 수 있는 사내 정보를 획득합니다." data-en="Then, it dynamically invokes specialized <strong>domain-expert agents (HR, Operations, Dev, etc.)</strong> corresponding to the extracted intent. Each agent queries the Vertex AI Search Datastore within its narrowed scope to acquire highly reliable internal information.">
+                            이후, 추출된 의도에 맞는 특화된 <strong>분야별 전문 에이전트(인사, 운영, 개발 등)</strong>를 동적으로 호출합니다. 각 에이전트는 자신만의 좁혀진 권한으로 Vertex AI Search의 데이터 스토어(Datastore)를 쿼리하여 가장 신뢰할 수 있는 사내 정보를 획득합니다.
+                        </p>
+                    </div>
+                </section>
+
+                <!-- 3. Architecture -->
+                <section id="key-design" class="scroll-mt-24">
+                    <div class="flex items-center mb-2">
+                        <div class="bg-indigo-100 p-2 rounded-lg mr-4">
+                            <svg class="w-7 h-7 text-indigo-600" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
+                        </div>
+                        <h2 class="text-3xl font-extrabold m-0" data-ko="3. Architecture" data-en="3. Architecture">3. Architecture</h2>
+                    </div>
+                    
+                    <p class="text-slate-500 font-medium mb-6 max-w-4xl" data-ko="Cloud Storage 기반 전처리와 의도(Intent) 분석 라우팅 워크플로우" data-en="Cloud Storage-based preprocessing and Intent Analysis routing workflow.">
+                        Cloud Storage 기반 전처리와 의도(Intent) 분석 라우팅 워크플로우
+                    </p>
+
+                    <div class="bg-white p-6 rounded-xl border border-slate-200 shadow-sm mb-6 max-w-4xl">
+                        <pre class="mermaid bg-transparent p-4 flex justify-center text-center">
+graph TD
+    User([User Query]) --> Classifier{Intent Analysis Layer <br/> Model + Gemini};
+    
+    Classifier -->|Extracts Labels| Routing[Agent Routing Engine];
+    
+    subgraph "Multi-Agent System"
+        Routing --> AgentA[Domain Agent A <br/> e.g., Dev/Tech];
+        Routing --> AgentB[Domain Agent B <br/> e.g., HR/Biz];
+    end
+    
+    subgraph "Data Pipeline & Vertex AI Search"
+        RawData[(Cloud Storage <br/> Raw KMS Docs)] --> Preprocess[Data Pipeline <br/> Load / Clean / Format];
+        Preprocess --> VertexSearch[(Vertex AI Search <br/> Datastore Engine)];
+    end
+    
+    AgentA -->|Semantic & Keyword Query| VertexSearch;
+    AgentB -->|Semantic & Keyword Query| VertexSearch;
+    
+    VertexSearch -.-> Reranker[Vertex AI Reranker];
+    Reranker -.-> LLM[Gemini LLM Endpoint];
+    LLM --> Response([Tailored Expert Answer]);
+    
+    style User fill:#f8fafc,stroke:#94a3b8,stroke-width:1px
+    style VertexSearch fill:#1e293b,stroke:#60a5fa,color:#fff
+    style RawData fill:#f1f5f9,stroke:#64748b
+    style Classifier fill:#fefce8,stroke:#eab308
+    style Routing fill:#f1f5f9,stroke:#64748b
+    style LLM fill:#eff6ff,stroke:#3b82f6,stroke-width:2px
+                        </pre>
+                    </div>
+                </section>
+
+                <!-- 4. Trade-off -->
+                <section id="trade-off" class="scroll-mt-24">
+                    <div class="flex items-center mb-2">
+                        <div class="bg-indigo-100 p-2 rounded-lg mr-4">
+                            <svg class="w-7 h-7 text-indigo-600" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 6l3 1m0 0l-3 9a5.002 5.002 0 006.001 0M6 7l3 9M6 7l6-2m6 2l3-1m-3 1l-3 9a5.002 5.002 0 006.001 0M18 7l3 9m-3-9l-6-2m0-2v2m0 16V5m0 16H9m3 0h3"></path></svg>
+                        </div>
+                        <h2 class="text-3xl font-extrabold m-0" data-ko="4. Technical Decisions" data-en="4. Technical Decisions">4. Technical Decisions</h2>
+                    </div>
+
+                    <p class="text-slate-500 font-medium mb-6 max-w-4xl" data-ko="정확도 향상과 인프라 최적화를 위해 거쳤던 치열한 엔지니어링 고민" data-en="Intense engineering considerations to optimize accuracy and infrastructure performance.">
+                        정확도 향상과 인프라 최적화를 위해 거쳤던 치열한 엔지니어링 고민
+                    </p>
+
+                    <div class="space-y-6 max-w-4xl">
+                        <!-- Trade-off 1 -->
+                        <div class="border border-slate-200 rounded-xl overflow-hidden">
+                            <div class="bg-slate-50 px-6 py-4 border-b border-slate-200">
+                                <h4 class="font-bold text-lg m-0 flex items-center" data-ko="의도 분석 계층 분리 <span class='text-slate-400 mx-3'>vs</span> 단일 거대 모델 사용" data-en="Intent Layer Separation vs Single Large Model">
+                                    의도 분석 계층 분리 <span class='text-slate-400 mx-3'>vs</span> 단일 거대 모델 사용
+                                </h4>
+                            </div>
+                            <div class="p-6 bg-white text-slate-700">
+                                <p class="mb-4" data-ko="사용자의 쿼리를 받을 때마다 무거운 프롬프트를 싣어 거대 모델(LLM) 하나가 모든 의도를 판단하게 하면, 시스템 응답 속도(Latency)가 저하되고 API 호출 비용이 급격히 늘어납니다." data-en="Having a single large model (LLM) handle heavy prompts to judge all intents per user query significantly increases latency and API call costs.">
+                                    사용자의 쿼리를 받을 때마다 무거운 프롬프트를 싣어 거대 모델(LLM) 하나가 모든 의도를 판단하게 하면, 시스템 응답 속도(Latency)가 저하되고 API 호출 비용이 급격히 늘어납니다.
+                                </p>
+                                <div class="bg-slate-100 p-4 rounded-lg border-l-4 border-indigo-500">
+                                    <strong class="text-slate-900 block mb-1" data-ko="해결: 경량 모델(Classifier) 선행 배치" data-en="Solution: Pre-deployment of Lightweight Classifier Model">해결: 경량 모델(Classifier) 선행 배치</strong>
+                                    <span class="text-sm" data-ko="문맥 전체를 읽지 않고 빠르고 정확하게 '의도 라벨(Intent Labels)'만 분리하는 <strong>별도의 하이브리드 분류 계층</strong>을 앞단에 배치했습니다. 이 라우터가 전문 에이전트를 먼저 호출하게 함으로써, 불필요한 토큰 낭비를 막고 검색 파이프라인의 속도를 최적화했습니다." data-en="Placed a <strong>separate hybrid classification layer</strong> at the front to quickly and accurately isolate 'Intent Labels' without reading the entire context. By having this router call the expert agent first, we prevented token waste and optimized search pipeline speeds.">
+                                        문맥 전체를 읽지 않고 빠르고 정확하게 '의도 라벨(Intent Labels)'만 분리하는 <strong>별도의 하이브리드 분류 계층</strong>을 앞단에 배치했습니다. 이 라우터가 전문 에이전트를 먼저 호출하게 함으로써, 불필요한 토큰 낭비를 막고 검색 파이프라인의 속도를 최적화했습니다.
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Trade-off 2 -->
+                        <div class="border border-slate-200 rounded-xl overflow-hidden">
+                            <div class="bg-slate-50 px-6 py-4 border-b border-slate-200">
+                                <h4 class="font-bold text-lg m-0 flex items-center" data-ko="순수 Vector DB 구축 <span class='text-slate-400 mx-3'>vs</span> Vertex AI Search(Agent Builder) 편입" data-en="Custom Vector DB Build vs Vertex AI Search Integration">
+                                    순수 Vector DB 구축 <span class='text-slate-400 mx-3'>vs</span> Vertex AI Search(Agent Builder) 편입
+                                </h4>
+                            </div>
+                            <div class="p-6 bg-white text-slate-700">
+                                <p class="mb-4" data-ko="오픈소스 Vector DB를 직접 컨테이너에 띄워 데이터를 색인하면 제어권은 완벽하지만, 엔터프라이즈의 보안(Security) 인증 및 데이터 크기(Scale)에 비례하는 끔찍한 인프라 관리 부채가 발생합니다." data-en="Running open-source Vector DBs in containers offers total control but creates terrifying infrastructure management debt proportional to enterprise security certifications and data scale.">
+                                    오픈소스 Vector DB를 직접 컨테이너에 띄워 데이터를 색인하면 제어권은 완벽하지만, 엔터프라이즈의 보안(Security) 인증 및 데이터 크기(Scale)에 비례하는 끔찍한 인프라 관리 부채가 발생합니다.
+                                </p>
+                                <div class="bg-slate-100 p-4 rounded-lg border-l-4 border-indigo-500">
+                                    <strong class="text-slate-900 block mb-1" data-ko="해결: Cloud Storage 연동의 관리형 Datastore 도입" data-en="Solution: Managed Datastore via Cloud Storage Integration">해결: Cloud Storage 연동의 관리형 Datastore 도입</strong>
+                                    <span class="text-sm" data-ko="정제된 KMS 데이터를 <strong>Cloud Storage 버킷</strong>에 올리고, 이를 <strong>Vertex AI Search의 Datastore</strong>로 다이렉트 인덱싱하는 구성을 채택했습니다. 이는 구글 인프라의 완전 관리형 하이브리드 검색 및 Reranker 기능을 백엔드 오버헤드 없이 즉시 사용할 수 있는 아키텍처적 결단입니다." data-en="Adopted a configuration of uploading refined KMS data to a <strong>Cloud Storage bucket</strong> and directly indexing it into <strong>Vertex AI Search Datastore</strong>. This architectural decision enables immediate use of Google's fully managed hybrid search and Reranker capabilities without backend overhead.">
+                                        정제된 KMS 데이터를 <strong>Cloud Storage 버킷</strong>에 올리고, 이를 <strong>Vertex AI Search의 Datastore</strong>로 다이렉트 인덱싱하는 구성을 채택했습니다. 이는 구글 인프라의 완전 관리형 하이브리드 검색 및 Reranker 기능을 백엔드 오버헤드 없이 즉시 사용할 수 있는 아키텍처적 결단입니다.
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- 5. Impact -->
+                <section id="impact" class="scroll-mt-24 mb-10">
+                    <div class="flex items-center mb-6">
+                        <div class="bg-indigo-100 p-2 rounded-lg mr-4">
+                            <svg class="w-7 h-7 text-indigo-600" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"></path></svg>
+                        </div>
+                        <h2 class="text-3xl font-extrabold m-0" data-ko="5. Business Impact" data-en="5. Business Impact">5. Business Impact</h2>
+                    </div>
+
+                    <div class="grid md:grid-cols-2 gap-6 mt-6 max-w-4xl">
+                        <!-- Impact 1 -->
+                        <div class="bg-indigo-600 text-white p-8 rounded-2xl shadow-lg relative overflow-hidden">
+                            <!-- Decorative Circle -->
+                            <div class="absolute -right-10 -top-10 w-40 h-40 bg-white opacity-10 rounded-full"></div>
+                            <h4 class="text-indigo-100 font-bold mb-4 text-xl" data-ko="사내 정보 탐색의 비효율 제거" data-en="Eliminating Inefficiencies in Internal Data Discovery">사내 정보 탐색의 비효율 제거</h4>
+                            <p class="text-indigo-50 font-medium text-lg leading-relaxed mt-2" data-ko="의도 분석 모델과 멀티 에이전트의 연계로, 복잡한 질문에서도 마치 부서별 전문가가 대답하는 것과 같은 정확도 높은 답변이 실시간으로 반환되어 엔터프라이즈 생산성을 대폭 강화합니다." data-en="Through the synergy of intent models and multi-agents, highly accurate answers equivalent to a departmental expert's response are returned in real-time even for complex queries, significantly boosting enterprise productivity.">
+                                의도 분석 모델과 멀티 에이전트의 연계로, 복잡한 질문에서도 마치 부서별 전문가가 대답하는 것과 같은 정확도 높은 답변이 실시간으로 반환되어 엔터프라이즈 생산성을 대폭 강화합니다.
+                            </p>
+                        </div>
+
+                        <!-- Impact 2 -->
+                        <div class="bg-white p-8 rounded-2xl border border-indigo-100 shadow-sm flex flex-col justify-center">
+                            <h4 class="text-slate-900 font-bold mb-4 text-xl" data-ko="모듈형 데이터 파이프라인 정착" data-en="Establishment of a Modular Data Pipeline">모듈형 데이터 파이프라인 정착</h4>
+                            <ul class="space-y-4">
+                                <li class="flex items-start">
+                                    <svg class="w-6 h-6 text-indigo-500 mr-2 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+                                    <span class="text-slate-700 text-sm" data-ko="<strong>플러그앤플레이(Plug-and-Play) 인덱싱</strong>: Cloud Storage에서 스테이징된 데이터를 Vertex AI Search로 즉각 매핑하는 파이프라인을 구축하여, 향후 타 부서나 완전히 다른 형태의 신규 데이터베이스라도 쉽게 편입시킬 수 있는 확장성을 획득했습니다." data-en="<strong>Plug-and-Play Indexing</strong>: By building a pipeline that maps data staged in Cloud Storage instantly to Vertex AI Search, we achieved scalability allowing easy integration of new databases from other departments or entirely different formats in the future.">
+                                        <strong>플러그앤플레이(Plug-and-Play) 인덱싱</strong>: Cloud Storage에서 스테이징된 데이터를 Vertex AI Search로 즉각 매핑하는 파이프라인을 구축하여, 향후 타 부서나 완전히 다른 형태의 신규 데이터베이스라도 쉽게 편입시킬 수 있는 확장성을 획득했습니다.
+                                    </span>
+                                </li>
+                                <li class="flex items-start">
+                                    <svg class="w-6 h-6 text-indigo-500 mr-2 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+                                    <span class="text-slate-700 text-sm" data-ko="<strong>Cloud Run 기반 배포 유연성</strong>: 모델 엔드포인트와 애플리케이션 프론트엔드를 Cloud Run 기반 컨테이너로 각각 독립 배포하여 성능 추적, 부하 분산 및 보안 인프라 구성을 완벽히 분리했습니다." data-en="<strong>Cloud Run Deployment Flexibility</strong>: The model endpoint and application frontend were deployed independently as Cloud Run containers, perfectly decoupling performance tracking, load balancing, and security infrastructure configuration.">
+                                        <strong>Cloud Run 기반 배포 유연성</strong>: 모델 엔드포인트와 애플리케이션 프론트엔드를 Cloud Run 기반 컨테이너로 각각 독립 배포하여 성능 추적, 부하 분산 및 보안 인프라 구성을 완벽히 분리했습니다.
+                                    </span>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </section>
+                
+            </main>
+        </div>
+        
+        <!-- Footer -->
+        <footer class="text-center mt-20 pt-8 border-t border-slate-200 text-slate-500 text-sm">
+            <p>&copy; 2025 Architectural Implementation Reference. Built for showcasing technical architecture.</p>
+        </footer>
+    </div>
+
+    <!-- Mermaid.js -->
+    <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+    <script>
+        mermaid.initialize({ startOnLoad: true, theme: 'neutral' });
+
+        // Mobile TOC Toggle
+        const mobileMenuBtn = document.getElementById('mobile-menu-btn');
+        const mobileToc = document.getElementById('mobile-toc');
+        
+        mobileMenuBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            mobileToc.classList.toggle('hidden');
+            mobileToc.classList.toggle('open');
+        });
+
+        // Close TOC when clicking outside or clicking a link
+        document.addEventListener('click', (e) => {
+            if (!mobileToc.contains(e.target) && !mobileMenuBtn.contains(e.target)) {
+                mobileToc.classList.add('hidden');
+                mobileToc.classList.remove('open');
+            }
+        });
+
+        mobileToc.querySelectorAll('a').forEach(link => {
+            link.addEventListener('click', () => {
+                mobileToc.classList.add('hidden');
+                mobileToc.classList.remove('open');
+            });
+        });
+
+        // Function to update internal links with current language
+        function updateLinksWithLang(lang) {
+            document.querySelectorAll('a').forEach(link => {
+                const href = link.getAttribute('href');
+                // Target only local HTML files or index.html
+                if (href && !href.startsWith('http') && !href.startsWith('#') && (href.includes('.html') || href === '/')) {
+                    const url = new URL(link.href, window.location.origin);
+                    url.searchParams.set('lang', lang);
+                    link.href = url.pathname + url.search + url.hash;
+                }
+            });
+        }
+
+        // Function to switch language
+        function switchLanguage(lang) {
+            document.querySelectorAll('[data-ko]').forEach(el => {
+                if (el.dataset[lang]) {
+                    el.innerHTML = el.dataset[lang];
+                }
+            });
+            document.documentElement.lang = lang;
+            document.title = document.querySelector('title').dataset[lang];
+            
+            // Save preference
+            localStorage.setItem('language', lang);
+
+            // Update button active state
+            document.getElementById('btn-ko').classList.toggle('active', lang === 'ko');
+            document.getElementById('btn-ko').classList.toggle('text-slate-600', lang !== 'ko');
+            document.getElementById('btn-ko').classList.toggle('bg-white', lang !== 'ko');
+            
+            document.getElementById('btn-en').classList.toggle('active', lang === 'en');
+            document.getElementById('btn-en').classList.toggle('text-slate-600', lang !== 'en');
+            document.getElementById('btn-en').classList.toggle('bg-white', lang !== 'en');
+
+            // Update all internal links with the selected language
+            updateLinksWithLang(lang);
+        }
+
+        // Set initial language
+        document.addEventListener('DOMContentLoaded', () => {
+            const urlParams = new URLSearchParams(window.location.search);
+            const langFromUrl = urlParams.get('lang');
+            const langFromStorage = localStorage.getItem('language');
+            const browserLang = (navigator.language || navigator.userLanguage).startsWith('en') ? 'en' : 'ko';
+            
+            const initialLang = langFromUrl || langFromStorage || browserLang;
+            switchLanguage(initialLang);
+        });
+    </script>
+</body>
+</html>
