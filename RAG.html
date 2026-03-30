@@ -1,0 +1,392 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" href="https://avatars.githubusercontent.com/u/35217573?v=4" type="image/x-icon">
+    <title data-ko="엔터프라이즈 교육용 RAG 챗봇 아키텍처" data-en="Enterprise Educational RAG Chatbot Architecture">엔터프라이즈 교육용 RAG 챗봇 아키텍처</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Noto+Sans+KR:wght@400;500;700;900&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', 'Noto Sans KR', sans-serif;
+            background-color: #f8fafc; /* slate-50 */
+        }
+        html { scroll-behavior: smooth; }
+        section { scroll-margin-top: 5rem; }
+        main section:not(:first-child) { margin-top: 4rem; }
+        h2 {
+            font-size: 1.875rem; font-weight: 800; margin-bottom: 1.5rem; letter-spacing: -0.025em; color: #0f172a;
+        }
+        h3 {
+            font-size: 1.5rem; font-weight: 700; margin-top: 2rem; margin-bottom: 1rem; color: #1e293b;
+        }
+        p, ul, ol, li { color: #475569; line-height: 1.75; }
+        main a { color: #2563eb; text-decoration: none; font-weight: 600; }
+        main a:hover { text-decoration: underline; color: #1d4ed8; }
+        strong { color: #1e293b; }
+        
+        .lang-toggle button.active { background-color: #4f46e5; color: white; }
+        
+        .workflow-box {
+            background: linear-gradient(to right bottom, #ffffff, #f8fafc);
+            border: 1px solid #e2e8f0; border-radius: 1rem; padding: 1.5rem;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05); transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+        .workflow-box:hover { transform: translateY(-2px); box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1); }
+        .step-number {
+            display: inline-flex; align-items: center; justify-content: center;
+            width: 2rem; height: 2rem; border-radius: 9999px; background-color: #4f46e5;
+            color: white; font-weight: 700; margin-right: 0.75rem;
+        }
+        
+        /* Mobile TOC Override */
+        #mobile-toc.open {
+            display: block !important; animation: slideUp 0.3s ease-out forwards;
+        }
+        @keyframes slideUp {
+            from { transform: translateY(10px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+        .mermaid { display: flex; justify-content: center; margin-top: 1.5rem; margin-bottom: 1.5rem;}
+    </style>
+</head>
+<body class="text-slate-800 relative pb-24 md:pb-0">
+
+    <!-- Header Actions -->
+    <div class="fixed top-4 right-4 z-50 flex items-center space-x-2">
+        <div class="lang-toggle bg-white/80 backdrop-blur-md shadow border border-slate-200 rounded-full p-1 flex space-x-1">
+            <button id="btn-ko" class="px-4 py-1.5 text-sm font-semibold rounded-full transition-all duration-200 active" onclick="switchLanguage('ko')">한국어</button>
+            <button id="btn-en" class="px-4 py-1.5 text-sm font-semibold rounded-full transition-all duration-200" onclick="switchLanguage('en')">English</button>
+        </div>
+        <button id="mobile-menu-btn" class="md:hidden bg-indigo-600 text-white p-2.5 rounded-full shadow-lg" aria-label="Toggle Table of Contents">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h7"></path></svg>
+        </button>
+    </div>
+
+    <!-- Mobile TOC Dropdown -->
+    <nav id="mobile-toc" class="hidden fixed top-16 right-4 z-40 bg-white p-4 rounded-xl shadow-xl border border-slate-200 w-64">
+        <ul class="space-y-3 font-medium text-sm text-slate-600">
+            <li><a href="#why" class="block hover:text-indigo-600 transition-colors" data-ko="1. Problem" data-en="1. Problem">1. Problem</a></li>
+            <li><a href="#what" class="block hover:text-indigo-600 transition-colors" data-ko="2. Solution" data-en="2. Solution">2. Solution</a></li>
+            <li><a href="#key-design" class="block hover:text-indigo-600 transition-colors" data-ko="3. Architecture" data-en="3. Architecture">3. Architecture</a></li>
+            <li><a href="#trade-off" class="block hover:text-indigo-600 transition-colors" data-ko="4. Technical Decisions" data-en="4. Technical Decisions">4. Technical Decisions</a></li>
+            <li><a href="#impact" class="block hover:text-indigo-600 transition-colors" data-ko="5. Business Impact" data-en="5. Business Impact">5. Business Impact</a></li>
+        </ul>
+    </nav>
+
+    <div class="container mx-auto px-4 py-10 md:py-16 max-w-7xl">
+        <!-- Header -->
+        <header class="text-center mb-16 md:mb-20">
+            <div class="inline-block px-3 py-1 mb-4 text-xs font-semibold tracking-wider text-emerald-700 uppercase bg-emerald-100 rounded-full border border-emerald-200">Production Use Case</div>
+            <h1 class="text-3xl md:text-4xl lg:text-5xl font-extrabold text-slate-900 mb-6 tracking-tight leading-tight" data-ko="엔터프라이즈 교육용 RAG 챗봇 아키텍처" data-en="Enterprise Educational RAG Chatbot Architecture">
+                엔터프라이즈 교육용 RAG 챗봇 아키텍처
+            </h1>
+            <p class="text-lg md:text-xl text-slate-600 font-medium max-w-3xl mx-auto mb-4" data-ko="방대한 자체 지식 데이터베이스를 기반으로 환각(Hallucination)을 통제하고, 학습자 맞춤형 AI 챗봇을 성공적으로 배포한 클라우드 네이티브 아키텍처" data-en="A cloud-native architecture successfully deploying a learner-customized AI chatbot that controls hallucinations based on a vast proprietary knowledge database.">
+                방대한 자체 지식 데이터베이스를 기반으로 환각(Hallucination)을 통제하고, 학습자 맞춤형 AI 챗봇을 성공적으로 배포한 클라우드 네이티브 아키텍처
+            </p>
+            <p class="text-sm text-slate-500" data-ko="Architectural Implementation Reference (2025)" data-en="Architectural Implementation Reference (2025)">Architectural Implementation Reference (2025)</p>
+        </header>
+
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-10">
+            <!-- Sidebar Navigation -->
+            <aside class="lg:col-span-3 lg:sticky top-8 self-start hidden md:block">
+                <nav class="bg-white p-6 rounded-xl shadow-sm border border-slate-100">
+                    <h3 class="font-extrabold text-lg mb-5 text-slate-900 uppercase tracking-wider text-sm" data-ko="목차" data-en="Table of Contents">목차</h3>
+                    <ul class="space-y-3 font-medium text-slate-600">
+                        <li><a href="#why" class="flex items-center hover:text-indigo-600 transition-colors" data-ko="1. Problem" data-en="1. Problem">1. Problem</a></li>
+                        <li><a href="#what" class="flex items-center hover:text-indigo-600 transition-colors" data-ko="2. Solution" data-en="2. Solution">2. Solution</a></li>
+                        <li><a href="#key-design" class="flex items-center hover:text-indigo-600 transition-colors" data-ko="3. Architecture" data-en="3. Architecture">3. Architecture</a></li>
+                        <li><a href="#trade-off" class="flex items-center hover:text-indigo-600 transition-colors" data-ko="4. Technical Decisions" data-en="4. Technical Decisions">4. Technical Decisions</a></li>
+                        <li><a href="#impact" class="flex items-center hover:text-indigo-600 transition-colors" data-ko="5. Business Impact" data-en="5. Business Impact">5. Business Impact</a></li>
+                    </ul>
+                </nav>
+            </aside>
+
+            <!-- Main Content -->
+            <main class="lg:col-span-9 space-y-16">
+
+                <!-- 요약 개요 -->
+                <section class="bg-white p-8 md:p-10 rounded-2xl shadow-sm border border-slate-100">
+                    <div class="max-w-4xl space-y-4">
+                        <p class="text-lg leading-relaxed text-slate-700" data-ko="에듀테크 시장에서 지식 자산을 AI 기술로 활용하려는 수요가 증가하고 있습니다." data-en="In the EdTech market, there is an increasing demand to utilize knowledge assets with AI technology.">
+                            에듀테크 시장에서 지식 자산을 AI 기술로 활용하려는 수요가 증가하고 있습니다.
+                        </p>
+                        <p class="text-lg leading-relaxed text-slate-700" data-ko="이 문서(Production Use Case)는 기업이 구축한 자체 데이터베이스를 기반으로, <strong>사용자 연령과 목적에 맞춘 신뢰성 높은 개인화 학습 서비스</strong>를 아키텍처 관점에서 어떻게 구현했는지 설명합니다." data-en="This production use case explains from an architectural perspective how to implement a <strong>reliable, personalized learning service tailored to user age and intent</strong>, based on a proprietary enterprise database.">
+                            이 문서(Production Use Case)는 기업이 구축한 자체 데이터베이스를 기반으로, <strong>사용자 연령과 목적에 맞춘 신뢰성 높은 개인화 학습 서비스</strong>를 아키텍처 관점에서 어떻게 구현했는지 설명합니다.
+                        </p>
+                    </div>
+                </section>
+
+                <!-- 1. Why -->
+                <section id="why" class="scroll-mt-24">
+                    <div class="flex items-center mb-2">
+                        <div class="bg-indigo-100 p-2 rounded-lg mr-4">
+                            <svg class="w-7 h-7 text-indigo-600" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                        </div>
+                        <h2 class="text-3xl font-extrabold m-0" data-ko="1. Problem" data-en="1. Problem">1. Problem</h2>
+                    </div>
+                    
+                    <p class="text-slate-500 font-medium mb-6 max-w-4xl" data-ko="범용 AI 챗봇의 정보 신뢰성 한계와 맞춤화 부재" data-en="The limitations of information reliability and the lack of personalization in general-purpose AI chatbots.">
+                        범용 AI 챗봇의 정보 신뢰성 한계와 맞춤화 부재
+                    </p>
+                    
+                    <div class="grid md:grid-cols-2 gap-6">
+                        <div class="bg-red-50 p-6 rounded-xl border border-red-100">
+                            <h4 class="text-red-800 font-bold text-lg mb-3 flex items-center" data-ko="<svg class='w-5 h-5 mr-2' fill='none' viewBox='0 0 24 24' stroke='currentColor'><path stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z'></path></svg> 환각(Hallucination)에 의한 무결성 하락" data-en="<svg class='w-5 h-5 mr-2' fill='none' viewBox='0 0 24 24' stroke='currentColor'><path stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z'></path></svg> Integrity Drop due to Hallucinations">
+                                <svg class='w-5 h-5 mr-2' fill='none' viewBox='0 0 24 24' stroke='currentColor'><path stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z'></path></svg> 환각(Hallucination)에 의한 무결성 하락
+                            </h4>
+                            <p class="text-red-900/80 mb-3" data-ko="교육 도메인은 사실(Fact) 전달이 생명입니다. 하지만 기존 범용 생성형 AI 모델들은 부정확한 정보를 그럴듯하게 생성하는 '환각' 현상을 완벽히 제어하지 못해, 실제 교육 콘텐츠 및 검증 자료로 활용하기 어려웠습니다." data-en="The education domain depends on factual delivery. However, existing general-purpose generative AI models struggled to fully control the 'hallucination' phenomenon, making them unsuitable as reliable educational content and verification materials.">
+                                교육 도메인은 사실(Fact) 전달이 생명입니다. 하지만 기존 범용 생성형 AI 모델들은 부정확한 정보를 그럴듯하게 생성하는 '환각' 현상을 완벽히 제어하지 못해, 실제 교육 콘텐츠 및 검증 자료로 활용하기 어려웠습니다.
+                            </p>
+                        </div>
+                        <div class="bg-orange-50 p-6 rounded-xl border border-orange-100">
+                            <h4 class="text-orange-800 font-bold text-lg mb-3 flex items-center" data-ko="<svg class='w-5 h-5 mr-2' fill='none' viewBox='0 0 24 24' stroke='currentColor'><path stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z'></path></svg> 획일화된 응답과 교육적 맥락 부재" data-en="<svg class='w-5 h-5 mr-2' fill='none' viewBox='0 0 24 24' stroke='currentColor'><path stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z'></path></svg> Uniform Responses & Lack of Context">
+                                <svg class='w-5 h-5 mr-2' fill='none' viewBox='0 0 24 24' stroke='currentColor'><path stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z'></path></svg> 획일화된 응답과 교육적 맥락 부재
+                            </h4>
+                            <p class="text-orange-900/80 mb-3" data-ko="학습자는 각기 다른 연령별 어휘 수준, 이독성(Readability) 기준, 교과 과정별 성취 목표를 갖습니다. 일반적인 API 호출만으로는 이처럼 미세한 '개인 맞춤형 교육 환경'을 반영한 신뢰 기반 답변을 도출할 수 없었습니다." data-en="Learners have varying vocabulary levels, readability requirements, and curriculum achievement goals. Standard API calls alone could not yield trust-based answers reflecting such fine-grained 'personalized educational environments.'">
+                                학습자는 각기 다른 연령별 어휘 수준, 이독성(Readability) 기준, 교과 과정별 성취 목표를 갖습니다. 일반적인 API 호출만으로는 이처럼 미세한 '개인 맞춤형 교육 환경'을 반영한 신뢰 기반 답변을 도출할 수 없었습니다.
+                            </p>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- 2. What -->
+                <section id="what" class="scroll-mt-24">
+                    <div class="flex items-center mb-2">
+                        <div class="bg-indigo-100 p-2 rounded-lg mr-4">
+                            <svg class="w-7 h-7 text-indigo-600" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
+                        </div>
+                        <h2 class="text-3xl font-extrabold m-0" data-ko="2. Solution" data-en="2. Solution">2. Solution</h2>
+                    </div>
+
+                    <p class="text-slate-500 font-medium mb-6 max-w-4xl" data-ko="기업 고유의 지식 자산과 생성형 AI를 결합한 맞춤형 RAG 파이프라인" data-en="A tailored RAG pipeline combining proprietary knowledge assets with generative AI.">
+                        기업 고유의 지식 자산과 생성형 AI를 결합한 맞춤형 RAG 파이프라인
+                    </p>
+
+                    <div class="max-w-4xl mb-8 text-lg text-slate-700">
+                        <p data-ko="이러한 문제를 해결하기 위해, 기업이 내부적으로 보유한 고품질 전문 교육 콘텐츠를 지식 베이스(Knowledge Base)로 활용하는 <strong>검색 증강 생성(RAG, Retrieval-Augmented Generation)</strong> 아키텍처를 도입했습니다." data-en="To resolve these issues, we introduced a <strong>Retrieval-Augmented Generation (RAG)</strong> architecture utilizing the enterprise's internally held, high-quality specialized educational content as the knowledge base.">
+                            이러한 문제를 해결하기 위해, 기업이 내부적으로 보유한 고품질 전문 교육 콘텐츠를 지식 베이스(Knowledge Base)로 활용하는 <strong>검색 증강 생성(RAG, Retrieval-Augmented Generation)</strong> 아키텍처를 도입했습니다.
+                        </p>
+                        <p class="mt-2" data-ko="Google Cloud의 인프라와 Gemini API를 통합하여 실시간 추론을 수행하며, 보안 및 인프라 확장을 완벽히 통제할 수 있는 프로덕션(Production-ready) 환경을 구축했습니다." data-en="Integrated with Google Cloud infrastructure and Gemini API to perform real-time inference, establishing a production-ready environment completely governing security and infrastructural scaling.">
+                            Google Cloud의 인프라와 Gemini API를 통합하여 실시간 추론을 수행하며, 보안 및 인프라 확장을 완벽히 통제할 수 있는 프로덕션(Production-ready) 환경을 구축했습니다.
+                        </p>
+                    </div>
+                </section>
+
+                <!-- 3. Architecture -->
+                <section id="key-design" class="scroll-mt-24">
+                    <div class="flex items-center mb-2">
+                        <div class="bg-indigo-100 p-2 rounded-lg mr-4">
+                            <svg class="w-7 h-7 text-indigo-600" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
+                        </div>
+                        <h2 class="text-3xl font-extrabold m-0" data-ko="3. Architecture" data-en="3. Architecture">3. Architecture</h2>
+                    </div>
+                    
+                    <p class="text-slate-500 font-medium mb-6 max-w-4xl" data-ko="클라우드 네이티브 기반의 유연하고 안전한 운영 생태계" data-en="A flexible and secure operational ecosystem based on Cloud-Native principles.">
+                        클라우드 네이티브 기반의 유연하고 안전한 운영 생태계
+                    </p>
+
+                    <div class="bg-white p-6 rounded-xl border border-slate-200 shadow-sm mb-6 max-w-4xl">
+                        <pre class="mermaid bg-transparent p-4 flex justify-center text-center">
+graph TD
+    User([Learner / End User]) --> App[Cloud Run Serverless App];
+    
+    subgraph "CI/CD & Supply Chain Security"
+        Repo(Source Code) --> Build[Cloud Build];
+        Build --> AR[Artifact Registry];
+        AR -.-> App;
+    end
+    
+    subgraph "Core AI & Knowledge Pipeline"
+        App --> Proxy[Compute Engine Proxy];
+        Proxy --> Gemini[Gemini for Google Cloud APIs];
+        App --> SQL[(Cloud SQL: Transaction/User Data)];
+        App --> GCS[(Cloud Storage: Assets)];
+    end
+    
+    subgraph "Operations & Automation"
+        Sched[Cloud Scheduler] --> PubSub[Pub/Sub];
+        PubSub --> Func[Cloud Run functions];
+        Func -.-> App;
+        App -.-> Obs[Google Cloud Observability];
+    end
+    
+    style User fill:#f8fafc,stroke:#94a3b8,stroke-width:1px
+    style App fill:#eff6ff,stroke:#3b82f6,stroke-width:2px
+    style Gemini fill:#fefce8,stroke:#eab308
+    style SQL fill:#f1f5f9,stroke:#64748b
+    style GCS fill:#f1f5f9,stroke:#64748b
+    style Obs fill:#f8fafc,stroke:#94a3b8,stroke-dasharray: 5 5
+                        </pre>
+                    </div>
+                </section>
+
+                <!-- 4. Trade-off -->
+                <section id="trade-off" class="scroll-mt-24">
+                    <div class="flex items-center mb-2">
+                        <div class="bg-indigo-100 p-2 rounded-lg mr-4">
+                            <svg class="w-7 h-7 text-indigo-600" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 6l3 1m0 0l-3 9a5.002 5.002 0 006.001 0M6 7l3 9M6 7l6-2m6 2l3-1m-3 1l-3 9a5.002 5.002 0 006.001 0M18 7l3 9m-3-9l-6-2m0-2v2m0 16V5m0 16H9m3 0h3"></path></svg>
+                        </div>
+                        <h2 class="text-3xl font-extrabold m-0" data-ko="4. Technical Decisions" data-en="4. Technical Decisions">4. Technical Decisions</h2>
+                    </div>
+
+                    <p class="text-slate-500 font-medium mb-6 max-w-4xl" data-ko="보안과 무중단 확장을 최우선으로 고려한 엔지니어링 의사결정" data-en="Engineering decisions prioritizing security and zero-downtime scaling.">
+                        보안과 무중단 확장을 최우선으로 고려한 엔지니어링 의사결정
+                    </p>
+
+                    <div class="space-y-6 max-w-4xl">
+                        <!-- Trade-off 1 -->
+                        <div class="border border-slate-200 rounded-xl overflow-hidden">
+                            <div class="bg-slate-50 px-6 py-4 border-b border-slate-200">
+                                <h4 class="font-bold text-lg m-0 flex items-center" data-ko="서버리스 기반의 무중단 아키텍처 확보" data-en="Zero-downtime architecture via Serverless">
+                                    서버리스 기반의 무중단 아키텍처 확보
+                                </h4>
+                            </div>
+                            <div class="p-6 bg-white text-slate-700">
+                                <p class="mb-4" data-ko="교육용 플랫폼은 사용자 트래픽의 변동이 심합니다. 상시로 가동되는 복잡한 인프라를 운영하기보다, 인프라 관리 부담을 최소화하면서 서비스 연속성을 유지하는 것이 중요했습니다." data-en="Educational platforms experience volatile user traffic. Rather than running complex infrastructure constantly, it was crucial to minimize infrastructure management burdens while maintaining service continuity.">
+                                    교육용 플랫폼은 사용자 트래픽의 변동이 심합니다. 상시로 가동되는 복잡한 인프라를 운영하기보다, 인프라 관리 부담을 최소화하면서 서비스 연속성을 유지하는 것이 중요했습니다.
+                                </p>
+                                <div class="bg-slate-100 p-4 rounded-lg border-l-4 border-indigo-500">
+                                    <strong class="text-slate-900 block mb-1" data-ko="해결: Cloud Run 중심의 유연한 컨테이너 배포" data-en="Solution: Flexible Container Deployment centering Cloud Run">해결: Cloud Run 중심의 유연한 컨테이너 배포</strong>
+                                    <span class="text-sm" data-ko="애플리케이션 런타임으로 <strong>Cloud Run</strong>을 채택하여, 트래픽 유입에 따라 완전 관리형(Fully-managed)으로 오토스케일링 되도록 설계했습니다. 하이브리드 연동을 위한 API 프록시는 Compute Engine에 분리 배포하여 안정성을 한층 높였습니다." data-en="Adopted <strong>Cloud Run</strong> as the application runtime, designing it for fully-managed autoscaling based on traffic influx. The API proxy for hybrid connection was deployed separately on Compute Engine, further elevating stability.">
+                                        애플리케이션 런타임으로 <strong>Cloud Run</strong>을 채택하여, 트래픽 유입에 따라 완전 관리형(Fully-managed)으로 오토스케일링 되도록 설계했습니다. 하이브리드 연동을 위한 API 프록시는 Compute Engine에 분리 배포하여 안정성을 한층 높였습니다.
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Trade-off 2 -->
+                        <div class="border border-slate-200 rounded-xl overflow-hidden">
+                            <div class="bg-slate-50 px-6 py-4 border-b border-slate-200">
+                                <h4 class="font-bold text-lg m-0 flex items-center" data-ko="운영 자동화 (Event-Driven) 및 보안 CI/CD" data-en="Event-Driven Ops Automation & Secure CI/CD">
+                                    운영 자동화 (Event-Driven) 및 보안 CI/CD
+                                </h4>
+                            </div>
+                            <div class="p-6 bg-white text-slate-700">
+                                <p class="mb-4" data-ko="엔터프라이즈 환경의 모델과 데이터베이스는 지속적으로 업데이트되어야 하며, 코드 반영 시 소프트웨어 공급망 보안(Supply Chain Security)을 철저히 준수해야 합니다." data-en="Enterprise environment models and databases must be continuously updated, and software supply chain security must be rigorously enforced during code reflection.">
+                                    엔터프라이즈 환경의 모델과 데이터베이스는 지속적으로 업데이트되어야 하며, 코드 반영 시 소프트웨어 공급망 보안(Supply Chain Security)을 철저히 준수해야 합니다.
+                                </p>
+                                <div class="bg-slate-100 p-4 rounded-lg border-l-4 border-indigo-500">
+                                    <strong class="text-slate-900 block mb-1" data-ko="해결: Cloud Scheduler와 Cloud Build 연동" data-en="Solution: Interlocked Cloud Scheduler and Cloud Build">해결: Cloud Scheduler와 Cloud Build 연동</strong>
+                                    <span class="text-sm" data-ko="<strong>Cloud Scheduler, Pub/Sub, Cloud Run functions</strong>를 엮어 주기적인 리소스 정리 및 데이터 갱신 파이프라인을 완전 자동화했습니다. 또한, Cloud Build 및 Artifact Registry 파이프라인을 통해 무결성이 검증된 이미지만 배포되며, <strong>Google Cloud Observability</strong>를 통해 서비스 전반의 로그가 실시간 중앙 집중식으로 관제됩니다." data-en="Automated periodic resource cleanup and data renewal pipelines by combining <strong>Cloud Scheduler, Pub/Sub, and Cloud Run functions</strong>. Through Cloud Build and Artifact Registry, only integrity-verified images are deployed. Real-time centralized monitoring of all service logs is conducted via <strong>Google Cloud Observability</strong>.">
+                                        <strong>Cloud Scheduler, Pub/Sub, Cloud Run functions</strong>를 엮어 주기적인 리소스 정리 및 데이터 갱신 파이프라인을 완전 자동화했습니다. 또한, Cloud Build 및 Artifact Registry 파이프라인을 통해 무결성이 검증된 이미지만 배포되며, <strong>Google Cloud Observability</strong>를 통해 서비스 전반의 로그가 실시간 중앙 집중식으로 관제됩니다.
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- 5. Impact -->
+                <section id="impact" class="scroll-mt-24 mb-10">
+                    <div class="flex items-center mb-6">
+                        <div class="bg-indigo-100 p-2 rounded-lg mr-4">
+                            <svg class="w-7 h-7 text-indigo-600" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"></path></svg>
+                        </div>
+                        <h2 class="text-3xl font-extrabold m-0" data-ko="5. Business Impact" data-en="5. Business Impact">5. Business Impact</h2>
+                    </div>
+
+                    <div class="grid md:grid-cols-2 gap-6 mt-6 max-w-4xl">
+                        <!-- Impact 1 -->
+                        <div class="bg-emerald-600 text-white p-8 rounded-2xl shadow-lg relative overflow-hidden">
+                            <!-- Decorative Circle -->
+                            <div class="absolute -right-10 -top-10 w-40 h-40 bg-white opacity-10 rounded-full"></div>
+                            <h4 class="text-emerald-100 font-bold mb-4 text-xl" data-ko="환각 없는 팩트 기반 서비스" data-en="Fact-based Service without Hallucinations">환각 없는 팩트 기반 서비스</h4>
+                            <p class="text-emerald-50 font-medium text-lg leading-relaxed mt-2" data-ko="RAG 파이프라인을 통해 생성형 AI의 가장 큰 리스크인 환각 문제를 원천적으로 제어하고, 고품질 교육 콘텐츠 데이터베이스 기반의 높은 무결성(Integrity)을 지닌 지식 전달 기반을 마련했습니다." data-en="Fundamentally controlled hallucination risks of generative AI via the RAG pipeline, establishing a knowledge delivery foundation with high integrity based on a high-quality educational content database.">
+                                RAG 파이프라인을 통해 생성형 AI의 가장 큰 리스크인 환각 문제를 원천적으로 제어하고, 고품질 교육 콘텐츠 데이터베이스 기반의 높은 무결성(Integrity)을 지닌 지식 전달 기반을 마련했습니다.
+                            </p>
+                        </div>
+
+                        <!-- Impact 2 -->
+                        <div class="bg-white p-8 rounded-2xl border border-indigo-100 shadow-sm flex flex-col justify-center">
+                            <h4 class="text-slate-900 font-bold mb-4 text-xl" data-ko="초개인화 교육 서비스의 포문" data-en="Spearheading Hyper-Personalized Education">초개인화 교육 서비스의 포문</h4>
+                            <ul class="space-y-4">
+                                <li class="flex items-start">
+                                    <svg class="w-6 h-6 text-indigo-500 mr-2 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+                                    <span class="text-slate-700 text-sm" data-ko="<strong>사용자(학습자) 맞춤형 처리</strong>: 연령별 어휘 수준, 이독성 지표, 교과 성취도 기준을 프롬프트 설계에 반영하여 사용자 그룹의 눈높이에 맞는 답변을 생성합니다." data-en="<strong>Learner-Customized Processing</strong>: By incorporating vocabulary levels by age, readability indices, and curriculum achievement goals into the prompt design, it generates answers suited to the user group's level.">
+                                        <strong>사용자(학습자) 맞춤형 처리</strong>: 연령별 어휘 수준, 이독성 지표, 교과 성취도 기준을 프롬프트 설계에 반영하여 사용자 그룹의 눈높이에 맞는 답변을 생성합니다.
+                                    </span>
+                                </li>
+                                <li class="flex items-start">
+                                    <svg class="w-6 h-6 text-indigo-500 mr-2 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+                                    <span class="text-slate-700 text-sm" data-ko="<strong>인프라 운영 효율화</strong>: 자동화된 CI/CD 및 모니터링 파이프라인과 서버리스(Serverless) 런타임 적용으로 인프라 관리 오버헤드를 감소시키고 서비스 안정성을 향상시켰습니다." data-en="<strong>Infrastructure Operational Efficiency</strong>: Reduced infrastructure management overhead and improved service stability by applying automated CI/CD, monitoring pipelines, and serverless runtimes.">
+                                        <strong>인프라 운영 효율화</strong>: 자동화된 CI/CD 및 모니터링 파이프라인과 서버리스(Serverless) 런타임 적용으로 인프라 관리 오버헤드를 감소시키고 서비스 안정성을 향상시켰습니다.
+                                    </span>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </section>
+                
+            </main>
+        </div>
+        
+        <!-- Footer -->
+        <footer class="text-center mt-20 pt-8 border-t border-slate-200 text-slate-500 text-sm">
+            <p>&copy; 2025 Architectural Implementation Reference. Built for showcasing technical architecture.</p>
+        </footer>
+    </div>
+
+    <!-- Mermaid.js -->
+    <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+    <script>
+        mermaid.initialize({ startOnLoad: true, theme: 'neutral' });
+
+        // Mobile TOC Toggle
+        const mobileMenuBtn = document.getElementById('mobile-menu-btn');
+        const mobileToc = document.getElementById('mobile-toc');
+        
+        mobileMenuBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            mobileToc.classList.toggle('hidden');
+            mobileToc.classList.toggle('open');
+        });
+
+        // Close TOC when clicking outside or clicking a link
+        document.addEventListener('click', (e) => {
+            if (!mobileToc.contains(e.target) && !mobileMenuBtn.contains(e.target)) {
+                mobileToc.classList.add('hidden');
+                mobileToc.classList.remove('open');
+            }
+        });
+
+        mobileToc.querySelectorAll('a').forEach(link => {
+            link.addEventListener('click', () => {
+                mobileToc.classList.add('hidden');
+                mobileToc.classList.remove('open');
+            });
+        });
+
+        // Function to switch language
+        function switchLanguage(lang) {
+            document.querySelectorAll('[data-ko]').forEach(el => {
+                if (el.dataset[lang]) {
+                    el.innerHTML = el.dataset[lang];
+                }
+            });
+            document.documentElement.lang = lang;
+            document.title = document.querySelector('title').dataset[lang];
+
+            // Update button active state
+            document.getElementById('btn-ko').classList.toggle('active', lang === 'ko');
+            document.getElementById('btn-ko').classList.toggle('text-slate-600', lang !== 'ko');
+            document.getElementById('btn-ko').classList.toggle('bg-white', lang !== 'ko');
+            
+            document.getElementById('btn-en').classList.toggle('active', lang === 'en');
+            document.getElementById('btn-en').classList.toggle('text-slate-600', lang !== 'en');
+            document.getElementById('btn-en').classList.toggle('bg-white', lang !== 'en');
+        }
+
+        // Set initial language
+        document.addEventListener('DOMContentLoaded', () => {
+            const userLang = navigator.language || navigator.userLanguage;
+            if (userLang.startsWith('en')) {
+                switchLanguage('en');
+            } else {
+                switchLanguage('ko');
+            }
+        });
+    </script>
+</body>
+</html>
