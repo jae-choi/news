@@ -4,401 +4,186 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="icon" href="https://avatars.githubusercontent.com/u/35217573?v=4" type="image/x-icon">
-    <title data-ko="단일 LLM 기반 디자인 에셋 생성 파이프라인" data-en="Unified LLM-based Design Asset Pipeline">단일 LLM 기반 디자인 에셋 파이프라인 - POC</title>
+    <title>Visual Asset Automation Studio</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Noto+Sans+KR:wght@400;500;700;900&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/lucide@latest"></script>
     <style>
-        body {
-            font-family: 'Inter', 'Noto Sans KR', sans-serif;
-            background-color: #f8fafc; /* slate-50 */
-        }
-        html { scroll-behavior: smooth; }
-        section { scroll-margin-top: 5rem; }
-        main section:not(:first-child) { margin-top: 4rem; }
-        h2 {
-            font-size: 1.875rem; font-weight: 800; margin-bottom: 1.5rem; letter-spacing: -0.025em; color: #0f172a;
-        }
-        h3 {
-            font-size: 1.5rem; font-weight: 700; margin-top: 2rem; margin-bottom: 1rem; color: #1e293b;
-        }
-        p, ul, ol, li { color: #475569; line-height: 1.75; }
-        main a { color: #2563eb; text-decoration: none; font-weight: 600; }
-        main a:hover { text-decoration: underline; color: #1d4ed8; }
-        strong { color: #1e293b; }
-        
-        .lang-toggle button.active { background-color: #4f46e5; color: white; }
-        
-        .workflow-box {
-            background: linear-gradient(to right bottom, #ffffff, #f8fafc);
-            border: 1px solid #e2e8f0; border-radius: 1rem; padding: 1.5rem;
-            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05); transition: transform 0.2s ease, box-shadow 0.2s ease;
-        }
-        .workflow-box:hover { transform: translateY(-2px); box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1); }
-        .step-number {
-            display: inline-flex; align-items: center; justify-content: center;
-            width: 2rem; height: 2rem; border-radius: 9999px; background-color: #4f46e5;
-            color: white; font-weight: 700; margin-right: 0.75rem;
-        }
-        
-        /* Mobile TOC Override */
-        #mobile-toc.open {
-            display: block !important; animation: slideUp 0.3s ease-out forwards;
-        }
-        @keyframes slideUp {
-            from { transform: translateY(10px); opacity: 0; }
-            to { transform: translateY(0); opacity: 1; }
-        }
-        .mermaid { display: flex; justify-content: center; margin-top: 1.5rem; margin-bottom: 1.5rem;}
+        body { font-family: 'Inter', 'Noto Sans KR', sans-serif; background-color: #f8fafc; }
+        .lang-ko .lang-en, .lang-en .lang-ko { display: none; }
+        .lang-btn.active { font-weight: 600; background-color: #2dd4bf; color: #0f172a; }
+        .lang-btn:not(.active) { color: #94a3b8; background-color: transparent; }
+        .prose h2, .prose h3 { color: #0f172a; letter-spacing: -0.025em; }
+        .prose p { color: #475569; line-height: 1.8; }
+        .mermaid-container { background: #ffffff; border: 1px solid #e2e8f0; border-radius: 1rem; padding: 1.5rem; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05); }
     </style>
 </head>
-<body class="text-slate-800 relative pb-24 md:pb-0">
-
-    <!-- Header Actions -->
+<body class="text-slate-800 antialiased">
     <div class="fixed top-4 right-4 z-50 flex items-center space-x-2">
-        <div class="lang-toggle bg-white/80 backdrop-blur-md shadow border border-slate-200 rounded-full p-1 flex space-x-1">
-            <button id="btn-ko" class="px-4 py-1.5 text-sm font-semibold rounded-full transition-all duration-200 active" onclick="switchLanguage('ko')">한국어</button>
-            <button id="btn-en" class="px-4 py-1.5 text-sm font-semibold rounded-full transition-all duration-200" onclick="switchLanguage('en')">English</button>
+        <a href="index_latest.html#projects" class="px-4 py-1.5 text-sm font-semibold rounded-full bg-white/80 backdrop-blur-md shadow border border-slate-200 text-slate-600 hover:text-indigo-600 transition">
+            &larr; <span class="lang lang-ko">돌아가기</span><span class="lang lang-en" style="display:none;">Back</span>
+        </a>
+        <div class="bg-white/80 backdrop-blur-md shadow border border-slate-200 rounded-full p-1 flex space-x-1">
+            <button id="btn-ko" class="lang-btn px-4 py-1.5 text-sm rounded-full transition-all duration-200" onclick="switchLang('ko')">KOR</button>
+            <button id="btn-en" class="lang-btn px-4 py-1.5 text-sm rounded-full transition-all duration-200" onclick="switchLang('en')">ENG</button>
         </div>
-        <button id="mobile-menu-btn" class="md:hidden bg-indigo-600 text-white p-2.5 rounded-full shadow-lg" aria-label="Toggle Table of Contents">
-            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h7"></path></svg>
-        </button>
     </div>
 
-    <!-- Mobile TOC Dropdown -->
-    <nav id="mobile-toc" class="hidden fixed top-16 right-4 z-40 bg-white p-4 rounded-xl shadow-xl border border-slate-200 w-64">
-        <ul class="space-y-3 font-medium text-sm text-slate-600">
-            <li><a href="#why" class="block hover:text-indigo-600 transition-colors" data-ko="1. Problem" data-en="1. Problem">1. Problem</a></li>
-            <li><a href="#what" class="block hover:text-indigo-600 transition-colors" data-ko="2. Solution" data-en="2. Solution">2. Solution</a></li>
-            <li><a href="#key-design" class="block hover:text-indigo-600 transition-colors" data-ko="3. Architecture" data-en="3. Architecture">3. Architecture</a></li>
-            <li><a href="#trade-off" class="block hover:text-indigo-600 transition-colors" data-ko="4. Technical Decisions" data-en="4. Technical Decisions">4. Technical Decisions</a></li>
-            <li><a href="#impact" class="block hover:text-indigo-600 transition-colors" data-ko="5. Business Impact" data-en="5. Business Impact">5. Business Impact</a></li>
-        </ul>
-    </nav>
-
-    <div class="container mx-auto px-4 py-10 md:py-16 max-w-7xl">
-        <!-- Header -->
-        <header class="text-center mb-16 md:mb-20">
-            <div class="inline-block px-3 py-1 mb-4 text-xs font-semibold tracking-wider text-indigo-600 uppercase bg-indigo-100 rounded-full border border-indigo-200">Proof of Concept (POC)</div>
-            <h1 class="text-3xl md:text-4xl lg:text-5xl font-extrabold text-slate-900 mb-6 tracking-tight leading-tight" data-ko="단일 LLM 기반 디자인 에셋 생성 파이프라인" data-en="Unified LLM-based Design Asset Pipeline">
-                단일 LLM 기반 디자인 에셋 생성 파이프라인
+    <main class="max-w-7xl mx-auto px-4 py-16 sm:px-6 lg:px-8 mt-10">
+        <div class="border-b border-slate-200 pb-12 mb-12">
+            <div class="inline-flex items-center px-3 py-1 rounded-full bg-indigo-50 text-indigo-600 text-sm font-semibold mb-6">
+                Project Prototype
+            </div>
+            <h1 class="text-4xl md:text-5xl font-extrabold text-slate-900 tracking-tight mb-4">
+                <span class="lang lang-ko">Visual Asset Automation Studio</span>
+                <span class="lang lang-en">Visual Asset Automation Studio</span>
             </h1>
-            <p class="text-lg md:text-xl text-slate-600 font-medium max-w-3xl mx-auto mb-4" data-ko="비싼 전용 비전(Vision) 딥러닝 모델들을 걷어내고, 오직 Gemini Vision 모델의 프롬프트 엔지니어링과 OpenCV 크로마키 기법만으로 배경 제거(누끼)부터 이미지 확장(Outpainting)까지 일괄 자동화한 파이프라인입니다." data-en="An automated pipeline that replaces expensive dedicated vision deep learning models. It performs everything from background removal to outpainting using only Gemini Vision prompt engineering and OpenCV chroma key techniques.">
-                비싼 전용 비전(Vision) 딥러닝 모델들을 걷어내고, 오직 Gemini Vision 모델의 프롬프트 엔지니어링과 OpenCV 크로마키 기법만으로 배경 제거(누끼)부터 이미지 확장(Outpainting)까지 일괄 자동화한 파이프라인입니다.
+            <p class="text-xl text-slate-500 max-w-3xl leading-relaxed">
+                <span class="lang lang-ko">단일 VLM과 OpenCV 후처리를 결합해 누끼 추출, 배경 정리, 이미지 확장을 한 흐름으로 묶은 visual asset automation prototype입니다.</span>
+                <span class="lang lang-en">A visual asset automation prototype that combines a single VLM with OpenCV post-processing for background extraction, cleanup, and image expansion in one flow.</span>
             </p>
-            <p class="text-sm text-slate-500" data-ko="Architectural Implementation Reference (2025)" data-en="Architectural Implementation Reference (2025)">Architectural Implementation Reference (2025)</p>
-        </header>
-
-        <div class="grid grid-cols-1 lg:grid-cols-12 gap-10">
-            <!-- Sidebar Navigation -->
-            <aside class="lg:col-span-3 lg:sticky top-8 self-start hidden md:block">
-                <nav class="bg-white p-6 rounded-xl shadow-sm border border-slate-100">
-                    <h3 class="font-extrabold text-lg mb-5 text-slate-900 uppercase tracking-wider text-sm" data-ko="목차" data-en="Table of Contents">목차</h3>
-                    <ul class="space-y-3 font-medium text-slate-600">
-                        <li><a href="#why" class="flex items-center hover:text-indigo-600 transition-colors" data-ko="1. Problem" data-en="1. Problem">1. Problem</a></li>
-                        <li><a href="#what" class="flex items-center hover:text-indigo-600 transition-colors" data-ko="2. Solution" data-en="2. Solution">2. Solution</a></li>
-                        <li><a href="#key-design" class="flex items-center hover:text-indigo-600 transition-colors" data-ko="3. Architecture" data-en="3. Architecture">3. Architecture</a></li>
-                        <li><a href="#trade-off" class="flex items-center hover:text-indigo-600 transition-colors" data-ko="4. Technical Decisions" data-en="4. Technical Decisions">4. Technical Decisions</a></li>
-                        <li><a href="#impact" class="flex items-center hover:text-indigo-600 transition-colors" data-ko="5. Business Impact" data-en="5. Business Impact">5. Business Impact</a></li>
-                    </ul>
-                </nav>
-            </aside>
-
-            <!-- Main Content -->
-            <main class="lg:col-span-9 space-y-16">
-
-                <!-- 요약 개요 -->
-                <section class="bg-white p-8 md:p-10 rounded-2xl shadow-sm border border-slate-100">
-                    <div class="max-w-4xl space-y-4">
-                        <p class="text-lg leading-relaxed text-slate-700" data-ko="웹툰, 커머스 등 마케팅 에셋을 대량 생산하는 부서에서는 캐릭터 썸네일 추출(누끼 따기), 글자 지우기, 레이아웃 16:9 확장과 같은 반복적인 디자인 작업에 엄청난 비용과 인력을 소모합니다." data-en="Departments that mass-produce marketing assets for webtoons and commerce consume immense costs and manpower on repetitive design tasks like character thumbnail extraction (background removal), text erasure, and 16:9 layout expansion.">
-                            웹툰, 커머스 등 마케팅 에셋을 대량 생산하는 부서에서는 캐릭터 썸네일 추출(누끼 따기), 글자 지우기, 레이아웃 16:9 확장과 같은 반복적인 디자인 작업에 엄청난 비용과 인력을 소모합니다.
-                        </p>
-                        <p class="text-lg leading-relaxed text-slate-700" data-ko="이 문서(POC)는 여러 개의 전용 딥러닝 모델(YOLO, SAM, SD 등)을 운영하는 무거운 인프라 구조를 버리고, 단 하나의 거대 언어 모델(Gemini Vision)과 <strong>Nano Banana 크로마키 기법</strong>을 통해 통합 디자인 자동화 파이프라인을 구축한 기술적 성과를 다룹니다." data-en="This POC documents the technical achievement of discarding heavy infrastructure running multiple dedicated deep learning models (YOLO, SAM, SD, etc.) in favor of building an integrated design automation pipeline using a single large language model (Gemini Vision) and the <strong>Nano Banana chroma key technique.</strong>">
-                            이 문서(POC)는 여러 개의 전용 딥러닝 모델(YOLO, SAM, SD 등)을 운영하는 무거운 인프라 구조를 버리고, 단 하나의 거대 언어 모델(Gemini Vision)과 <strong>Nano Banana 크로마키 기법</strong>을 통해 통합 디자인 자동화 파이프라인을 구축한 기술적 성과를 다룹니다.
-                        </p>
-                    </div>
-                </section>
-
-                <!-- 1. Why -->
-                <section id="why" class="scroll-mt-24">
-                    <div class="flex items-center mb-2">
-                        <div class="bg-indigo-100 p-2 rounded-lg mr-4">
-                            <svg class="w-7 h-7 text-indigo-600" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
-                        </div>
-                        <h2 class="text-3xl font-extrabold m-0" data-ko="1. Problem" data-en="1. Problem">1. Problem</h2>
-                    </div>
-                    
-                    <p class="text-slate-500 font-medium mb-6 max-w-4xl" data-ko="복잡한 비전 파이프라인과 비싼 GPU 인프라 종속성" data-en="Complex vision pipelines and expensive GPU infrastructure dependency.">
-                        복잡한 비전 파이프라인과 비싼 GPU 인프라 종속성
-                    </p>
-                    
-                    <div class="grid md:grid-cols-2 gap-6">
-                        <div class="bg-red-50 p-6 rounded-xl border border-red-100">
-                            <h4 class="text-red-800 font-bold text-lg mb-3 flex items-center" data-ko="<svg class='w-5 h-5 mr-2' fill='none' viewBox='0 0 24 24' stroke='currentColor'><path stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z'></path></svg> 다중 딥러닝 모델 유지보수의 늪" data-en="<svg class='w-5 h-5 mr-2' fill='none' viewBox='0 0 24 24' stroke='currentColor'><path stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z'></path></svg> The Swamp of Multi-Model Maintenance">
-                                <svg class='w-5 h-5 mr-2' fill='none' viewBox='0 0 24 24' stroke='currentColor'><path stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z'></path></svg> 다중 딥러닝 모델 유지보수의 늪
-                            </h4>
-                            <p class="text-red-900/80 mb-3" data-ko="일반적으로 이미지 속 인물을 찾고(YOLO), 배경을 지우며(SAM), 빈 공간을 채워넣으려면(Stable Diffusion) 3~4개의 각기 다른 고비용 AI 모델들을 각각의 GPU 서버에 배포하고 연결해야 합니다. 이는 관리 포인트를 기하급수적으로 늘립니다." data-en="Normally, finding a person in an image (YOLO), removing the background (SAM), and filling empty spaces (Stable Diffusion) requires deploying 3-4 different, expensive AI models across separate GPU servers. This exponentially increases management overhead.">
-                                일반적으로 이미지 속 인물을 찾고(YOLO), 배경을 지우며(SAM), 빈 공간을 채워넣으려면(Stable Diffusion) 3~4개의 각기 다른 고비용 AI 모델들을 각각의 GPU 서버에 배포하고 연결해야 합니다. 이는 관리 포인트를 기하급수적으로 늘립니다.
-                            </p>
-                        </div>
-                        <div class="bg-orange-50 p-6 rounded-xl border border-orange-100">
-                            <h4 class="text-orange-800 font-bold text-lg mb-3 flex items-center" data-ko="<svg class='w-5 h-5 mr-2' fill='none' viewBox='0 0 24 24' stroke='currentColor'><path stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z'></path></svg> API 기반 투명 배경 생성의 기술적 한계" data-en="<svg class='w-5 h-5 mr-2' fill='none' viewBox='0 0 24 24' stroke='currentColor'><path stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z'></path></svg> Limitations of API-based Alpha Channels">
-                                <svg class='w-5 h-5 mr-2' fill='none' viewBox='0 0 24 24' stroke='currentColor'><path stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z'></path></svg> API 기반 투명 배경 생성의 기술적 한계
-                            </h4>
-                            <p class="text-orange-900/80 mb-3" data-ko="클라우드 서비스(Gemini 등)의 범용 비전 모델은 이미지 생성은 뛰어나지만, 알파 채널(투명 배경, PNG)을 깔끔하게 반환하는 누끼 따기 능력은 구조적으로 불가능에 가까웠습니다. 모델이 체커보드 패턴을 그리는 등 오작동이 빈번했습니다." data-en="While cloud-based vision models (like Gemini) excel at image generation, cleanly returning an alpha channel (transparent background, PNG) is structurally nearly impossible for them. They frequently malfunctioned by drawing checkerboard patterns instead.">
-                                클라우드 서비스(Gemini 등)의 범용 비전 모델은 이미지 생성은 뛰어나지만, 알파 채널(투명 배경, PNG)을 깔끔하게 반환하는 누끼 따기 능력은 구조적으로 불가능에 가까웠습니다. 모델이 체커보드 패턴을 그리는 등 오작동이 빈번했습니다.
-                            </p>
-                        </div>
-                    </div>
-                </section>
-
-                <!-- 2. What -->
-                <section id="what" class="scroll-mt-24">
-                    <div class="flex items-center mb-2">
-                        <div class="bg-indigo-100 p-2 rounded-lg mr-4">
-                            <svg class="w-7 h-7 text-indigo-600" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
-                        </div>
-                        <h2 class="text-3xl font-extrabold m-0" data-ko="2. Solution" data-en="2. Solution">2. Solution</h2>
-                    </div>
-
-                    <p class="text-slate-500 font-medium mb-6 max-w-4xl" data-ko="Gemini 3.1 VLM 모델 기반 올인원(All-in-one) 비전 프롬프팅" data-en="All-in-one Vision Prompting using the Gemini 3.1 VLM Model.">
-                        Gemini 3.1 VLM 모델 기반 올인원(All-in-one) 비전 프롬프팅
-                    </p>
-
-                    <div class="max-w-4xl mb-8 text-lg text-slate-700">
-                        <p data-ko="여러 개의 비전 특화 모델들을 모두 폐기하고, 오직 <strong>단일 거대 시각 언어 모델(Gemini 3.1 Pro/Flash)</strong>만 사용하여 객체 탐지, 이미지 확장(Outpainting), 글자 지우기(Inpainting)를 모두 처리하는 백엔드 서버(FastAPI)를 구축했습니다." data-en="We discarded multiple specialized vision models and built a backend server (FastAPI) that handles object detection, image expansion (Outpainting), and text erasure (Inpainting) using only a <strong>single Vision-Language Model (Gemini 3.1 Pro/Flash).</strong>">
-                            여러 개의 비전 특화 모델들을 모두 폐기하고, 오직 <strong>단일 거대 시각 언어 모델(Gemini 3.1 Pro/Flash)</strong>만 사용하여 객체 탐지, 이미지 확장(Outpainting), 글자 지우기(Inpainting)를 모두 처리하는 백엔드 서버(FastAPI)를 구축했습니다.
-                        </p>
-                        <p class="mt-2" data-ko="특히 불가능에 가깝던 투명 배경 처리(누끼) 문제는 <strong>'모델에게 배경을 형광 녹색으로 칠하게 한 뒤 OpenCV로 뚫어내는 (Nano Banana 기법)'</strong> 창의적 엔지니어링으로 완벽하게 해결했습니다." data-en="In particular, the seemingly impossible task of generating transparent backgrounds was flawlessly solved using a creative engineering trick: <strong>'Nano Banana technique' (prompting the model to paint the background solid neon green, then punching it out using OpenCV).</strong>">
-                            특히 불가능에 가깝던 투명 배경 처리(누끼) 문제는 <strong>'모델에게 배경을 형광 녹색으로 칠하게 한 뒤 OpenCV로 뚫어내는 (Nano Banana 기법)'</strong> 창의적 엔지니어링으로 완벽하게 해결했습니다.
-                        </p>
-                    </div>
-                </section>
-
-                <!-- 3. Architecture -->
-                <section id="key-design" class="scroll-mt-24">
-                    <div class="flex items-center mb-2">
-                        <div class="bg-indigo-100 p-2 rounded-lg mr-4">
-                            <svg class="w-7 h-7 text-indigo-600" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
-                        </div>
-                        <h2 class="text-3xl font-extrabold m-0" data-ko="3. Architecture" data-en="3. Architecture">3. Architecture</h2>
-                    </div>
-                    
-                    <p class="text-slate-500 font-medium mb-6 max-w-4xl" data-ko="FastAPI 기반 디자인 에셋 생성 자동화 워크플로우" data-en="Automated design asset generation workflow based on FastAPI.">
-                        FastAPI 기반 디자인 에셋 생성 자동화 워크플로우
-                    </p>
-
-                    <div class="bg-white p-6 rounded-xl border border-slate-200 shadow-sm mb-6 max-w-4xl">
-                        <pre class="mermaid bg-transparent p-4 flex justify-center text-center">
-graph TD
-    User([Marketer / Designer]) --> API[FastAPI Backend Server];
-    
-    API --> Step1{1. Object Detection <br/> Gemini 3.1 Pro};
-    Step1 -.->|Output: 2D Bounding Box JSON| Crop[Backend: Image Cropping];
-    
-    Crop --> Step2{2. Nano Banana <br/> Gemini 3.1 Flash};
-    Step2 -.->|Output: Solid Neon Green BG| OpenCV[Backend: OpenCV Chroma Key];
-    OpenCV -.->|Output: Transparent PNG| Output1([Extracted Character Image]);
-    
-    API --> Step3{3. Inpainting / Expansion <br/> Gemini 3.1 Flash};
-    Step3 -.->|Generative Fill / Erase Text| Output2([Expanded & Cleaned Background]);
-    
-    style User fill:#f8fafc,stroke:#94a3b8,stroke-width:1px
-    style API fill:#eff6ff,stroke:#3b82f6,stroke-width:2px
-    style Step1 fill:#fefce8,stroke:#eab308
-    style Step2 fill:#fefce8,stroke:#eab308
-    style Step3 fill:#fefce8,stroke:#eab308
-    style Crop fill:#f1f5f9,stroke:#64748b
-    style OpenCV fill:#f1f5f9,stroke:#64748b
-    style Output1 fill:#1e293b,stroke:#2dd4bf,color:#fff
-    style Output2 fill:#1e293b,stroke:#2dd4bf,color:#fff
-                        </pre>
-                    </div>
-                </section>
-
-                <!-- 4. Trade-off -->
-                <section id="trade-off" class="scroll-mt-24">
-                    <div class="flex items-center mb-2">
-                        <div class="bg-indigo-100 p-2 rounded-lg mr-4">
-                            <svg class="w-7 h-7 text-indigo-600" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 6l3 1m0 0l-3 9a5.002 5.002 0 006.001 0M6 7l3 9M6 7l6-2m6 2l3-1m-3 1l-3 9a5.002 5.002 0 006.001 0M18 7l3 9m-3-9l-6-2m0-2v2m0 16V5m0 16H9m3 0h3"></path></svg>
-                        </div>
-                        <h2 class="text-3xl font-extrabold m-0" data-ko="4. Technical Decisions" data-en="4. Technical Decisions">4. Technical Decisions</h2>
-                    </div>
-
-                    <p class="text-slate-500 font-medium mb-6 max-w-4xl" data-ko="비용 한계 극복을 위한 창의적인 엔지니어링 의사결정" data-en="Creative engineering decisions to overcome cost limitations.">
-                        비용 한계 극복을 위한 창의적인 엔지니어링 의사결정
-                    </p>
-
-                    <div class="space-y-6 max-w-4xl">
-                        <!-- Trade-off 1 -->
-                        <div class="border border-slate-200 rounded-xl overflow-hidden">
-                            <div class="bg-slate-50 px-6 py-4 border-b border-slate-200">
-                                <h4 class="font-bold text-lg m-0 flex items-center" data-ko="SAM 모델 등 전용 인프라 운용 <span class='text-slate-400 mx-3'>vs</span> Nano Banana 크로마키 기법" data-en="Running Dedicated SAM Infrastructure vs Nano Banana Chroma Key Technique">
-                                    SAM 모델 등 전용 인프라 운용 <span class='text-slate-400 mx-3'>vs</span> Nano Banana 크로마키 기법
-                                </h4>
-                            </div>
-                            <div class="p-6 bg-white text-slate-700">
-                                <p class="mb-4" data-ko="완벽한 누끼(배경 제거)를 위해 SAM(Segment Anything Model) 서버를 구축하면 GPU 비용이 크게 상승합니다. 반면, API 기반 VLM 모델은 투명 배경(Alpha)을 제대로 렌더링하지 못하는 구조적 맹점이 있었습니다." data-en="Building a SAM (Segment Anything Model) server for perfect background removal drastically increases GPU costs. Conversely, API-based VLM models have a structural blind spot where they cannot properly render transparent backgrounds (Alpha channel).">
-                                    완벽한 누끼(배경 제거)를 위해 SAM(Segment Anything Model) 서버를 구축하면 GPU 비용이 크게 상승합니다. 반면, API 기반 VLM 모델은 투명 배경(Alpha)을 제대로 렌더링하지 못하는 구조적 맹점이 있었습니다.
-                                </p>
-                                <div class="bg-slate-100 p-4 rounded-lg border-l-4 border-indigo-500">
-                                    <strong class="text-slate-900 block mb-1" data-ko="해결: Prompting과 OpenCV의 결합 (Nano Banana)" data-en="Solution: Combining Prompting with OpenCV (Nano Banana)">해결: Prompting과 OpenCV의 결합 (Nano Banana)</strong>
-                                    <span class="text-sm" data-ko="모델에게 투명 처리를 기대하는 대신, <strong>'배경을 완벽한 네온 그린(#00FF00)으로 덮어라'</strong>는 강력한 프롬프트를 주입했습니다. 이렇게 렌더링된 이미지를 FastAPI 백엔드에서 <code>OpenCV</code> 라이브러리를 통해 전통적인 크로마키 기법으로 초록색만 뚫어버리는 우회(Workaround) 전술을 사용하여 GPU 비용을 완전히 소거했습니다." data-en="Instead of expecting transparency from the model, we injected a strong prompt: <strong>'Cover the background completely in solid Neon Green (#00FF00)'.</strong> We then used a workaround tactic in the FastAPI backend, utilizing the <code>OpenCV</code> library's traditional chroma key technique to punch out only the green color, entirely eliminating GPU costs.">
-                                        모델에게 투명 처리를 기대하는 대신, <strong>'배경을 완벽한 네온 그린(#00FF00)으로 덮어라'</strong>는 강력한 프롬프트를 주입했습니다. 이렇게 렌더링된 이미지를 FastAPI 백엔드에서 <code>OpenCV</code> 라이브러리를 통해 전통적인 크로마키 기법으로 초록색만 뚫어버리는 우회(Workaround) 전술을 사용하여 GPU 비용을 완전히 소거했습니다.
-                                    </span>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Trade-off 2 -->
-                        <div class="border border-slate-200 rounded-xl overflow-hidden">
-                            <div class="bg-slate-50 px-6 py-4 border-b border-slate-200">
-                                <h4 class="font-bold text-lg m-0 flex items-center" data-ko="절대 픽셀값 예측 <span class='text-slate-400 mx-3'>vs</span> 좌표 정규화 기반 공간 추론" data-en="Absolute Pixel Prediction vs Normalized Coordinate Spatial Reasoning">
-                                    절대 픽셀값 예측 <span class='text-slate-400 mx-3'>vs</span> 좌표 정규화 기반 공간 추론
-                                </h4>
-                            </div>
-                            <div class="p-6 bg-white text-slate-700">
-                                <p class="mb-4" data-ko="다양한 해상도(Resolution)의 이미지가 들어올 때, 모델에게 특정 객체의 Bounding Box를 정확한 절대 픽셀 좌표(예: 1024x768)로 찾으라고 명령하면 인식률이 크게 요동칩니다." data-en="When receiving images of various resolutions, commanding the model to find an object's Bounding Box in exact absolute pixel coordinates (e.g., 1024x768) causes the recognition rate to fluctuate wildly.">
-                                    다양한 해상도(Resolution)의 이미지가 들어올 때, 모델에게 특정 객체의 Bounding Box를 정확한 절대 픽셀 좌표(예: 1024x768)로 찾으라고 명령하면 인식률이 크게 요동칩니다.
-                                </p>
-                                <div class="bg-slate-100 p-4 rounded-lg border-l-4 border-indigo-500">
-                                    <strong class="text-slate-900 block mb-1" data-ko="해결: 0~1000 스케일 맵핑 및 JSON 응답 강제" data-en="Solution: 0-1000 Scale Mapping and Forced JSON Response">해결: 0~1000 스케일 맵핑 및 JSON 응답 강제</strong>
-                                    <span class="text-sm" data-ko="원본 해상도에 상관없이 모델에게 <strong>이미지를 가로세로 0부터 1000까지의 상대적 비율로 인식</strong>하게 한 뒤, <code>[ymin, xmin, ymax, xmax]</code> 형태의 정규화된 JSON 데이터로만 출력하도록 시스템 프롬프트를 고도화했습니다. 백엔드에서는 이를 다시 원본 해상도로 곱하여(Scale-up) 완벽한 크롭(Crop) 안정성을 확보했습니다." data-en="We advanced the system prompt to force the model to <strong>perceive any image logically on a relative scale from 0 to 1000 (width and height)</strong> regardless of original resolution, outputting only normalized JSON data formatted as <code>[ymin, xmin, ymax, xmax]</code>. The backend then scales this up to the original resolution, securing flawless cropping stability.">
-                                        원본 해상도에 상관없이 모델에게 <strong>이미지를 가로세로 0부터 1000까지의 상대적 비율로 인식</strong>하게 한 뒤, <code>[ymin, xmin, ymax, xmax]</code> 형태의 정규화된 JSON 데이터로만 출력하도록 시스템 프롬프트를 고도화했습니다. 백엔드에서는 이를 다시 원본 해상도로 곱하여(Scale-up) 완벽한 크롭(Crop) 안정성을 확보했습니다.
-                                    </span>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </section>
-
-                <!-- 5. Impact -->
-                <section id="impact" class="scroll-mt-24 mb-10">
-                    <div class="flex items-center mb-6">
-                        <div class="bg-indigo-100 p-2 rounded-lg mr-4">
-                            <svg class="w-7 h-7 text-indigo-600" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"></path></svg>
-                        </div>
-                        <h2 class="text-3xl font-extrabold m-0" data-ko="5. Business Impact" data-en="5. Business Impact">5. Business Impact</h2>
-                    </div>
-
-                    <div class="grid md:grid-cols-2 gap-6 mt-6 max-w-4xl">
-                        <!-- Impact 1 -->
-                        <div class="bg-indigo-600 text-white p-8 rounded-2xl shadow-lg relative overflow-hidden">
-                            <!-- Decorative Circle -->
-                            <div class="absolute -right-10 -top-10 w-40 h-40 bg-white opacity-10 rounded-full"></div>
-                            <h4 class="text-indigo-100 font-bold mb-4 text-xl" data-ko="고비용 비전 인프라 제로화" data-en="Zero High-Cost Vision Infrastructure">고비용 비전 인프라 제로화</h4>
-                            <p class="text-indigo-50 font-medium text-lg leading-relaxed mt-2" data-ko="마케팅 썸네일 생성을 위한 무거운 딥러닝 서버군(YOLO, SAM, SD)을 <strong>경량 백엔드 API 서버 1대로 100% 통합 및 교체</strong>했습니다. 이로 인해 수천 달러에 달하던 월간 GPU 유지보수 비용을 Gemini 토큰 비용 수준으로 파격적으로 줄였습니다." data-en="<strong>100% consolidated and replaced</strong> heavy deep learning server clusters (YOLO, SAM, SD) meant for marketing thumbnail generation with <strong>a single lightweight backend API server.</strong> This drastically slashed monthly GPU maintenance costs of thousands of dollars down to mere Gemini token costs.">
-                                마케팅 썸네일 생성을 위한 무거운 딥러닝 서버군(YOLO, SAM, SD)을 <strong>경량 백엔드 API 서버 1대로 100% 통합 및 교체</strong>했습니다. 이로 인해 수천 달러에 달하던 월간 GPU 유지보수 비용을 Gemini 토큰 비용 수준으로 파격적으로 줄였습니다.
-                            </p>
-                        </div>
-
-                        <!-- Impact 2 -->
-                        <div class="bg-white p-8 rounded-2xl border border-indigo-100 shadow-sm flex flex-col justify-center">
-                            <h4 class="text-slate-900 font-bold mb-4 text-xl" data-ko="통합 에셋 파이프라인의 완성" data-en="Completion of an Integrated Asset Pipeline">통합 에셋 파이프라인의 완성</h4>
-                            <ul class="space-y-4">
-                                <li class="flex items-start">
-                                    <svg class="w-6 h-6 text-indigo-500 mr-2 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
-                                    <span class="text-slate-700 text-sm" data-ko="<strong>크리에이티브 워크플로 통합</strong>: 디자이너가 여러 툴을 번갈아 쓸 필요 없이, 단일 API 플랫폼에서 '인물 누끼 추출 &rarr; 텍스트 삭제 &rarr; 여백 16:9 확장'까지 한 번에 자동화하여 에셋 생산성을 극대화했습니다." data-en="<strong>Creative Workflow Integration</strong>: Maximized asset productivity by automating the entire process from 'character background removal &rarr; text erasure &rarr; 16:9 margin expansion' on a single API platform, eliminating the need for designers to jump between multiple tools.">
-                                        <strong>크리에이티브 워크플로 통합</strong>: 디자이너가 여러 툴을 번갈아 쓸 필요 없이, 단일 API 플랫폼에서 '인물 누끼 추출 &rarr; 텍스트 삭제 &rarr; 여백 16:9 확장'까지 한 번에 자동화하여 에셋 생산성을 극대화했습니다.
-                                    </span>
-                                </li>
-                                <li class="flex items-start">
-                                    <svg class="w-6 h-6 text-indigo-500 mr-2 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
-                                    <span class="text-slate-700 text-sm" data-ko="<strong>비개발 모델 파인튜닝의 한계 극복</strong>: 모델 자체의 한계(투명도 렌더링 불가 등)를 외부 코드 레벨의 엔지니어링(OpenCV 크로마키)으로 우회 결합하여, AI의 결함을 유연하게 보완하는 아키텍처 방법론을 증명했습니다." data-en="<strong>Overcoming Non-dev Model Fine-Tuning Limits</strong>: Proved an architectural methodology that flexibly compensates for AI flaws by circumventing model limitations (like transparency rendering) through external code-level engineering (OpenCV chroma key).">
-                                        <strong>비개발 모델 파인튜닝의 한계 극복</strong>: 모델 자체의 한계(투명도 렌더링 불가 등)를 외부 코드 레벨의 엔지니어링(OpenCV 크로마키)으로 우회 결합하여, AI의 결함을 유연하게 보완하는 아키텍처 방법론을 증명했습니다.
-                                    </span>
-                                </li>
-                            </ul>
-                        </div>
-                    </div>
-                </section>
-                
-            </main>
         </div>
-        
-        <!-- Footer -->
-        <footer class="text-center mt-20 pt-8 border-t border-slate-200 text-slate-500 text-sm">
-            <p>&copy; 2025 Architectural Implementation Reference. Built for showcasing technical architecture.</p>
-        </footer>
-    </div>
 
-    <!-- Mermaid.js -->
-    <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
-    <script>
+        <div class="grid lg:grid-cols-12 gap-12 items-start">
+            <div class="lg:col-span-7 space-y-12">
+                <div class="bg-white border border-slate-200 rounded-2xl p-7 shadow-sm">
+                    <p class="text-base leading-8 text-slate-600">
+                        <span class="lang lang-ko">이 프로젝트는 무거운 비전 서버군을 하나의 경량 API 흐름으로 대체하는 데 초점을 둡니다. 객체 추출, 텍스트 제거, 여백 확장을 한 파이프라인으로 통합하면서도 상시 GPU 비용을 줄이는 방향으로 설계했습니다.</span>
+                        <span class="lang lang-en">This project focuses on replacing a stack of heavy vision servers with a lightweight API flow. It integrates object extraction, text removal, and canvas expansion into one pipeline while reducing always-on GPU cost.</span>
+                    </p>
+                </div>
+
+                <div class="prose prose-lg max-w-none text-slate-600">
+                    <h2 class="text-2xl font-bold border-b border-slate-200 pb-2 mb-6">
+                        <span class="lang lang-ko">Solution</span>
+                        <span class="lang lang-en">Solution</span>
+                    </h2>
+                    <p>
+                        <span class="lang lang-ko">여러 전용 모델을 따로 운영하는 대신, 단일 VLM이 object detection, inpainting, outpainting을 맡고 FastAPI 백엔드가 crop과 후처리를 담당하도록 설계했습니다. 이로써 한 번의 요청 안에서 주요 디자인 보정 작업을 끝낼 수 있게 했습니다.</span>
+                        <span class="lang lang-en">Instead of operating multiple specialized models, we let a single VLM handle object detection, inpainting, and outpainting while a FastAPI backend manages crop and post-processing. This allows major design cleanup tasks to finish within one request flow.</span>
+                    </p>
+                    <p>
+                        <span class="lang lang-ko">가장 까다로운 문제였던 투명 배경 처리는 모델이 alpha channel을 안정적으로 만들지 못하는 한계를 우회해야 했습니다. 그래서 배경을 네온 그린으로 생성하게 한 뒤 OpenCV 크로마키로 제거하는 Nano Banana 방식을 채택했습니다.</span>
+                        <span class="lang lang-en">Transparent background generation was the hardest part because the model could not reliably produce alpha channels. We worked around that by generating a neon-green background and removing it with OpenCV chroma keying, the Nano Banana method.</span>
+                    </p>
+
+                    <h2 class="text-2xl font-bold border-b border-slate-200 pb-2 mb-6 mt-12">
+                        <span class="lang lang-ko">Architecture</span>
+                        <span class="lang lang-en">Architecture</span>
+                    </h2>
+                    <p>
+                        <span class="lang lang-ko">이미지가 들어오면 detection step이 정규화된 bounding box JSON을 반환하고, 백엔드는 이를 원본 해상도에 맞춰 crop합니다. 이후 cutout, text erase, background expansion이 각각 필요한 방식으로 분기되지만 모두 같은 API 서버 안에서 orchestration 됩니다.</span>
+                        <span class="lang lang-en">When an image arrives, the detection step returns normalized bounding box JSON, and the backend rescales it to the source resolution for cropping. Cutout, text erase, and background expansion branch as needed, but all are orchestrated inside the same API server.</span>
+                    </p>
+                    <p>
+                        <span class="lang lang-ko">핵심은 모델 출력 형식을 backend-friendly 하게 강제한 점입니다. 절대 픽셀 대신 0부터 1000까지의 상대 좌표 JSON을 받아 다양한 해상도에서도 안정적인 crop을 유지하도록 만들었습니다.</span>
+                        <span class="lang lang-en">A key architectural choice was forcing the model into a backend-friendly output format. By using JSON with relative coordinates from 0 to 1000 instead of absolute pixels, crop stability holds across different resolutions.</span>
+                    </p>
+
+                    <h2 class="text-2xl font-bold border-b border-slate-200 pb-2 mb-6 mt-12">
+                        <span class="lang lang-ko">Technical Decisions</span>
+                        <span class="lang lang-en">Technical Decisions</span>
+                    </h2>
+                </div>
+
+                <div class="grid sm:grid-cols-2 gap-6 mt-8">
+                    <div class="p-6 bg-white border border-slate-200 rounded-2xl shadow-sm hover:shadow-md transition">
+                        <div class="w-12 h-12 bg-indigo-50 text-indigo-600 rounded-xl flex items-center justify-center mb-4">
+                            <i data-lucide="scissors" class="w-6 h-6"></i>
+                        </div>
+                        <h3 class="text-lg font-bold text-slate-900 mb-2">
+                            <span class="lang lang-ko">Nano Banana</span>
+                            <span class="lang lang-en">Nano Banana</span>
+                        </h3>
+                        <p class="text-sm text-slate-500 leading-relaxed">
+                            <span class="lang lang-ko">SAM 같은 전용 인프라를 늘리는 대신, prompt engineering과 OpenCV를 결합한 우회 전략으로 누끼 품질을 확보했습니다. 비용 대비 효과가 가장 큰 선택이었습니다.</span>
+                            <span class="lang lang-en">Instead of adding dedicated infrastructure such as SAM, we secured cutout quality through a workaround that combines prompt engineering with OpenCV. It delivered the best cost-to-outcome tradeoff.</span>
+                        </p>
+                    </div>
+
+                    <div class="p-6 bg-white border border-slate-200 rounded-2xl shadow-sm hover:shadow-md transition">
+                        <div class="w-12 h-12 bg-teal-50 text-teal-600 rounded-xl flex items-center justify-center mb-4">
+                            <i data-lucide="crop" class="w-6 h-6"></i>
+                        </div>
+                        <h3 class="text-lg font-bold text-slate-900 mb-2">
+                            <span class="lang lang-ko">Normalized JSON Output</span>
+                            <span class="lang lang-en">Normalized JSON Output</span>
+                        </h3>
+                        <p class="text-sm text-slate-500 leading-relaxed">
+                            <span class="lang lang-ko">절대 픽셀 박스 예측은 해상도 변화에 취약합니다. 상대 좌표 JSON만 허용하고 backend에서 scale-up 하는 방식으로 안정적인 crop을 확보했습니다.</span>
+                            <span class="lang lang-en">Absolute pixel box prediction is fragile across resolutions. We enforced normalized JSON output and scaled it up in the backend for stable cropping.</span>
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="lg:col-span-5">
+                <div class="sticky top-24 space-y-8">
+                    <div class="bg-white rounded-2xl p-6 border border-slate-200 shadow-sm">
+                        <h3 class="text-sm font-bold text-slate-900 uppercase tracking-wider mb-4">Tech Stack</h3>
+                        <div class="flex flex-wrap gap-2">
+                            <span class="px-3 py-1 bg-slate-100 border border-slate-200 rounded-full text-xs font-semibold text-slate-600">Gemini 3.1 Pro</span>
+                            <span class="px-3 py-1 bg-slate-100 border border-slate-200 rounded-full text-xs font-semibold text-slate-600">Gemini 3.1 Flash</span>
+                            <span class="px-3 py-1 bg-slate-100 border border-slate-200 rounded-full text-xs font-semibold text-slate-600">FastAPI</span>
+                            <span class="px-3 py-1 bg-slate-100 border border-slate-200 rounded-full text-xs font-semibold text-slate-600">OpenCV</span>
+                            <span class="px-3 py-1 bg-slate-100 border border-slate-200 rounded-full text-xs font-semibold text-slate-600">Normalized JSON</span>
+                        </div>
+                    </div>
+
+                    <div class="mermaid-container">
+                        <div class="mermaid">
+graph TD
+    User([Image Request]) --> API[FastAPI Backend]
+    API --> Detect[Object Detection]
+    Detect --> Crop[Crop by JSON Box]
+    Crop --> Nano[Nano Banana Prompt]
+    Nano --> OpenCV[OpenCV Chroma Key]
+    API --> Expand[Inpainting / Expansion]
+    OpenCV --> Output1([Transparent Cutout])
+    Expand --> Output2([Expanded Asset])
+
+    style User fill:#f8fafc,stroke:#94a3b8
+    style API fill:#eff6ff,stroke:#3b82f6
+    style Detect fill:#fefce8,stroke:#eab308
+    style Crop fill:#f1f5f9,stroke:#64748b
+    style Nano fill:#fef3c7,stroke:#f59e0b
+    style OpenCV fill:#f1f5f9,stroke:#64748b
+    style Expand fill:#fefce8,stroke:#eab308
+    style Output1 fill:#ecfdf5,stroke:#10b981
+    style Output2 fill:#ecfdf5,stroke:#10b981
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script type="module">
+        import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.esm.min.mjs';
         mermaid.initialize({ startOnLoad: true, theme: 'neutral' });
+    </script>
 
-        // Mobile TOC Toggle
-        const mobileMenuBtn = document.getElementById('mobile-menu-btn');
-        const mobileToc = document.getElementById('mobile-toc');
-        
-        mobileMenuBtn.addEventListener('click', (e) => {
-            e.stopPropagation();
-            mobileToc.classList.toggle('hidden');
-            mobileToc.classList.toggle('open');
-        });
-
-        // Close TOC when clicking outside or clicking a link
-        document.addEventListener('click', (e) => {
-            if (!mobileToc.contains(e.target) && !mobileMenuBtn.contains(e.target)) {
-                mobileToc.classList.add('hidden');
-                mobileToc.classList.remove('open');
-            }
-        });
-
-        mobileToc.querySelectorAll('a').forEach(link => {
-            link.addEventListener('click', () => {
-                mobileToc.classList.add('hidden');
-                mobileToc.classList.remove('open');
-            });
-        });
-
-        // Function to update internal links with current language
-        function updateLinksWithLang(lang) {
-            document.querySelectorAll('a').forEach(link => {
-                const href = link.getAttribute('href');
-                // Target only local HTML files or index.html
-                if (href && !href.startsWith('http') && !href.startsWith('#') && (href.includes('.html') || href === '/')) {
-                    const url = new URL(link.href, window.location.origin);
-                    url.searchParams.set('lang', lang);
-                    link.href = url.pathname + url.search + url.hash;
-                }
-            });
-        }
-
-        // Function to switch language
-        function switchLanguage(lang) {
-            document.querySelectorAll('[data-ko]').forEach(el => {
-                if (el.dataset[lang]) {
-                    el.innerHTML = el.dataset[lang];
-                }
-            });
+    <script>
+        lucide.createIcons();
+        function switchLang(lang) {
             document.documentElement.lang = lang;
-            document.title = document.querySelector('title').dataset[lang];
-            
-            // Save preference
+            document.documentElement.className = lang;
             localStorage.setItem('language', lang);
-
-            // Update button active state
-            document.getElementById('btn-ko').classList.toggle('active', lang === 'ko');
-            document.getElementById('btn-ko').classList.toggle('text-slate-600', lang !== 'ko');
-            document.getElementById('btn-ko').classList.toggle('bg-white', lang !== 'ko');
-            
-            document.getElementById('btn-en').classList.toggle('active', lang === 'en');
-            document.getElementById('btn-en').classList.toggle('text-slate-600', lang !== 'en');
-            document.getElementById('btn-en').classList.toggle('bg-white', lang !== 'en');
-
-            // Update all internal links with the selected language
-            updateLinksWithLang(lang);
+            document.querySelectorAll('.lang').forEach(el => {
+                if (el.classList.contains(`lang-${lang}`)) { el.style.display = ''; } else { el.style.display = 'none'; }
+            });
+            document.querySelectorAll('.lang-btn').forEach(btn => { btn.classList.remove('active'); });
+            const activeBtn = document.getElementById(`btn-${lang}`);
+            if (activeBtn) activeBtn.classList.add('active');
         }
-
-        // Set initial language
         document.addEventListener('DOMContentLoaded', () => {
             const urlParams = new URLSearchParams(window.location.search);
             const langFromUrl = urlParams.get('lang');
             const langFromStorage = localStorage.getItem('language');
             const browserLang = (navigator.language || navigator.userLanguage).startsWith('en') ? 'en' : 'ko';
-            
-            const initialLang = langFromUrl || langFromStorage || browserLang;
-            switchLanguage(initialLang);
+            switchLang(langFromUrl || langFromStorage || browserLang);
         });
     </script>
 </body>

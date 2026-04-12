@@ -4,401 +4,182 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="icon" href="https://avatars.githubusercontent.com/u/35217573?v=4" type="image/x-icon">
-    <title data-ko="초저지연 커스텀 음성 복제 아키텍처" data-en="Instant Custom Voice Cloning Architecture">초저지연 커스텀 음성 복제 아키텍처 - POC</title>
+    <title>Custom Voice Cloning Demo</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Noto+Sans+KR:wght@400;500;700;900&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/lucide@latest"></script>
     <style>
-        body {
-            font-family: 'Inter', 'Noto Sans KR', sans-serif;
-            background-color: #f8fafc; /* slate-50 */
-        }
-        html { scroll-behavior: smooth; }
-        section { scroll-margin-top: 5rem; }
-        main section:not(:first-child) { margin-top: 4rem; }
-        h2 {
-            font-size: 1.875rem; font-weight: 800; margin-bottom: 1.5rem; letter-spacing: -0.025em; color: #0f172a;
-        }
-        h3 {
-            font-size: 1.5rem; font-weight: 700; margin-top: 2rem; margin-bottom: 1rem; color: #1e293b;
-        }
-        p, ul, ol, li { color: #475569; line-height: 1.75; }
-        main a { color: #2563eb; text-decoration: none; font-weight: 600; }
-        main a:hover { text-decoration: underline; color: #1d4ed8; }
-        strong { color: #1e293b; }
-        
-        .lang-toggle button.active { background-color: #4f46e5; color: white; }
-        
-        .workflow-box {
-            background: linear-gradient(to right bottom, #ffffff, #f8fafc);
-            border: 1px solid #e2e8f0; border-radius: 1rem; padding: 1.5rem;
-            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05); transition: transform 0.2s ease, box-shadow 0.2s ease;
-        }
-        .workflow-box:hover { transform: translateY(-2px); box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1); }
-        .step-number {
-            display: inline-flex; align-items: center; justify-content: center;
-            width: 2rem; height: 2rem; border-radius: 9999px; background-color: #4f46e5;
-            color: white; font-weight: 700; margin-right: 0.75rem;
-        }
-        
-        /* Mobile TOC Override */
-        #mobile-toc.open {
-            display: block !important; animation: slideUp 0.3s ease-out forwards;
-        }
-        @keyframes slideUp {
-            from { transform: translateY(10px); opacity: 0; }
-            to { transform: translateY(0); opacity: 1; }
-        }
-        .mermaid { display: flex; justify-content: center; margin-top: 1.5rem; margin-bottom: 1.5rem;}
+        body { font-family: 'Inter', 'Noto Sans KR', sans-serif; background-color: #f8fafc; }
+        .lang-ko .lang-en, .lang-en .lang-ko { display: none; }
+        .lang-btn.active { font-weight: 600; background-color: #2dd4bf; color: #0f172a; }
+        .lang-btn:not(.active) { color: #94a3b8; background-color: transparent; }
+        .prose h2, .prose h3 { color: #0f172a; letter-spacing: -0.025em; }
+        .prose p { color: #475569; line-height: 1.8; }
+        .mermaid-container { background: #ffffff; border: 1px solid #e2e8f0; border-radius: 1rem; padding: 1.5rem; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05); }
     </style>
 </head>
-<body class="text-slate-800 relative pb-24 md:pb-0">
-
-    <!-- Header Actions -->
+<body class="text-slate-800 antialiased">
     <div class="fixed top-4 right-4 z-50 flex items-center space-x-2">
-        <div class="lang-toggle bg-white/80 backdrop-blur-md shadow border border-slate-200 rounded-full p-1 flex space-x-1">
-            <button id="btn-ko" class="px-4 py-1.5 text-sm font-semibold rounded-full transition-all duration-200 active" onclick="switchLanguage('ko')">한국어</button>
-            <button id="btn-en" class="px-4 py-1.5 text-sm font-semibold rounded-full transition-all duration-200" onclick="switchLanguage('en')">English</button>
+        <a href="index_latest.html#projects" class="px-4 py-1.5 text-sm font-semibold rounded-full bg-white/80 backdrop-blur-md shadow border border-slate-200 text-slate-600 hover:text-indigo-600 transition">
+            &larr; <span class="lang lang-ko">돌아가기</span><span class="lang lang-en" style="display:none;">Back</span>
+        </a>
+        <div class="bg-white/80 backdrop-blur-md shadow border border-slate-200 rounded-full p-1 flex space-x-1">
+            <button id="btn-ko" class="lang-btn px-4 py-1.5 text-sm rounded-full transition-all duration-200" onclick="switchLang('ko')">KOR</button>
+            <button id="btn-en" class="lang-btn px-4 py-1.5 text-sm rounded-full transition-all duration-200" onclick="switchLang('en')">ENG</button>
         </div>
-        <button id="mobile-menu-btn" class="md:hidden bg-indigo-600 text-white p-2.5 rounded-full shadow-lg" aria-label="Toggle Table of Contents">
-            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h7"></path></svg>
-        </button>
     </div>
 
-    <!-- Mobile TOC Dropdown -->
-    <nav id="mobile-toc" class="hidden fixed top-16 right-4 z-40 bg-white p-4 rounded-xl shadow-xl border border-slate-200 w-64">
-        <ul class="space-y-3 font-medium text-sm text-slate-600">
-            <li><a href="#why" class="block hover:text-indigo-600 transition-colors" data-ko="1. Problem" data-en="1. Problem">1. Problem</a></li>
-            <li><a href="#what" class="block hover:text-indigo-600 transition-colors" data-ko="2. Solution" data-en="2. Solution">2. Solution</a></li>
-            <li><a href="#key-design" class="block hover:text-indigo-600 transition-colors" data-ko="3. Architecture" data-en="3. Architecture">3. Architecture</a></li>
-            <li><a href="#trade-off" class="block hover:text-indigo-600 transition-colors" data-ko="4. Technical Decisions" data-en="4. Technical Decisions">4. Technical Decisions</a></li>
-            <li><a href="#impact" class="block hover:text-indigo-600 transition-colors" data-ko="5. Business Impact" data-en="5. Business Impact">5. Business Impact</a></li>
-        </ul>
-    </nav>
-
-    <div class="container mx-auto px-4 py-10 md:py-16 max-w-7xl">
-        <!-- Header -->
-        <header class="text-center mb-16 md:mb-20">
-            <div class="inline-block px-3 py-1 mb-4 text-xs font-semibold tracking-wider text-indigo-600 uppercase bg-indigo-100 rounded-full border border-indigo-200">Proof of Concept (POC)</div>
-            <h1 class="text-3xl md:text-4xl lg:text-5xl font-extrabold text-slate-900 mb-6 tracking-tight leading-tight" data-ko="초저지연 커스텀 음성 복제 아키텍처" data-en="Instant Custom Voice Cloning Architecture">
-                초저지연 커스텀 음성 복제 아키텍처
+    <main class="max-w-7xl mx-auto px-4 py-16 sm:px-6 lg:px-8 mt-10">
+        <div class="border-b border-slate-200 pb-12 mb-12">
+            <div class="inline-flex items-center px-3 py-1 rounded-full bg-indigo-50 text-indigo-600 text-sm font-semibold mb-6">
+                Project Prototype
+            </div>
+            <h1 class="text-4xl md:text-5xl font-extrabold text-slate-900 tracking-tight mb-4">
+                <span class="lang lang-ko">Custom Voice Cloning Demo</span>
+                <span class="lang lang-en">Custom Voice Cloning Demo</span>
             </h1>
-            <p class="text-lg md:text-xl text-slate-600 font-medium max-w-3xl mx-auto mb-4" data-ko="사용자의 단일 목소리 샘플만으로 즉각적인 음성 복제(Zero-shot Voice Cloning)를 수행하고, 엔터프라이즈 환경에서 안정적으로 TTS 파이프라인을 운영하기 위한 자동화 검증 사례입니다." data-en="A validation case demonstrating instant, zero-shot voice cloning using a single user voice sample, while stably operating a TTS pipeline in an enterprise environment.">
-                사용자의 단일 목소리 샘플만으로 즉각적인 음성 복제(Zero-shot Voice Cloning)를 수행하고, 엔터프라이즈 환경에서 안정적으로 TTS 파이프라인을 운영하기 위한 자동화 검증 사례입니다.
+            <p class="text-xl text-slate-500 max-w-3xl leading-relaxed">
+                <span class="lang lang-ko">오디오 전처리 미들웨어로 API 제약을 흡수하고, 업로드부터 생성까지 실패율을 낮춘 custom voice cloning prototype입니다.</span>
+                <span class="lang lang-en">A custom voice cloning prototype that absorbs API constraints through audio preprocessing middleware and reduces failure rates from upload to generation.</span>
             </p>
-            <p class="text-sm text-slate-500" data-ko="Architectural Implementation Reference (2025)" data-en="Architectural Implementation Reference (2025)">Architectural Implementation Reference (2025)</p>
-        </header>
-
-        <div class="grid grid-cols-1 lg:grid-cols-12 gap-10">
-            <!-- Sidebar Navigation -->
-            <aside class="lg:col-span-3 lg:sticky top-8 self-start hidden md:block">
-                <nav class="bg-white p-6 rounded-xl shadow-sm border border-slate-100">
-                    <h3 class="font-extrabold text-lg mb-5 text-slate-900 uppercase tracking-wider text-sm" data-ko="목차" data-en="Table of Contents">목차</h3>
-                    <ul class="space-y-3 font-medium text-slate-600">
-                        <li><a href="#why" class="flex items-center hover:text-indigo-600 transition-colors" data-ko="1. Problem" data-en="1. Problem">1. Problem</a></li>
-                        <li><a href="#what" class="flex items-center hover:text-indigo-600 transition-colors" data-ko="2. Solution" data-en="2. Solution">2. Solution</a></li>
-                        <li><a href="#key-design" class="flex items-center hover:text-indigo-600 transition-colors" data-ko="3. Architecture" data-en="3. Architecture">3. Architecture</a></li>
-                        <li><a href="#trade-off" class="flex items-center hover:text-indigo-600 transition-colors" data-ko="4. Technical Decisions" data-en="4. Technical Decisions">4. Technical Decisions</a></li>
-                        <li><a href="#impact" class="flex items-center hover:text-indigo-600 transition-colors" data-ko="5. Business Impact" data-en="5. Business Impact">5. Business Impact</a></li>
-                    </ul>
-                </nav>
-            </aside>
-
-            <!-- Main Content -->
-            <main class="lg:col-span-9 space-y-16">
-
-                <!-- 요약 개요 -->
-                <section class="bg-white p-8 md:p-10 rounded-2xl shadow-sm border border-slate-100">
-                    <div class="max-w-4xl space-y-4">
-                        <p class="text-lg leading-relaxed text-slate-700" data-ko="뉴스 리딩, 팟캐스트 자동화, 대규모 콜센터(CS) 등 엔터프라이즈 미디어/운영 환경에서는 고도화된 음성 합성(TTS)과 신속한 화자 모델 복제 기술이 필수적입니다." data-en="In enterprise media and operational environments such as automated news reading, podcasts, and large-scale call centers (CS), advanced Text-to-Speech (TTS) and rapid speaker voice cloning technologies are essential.">
-                            뉴스 리딩, 팟캐스트 자동화, 대규모 콜센터(CS) 등 엔터프라이즈 미디어/운영 환경에서는 고도화된 음성 합성(TTS)과 신속한 화자 모델 복제 기술이 필수적입니다.
-                        </p>
-                        <p class="text-lg leading-relaxed text-slate-700" data-ko="본 POC는 엄격한 API 제약 조건을 가진 대형 파운데이션 모델(Google Chirp 3)을 도입할 때 발생하는 <strong>입력 오디오 전처리 병목과 인증 실패 문제</strong>를 미들웨어로 해결하여, 에러 없는 100% 자동화 파이프라인을 구축한 과정을 증명합니다." data-en="This POC demonstrates the process of building a 100% error-free automated pipeline by utilizing middleware to resolve <strong>input audio preprocessing bottlenecks and authentication failure issues</strong> that arise when introducing large foundation models (like Google Chirp 3) with strict API constraints.">
-                            본 POC는 엄격한 API 제약 조건을 가진 대형 파운데이션 모델(Google Chirp 3)을 도입할 때 발생하는 <strong>입력 오디오 전처리 병목과 인증 실패 문제</strong>를 미들웨어로 해결하여, 에러 없는 100% 자동화 파이프라인을 구축한 과정을 증명합니다.
-                        </p>
-                    </div>
-                </section>
-
-                <!-- 1. Why -->
-                <section id="why" class="scroll-mt-24">
-                    <div class="flex items-center mb-2">
-                        <div class="bg-indigo-100 p-2 rounded-lg mr-4">
-                            <svg class="w-7 h-7 text-indigo-600" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
-                        </div>
-                        <h2 class="text-3xl font-extrabold m-0" data-ko="1. Problem" data-en="1. Problem">1. Problem</h2>
-                    </div>
-                    
-                    <p class="text-slate-500 font-medium mb-6 max-w-4xl" data-ko="엔터프라이즈 음성 서비스 도입의 기술적 진입 장벽" data-en="Technical barriers to entry for adopting enterprise voice services.">
-                        엔터프라이즈 음성 서비스 도입의 기술적 진입 장벽
-                    </p>
-                    
-                    <div class="grid md:grid-cols-2 gap-6">
-                        <div class="bg-red-50 p-6 rounded-xl border border-red-100">
-                            <h4 class="text-red-800 font-bold text-lg mb-3 flex items-center" data-ko="<svg class='w-5 h-5 mr-2' fill='none' viewBox='0 0 24 24' stroke='currentColor'><path stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z'></path></svg> 엄격한 API 제약 조건" data-en="<svg class='w-5 h-5 mr-2' fill='none' viewBox='0 0 24 24' stroke='currentColor'><path stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z'></path></svg> Strict API Constraints">
-                                <svg class='w-5 h-5 mr-2' fill='none' viewBox='0 0 24 24' stroke='currentColor'><path stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z'></path></svg> 엄격한 API 제약 조건
-                            </h4>
-                            <p class="text-red-900/80 mb-3" data-ko="엔터프라이즈급 안정성을 제공하는 고성능 TTS 모델(예: Google Chirp 3)은 대개 <strong>24kHz의 특정 샘플링 레이트와 최대 10초 미만</strong>이라는 엄격한 오디오 입력 규격을 요구합니다. 사용자가 일반적인 스마트폰이나 녹음기로 생성한 44.1kHz/48kHz 파일을 그대로 전송하면 API 단에서 즉각적인 런타임 에러가 발생합니다." data-en="High-performance TTS models offering enterprise-grade stability (e.g., Google Chirp 3) generally require strict audio input specifications: <strong>a specific 24kHz sampling rate and a duration of under 10 seconds.</strong> Sending 44.1kHz/48kHz files generated from standard smartphones or recorders directly to the API results in immediate runtime errors.">
-                                엔터프라이즈급 안정성을 제공하는 고성능 TTS 모델(예: Google Chirp 3)은 대개 <strong>24kHz의 특정 샘플링 레이트와 최대 10초 미만</strong>이라는 엄격한 오디오 입력 규격을 요구합니다. 사용자가 일반적인 스마트폰이나 녹음기로 생성한 44.1kHz/48kHz 파일을 그대로 전송하면 API 단에서 즉각적인 런타임 에러가 발생합니다.
-                            </p>
-                        </div>
-                        <div class="bg-orange-50 p-6 rounded-xl border border-orange-100">
-                            <h4 class="text-orange-800 font-bold text-lg mb-3 flex items-center" data-ko="<svg class='w-5 h-5 mr-2' fill='none' viewBox='0 0 24 24' stroke='currentColor'><path stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z'></path></svg> 화자 인증(Consent) 실패 취약성" data-en="<svg class='w-5 h-5 mr-2' fill='none' viewBox='0 0 24 24' stroke='currentColor'><path stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z'></path></svg> Vulnerability in Speaker Consent">
-                                <svg class='w-5 h-5 mr-2' fill='none' viewBox='0 0 24 24' stroke='currentColor'><path stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z'></path></svg> 화자 인증(Consent) 실패 취약성
-                            </h4>
-                            <p class="text-orange-900/80 mb-3" data-ko="보안 정책상 지정된 영어 동의 스크립트('I am the owner...')를 정확히 읽지 않거나, 참조(Reference)용 원본 음성과 동의(Consent) 파일 간의 목소리 톤/노이즈 환경이 다르면 화자 불일치로 모델 생성이 거부됩니다. 이 과정에 대한 가이던스나 전처리 로직이 없으면 실제 프로덕션 적용이 불가능합니다." data-en="Due to security policies, if the designated English consent script ('I am the owner...') is not read exactly, or if the voice tone/noise environment differs between the reference and consent audio files, model generation is rejected due to speaker mismatch. Production deployment is impossible without guidance or preprocessing logic for this stage.">
-                                보안 정책상 지정된 영어 동의 스크립트('I am the owner...')를 정확히 읽지 않거나, 참조(Reference)용 원본 음성과 동의(Consent) 파일 간의 목소리 톤/노이즈 환경이 다르면 화자 불일치로 모델 생성이 거부됩니다. 이 과정에 대한 가이던스나 전처리 로직이 없으면 실제 프로덕션 적용이 불가능합니다.
-                            </p>
-                        </div>
-                    </div>
-                </section>
-
-                <!-- 2. What -->
-                <section id="what" class="scroll-mt-24">
-                    <div class="flex items-center mb-2">
-                        <div class="bg-indigo-100 p-2 rounded-lg mr-4">
-                            <svg class="w-7 h-7 text-indigo-600" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
-                        </div>
-                        <h2 class="text-3xl font-extrabold m-0" data-ko="2. Solution" data-en="2. Solution">2. Solution</h2>
-                    </div>
-
-                    <p class="text-slate-500 font-medium mb-6 max-w-4xl" data-ko="동적 오디오 전처리 미들웨어 및 자동화 파이프라인" data-en="Dynamic Audio Preprocessing Middleware and Automated Pipeline.">
-                        동적 오디오 전처리 미들웨어 및 자동화 파이프라인
-                    </p>
-
-                    <div class="max-w-4xl mb-8 text-lg text-slate-700">
-                        <p data-ko="엔터프라이즈 환경에서 사용할 수 있도록, 사용자가 어떤 오디오를 올리든 백엔드에서 <strong>자동으로 24kHz 변환(Resampling) 및 9초 트리밍(Trimming)을 수행</strong>하는 미들웨어 파이프라인을 구축했습니다." data-en="Built a middleware pipeline for enterprise environments that <strong>automatically resamples to 24kHz and trims to 9 seconds</strong> in the backend, regardless of the audio the user uploads.">
-                            엔터프라이즈 환경에서 사용할 수 있도록, 사용자가 어떤 오디오를 올리든 백엔드에서 <strong>자동으로 24kHz 변환(Resampling) 및 9초 트리밍(Trimming)을 수행</strong>하는 미들웨어 파이프라인을 구축했습니다.
-                        </p>
-                        <p class="mt-2" data-ko="프론트엔드 UI(Gradio)에 명확한 필수 스크립트 가이드라인을 강제 노출하고, <code>librosa</code> 기반의 백그라운드 프로세싱을 거친 후 Google Chirp 3 API를 안전하게 호출(Safe Call)하여 모델 생성을 100% 보장하는 엔드투엔드 로직을 완성했습니다." data-en="Enforced explicit script guidelines on the frontend UI (Gradio) and completed an end-to-end logic that guarantees 100% successful model generation by safely calling the Google Chirp 3 API after background processing via <code>librosa</code>.">
-                            프론트엔드 UI(Gradio)에 명확한 필수 스크립트 가이드라인을 강제 노출하고, <code>librosa</code> 기반의 백그라운드 프로세싱을 거친 후 Google Chirp 3 API를 안전하게 호출(Safe Call)하여 모델 생성을 100% 보장하는 엔드투엔드 로직을 완성했습니다.
-                        </p>
-                    </div>
-                </section>
-
-                <!-- 3. Architecture -->
-                <section id="key-design" class="scroll-mt-24">
-                    <div class="flex items-center mb-2">
-                        <div class="bg-indigo-100 p-2 rounded-lg mr-4">
-                            <svg class="w-7 h-7 text-indigo-600" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
-                        </div>
-                        <h2 class="text-3xl font-extrabold m-0" data-ko="3. Architecture" data-en="3. Architecture">3. Architecture</h2>
-                    </div>
-                    
-                    <p class="text-slate-500 font-medium mb-6 max-w-4xl" data-ko="오디오 무결성 검증 및 음성 생성 흐름도" data-en="Audio integrity verification and voice generation workflow.">
-                        오디오 무결성 검증 및 음성 생성 흐름도
-                    </p>
-
-                    <div class="bg-white p-6 rounded-xl border border-slate-200 shadow-sm mb-6 max-w-4xl">
-                        <pre class="mermaid bg-transparent p-4 flex justify-center text-center">
-graph TD
-    User([End User]) -->|Upload Ref & Consent Audio| Front[Web UI Framework];
-    Front --> Preprocess{Audio Preprocessor <br/> Librosa Core};
-    
-    Preprocess -.->|Format Mismatch| Resample[Auto Resample to 24kHz];
-    Preprocess -.->|Exceeds 10s Limit| Trim[Auto Trim to 9s];
-    
-    Resample --> ApiCall[Safe API Request Builder];
-    Trim --> ApiCall;
-    
-    ApiCall --> Auth{Speaker Verification <br/> Script Check};
-    Auth -.->|Mismatch| Error([Auth Denied Error]);
-    Auth -->|Passed| Backend[Enterprise TTS API <br/> Google Chirp 3];
-    
-    Backend -->|Return Voice Model Key| TTS[Text-to-Speech Engine];
-    TTS --> Result([Generated Custom Audio]);
-    
-    style User fill:#f8fafc,stroke:#94a3b8,stroke-width:1px
-    style Preprocess fill:#eff6ff,stroke:#3b82f6,stroke-width:2px
-    style Backend fill:#fefce8,stroke:#eab308,stroke-width:2px
-    style TTS fill:#fefce8,stroke:#eab308,stroke-width:2px
-    style Error fill:#fef2f2,stroke:#ef4444
-                        </pre>
-                    </div>
-                </section>
-
-                <!-- 4. Trade-off -->
-                <section id="trade-off" class="scroll-mt-24">
-                    <div class="flex items-center mb-2">
-                        <div class="bg-indigo-100 p-2 rounded-lg mr-4">
-                            <svg class="w-7 h-7 text-indigo-600" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 6l3 1m0 0l-3 9a5.002 5.002 0 006.001 0M6 7l3 9M6 7l6-2m6 2l3-1m-3 1l-3 9a5.002 5.002 0 006.001 0M18 7l3 9m-3-9l-6-2m0-2v2m0 16V5m0 16H9m3 0h3"></path></svg>
-                        </div>
-                        <h2 class="text-3xl font-extrabold m-0" data-ko="4. Technical Decisions" data-en="4. Technical Decisions">4. Technical Decisions</h2>
-                    </div>
-
-                    <p class="text-slate-500 font-medium mb-6 max-w-4xl" data-ko="API 제약 사항 극복을 위한 백엔드 자동화 로직 설계" data-en="Backend automation logic design to overcome API constraints.">
-                        API 제약 사항 극복을 위한 백엔드 자동화 로직 설계
-                    </p>
-
-                    <div class="space-y-6 max-w-4xl">
-                        <!-- Trade-off 1 -->
-                        <div class="border border-slate-200 rounded-xl overflow-hidden">
-                            <div class="bg-slate-50 px-6 py-4 border-b border-slate-200">
-                                <h4 class="font-bold text-lg m-0 flex items-center" data-ko="프론트엔드 검증 위임 <span class='text-slate-400 mx-3'>vs</span> 백엔드 강제 전처리" data-en="Frontend Validation Delegation vs Backend Forced Preprocessing">
-                                    프론트엔드 검증 위임 <span class='text-slate-400 mx-3'>vs</span> 백엔드 강제 전처리
-                                </h4>
-                            </div>
-                            <div class="p-6 bg-white text-slate-700">
-                                <p class="mb-4" data-ko="'24kHz 및 10초 미만'이라는 조건에 대해, UI 단에서 사용자에게 올바른 파일을 올리라고 가이드라인만 주면 결국 잘못된 포맷 업로드로 인해 높은 빈도의 API 실패율을 초래합니다." data-en="Regarding the '24kHz and under 10 seconds' condition, simply providing guidelines to the user on the UI level eventually leads to a high frequency of API failures due to incorrect format uploads.">
-                                    '24kHz 및 10초 미만'이라는 조건에 대해, UI 단에서 사용자에게 올바른 파일을 올리라고 가이드라인만 주면 결국 잘못된 포맷 업로드로 인해 높은 빈도의 API 실패율을 초래합니다.
-                                </p>
-                                <div class="bg-slate-100 p-4 rounded-lg border-l-4 border-indigo-500">
-                                    <strong class="text-slate-900 block mb-1" data-ko="해결: Librosa 기반 무중단 미들웨어 (Safe Wrapper)" data-en="Solution: Non-disruptive Middleware via Librosa (Safe Wrapper)">해결: Librosa 기반 무중단 미들웨어 (Safe Wrapper)</strong>
-                                    <span class="text-sm" data-ko="업로드 직후 API를 호출하기 전에, <code>librosa</code> 오디오 패키지를 띄워 <strong>강제로 24,000Hz 리샘플링</strong>을 거치고, 파일 배열 길이가 10초를 초과할 경우 내부 알고리즘에 의해 <strong>자동으로 앞부분 9초만 슬라이싱(Trimming)</strong>하여 새로운 임시 객체로 생성하는 로직을 짰습니다. 이로써 서비스 안정성(Reliability)을 완벽히 확보했습니다." data-en="Created logic that launches the <code>librosa</code> audio package immediately after upload to <strong>force a 24,000Hz resampling</strong> before calling the API. If the file array length exceeds 10 seconds, the internal algorithm <strong>automatically slices (trims) only the first 9 seconds</strong>, creating a new temporary object. This completely secured service reliability.">
-                                        업로드 직후 API를 호출하기 전에, <code>librosa</code> 오디오 패키지를 띄워 <strong>강제로 24,000Hz 리샘플링</strong>을 거치고, 파일 배열 길이가 10초를 초과할 경우 내부 알고리즘에 의해 <strong>자동으로 앞부분 9초만 슬라이싱(Trimming)</strong>하여 새로운 임시 객체로 생성하는 로직을 짰습니다. 이로써 서비스 안정성(Reliability)을 완벽히 확보했습니다.
-                                    </span>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Trade-off 2 -->
-                        <div class="border border-slate-200 rounded-xl overflow-hidden">
-                            <div class="bg-slate-50 px-6 py-4 border-b border-slate-200">
-                                <h4 class="font-bold text-lg m-0 flex items-center" data-ko="UI 라이브러리 종속성 <span class='text-slate-400 mx-3'>vs</span> 호환성 중심 설계" data-en="UI Library Dependency vs Compatibility-Centric Design">
-                                    UI 라이브러리 종속성 <span class='text-slate-400 mx-3'>vs</span> 호환성 중심 설계
-                                </h4>
-                            </div>
-                            <div class="p-6 bg-white text-slate-700">
-                                <p class="mb-4" data-ko="웹 인터페이스 도구(Gradio 등)는 메이저 버전(예: 3.x -> 6.x) 업데이트마다 오디오 입력 데이터 객체의 구조(단순 String -> SimpleNamespace 등)가 달라져 백엔드 코드의 파싱 오류를 유발합니다." data-en="Web interface tools (like Gradio) change the structure of audio input data objects (e.g., from simple Strings to SimpleNamespaces) with every major version update, causing parsing errors in the backend code.">
-                                    웹 인터페이스 도구(Gradio 등)는 메이저 버전(예: 3.x -> 6.x) 업데이트마다 오디오 입력 데이터 객체의 구조(단순 String -> SimpleNamespace 등)가 달라져 백엔드 코드의 파싱 오류를 유발합니다.
-                                </p>
-                                <div class="bg-slate-100 p-4 rounded-lg border-l-4 border-indigo-500">
-                                    <strong class="text-slate-900 block mb-1" data-ko="해결: 데이터 타입 판별 추출기 작성" data-en="Solution: Data Type Discrimination Extractor">해결: 데이터 타입 판별 추출기 작성</strong>
-                                    <span class="text-sm" data-ko="UI 프레임워크의 버전에 의존하지 않도록, 전송받은 데이터가 객체인지 문자열인지 조건문으로 먼저 판별(`hasattr`)하여 <strong>안전하게 파일 절대 경로만 반환하는 추출 함수(Wrapper)</strong>를 구현했습니다. 이를 통해 로컬 테스트 환경과 클라우드 배포 환경의 프레임워크 버전 불일치에도 견고하게 작동합니다." data-en="To avoid dependency on UI framework versions, we implemented an <strong>extractor function (wrapper) that safely returns only the absolute file path</strong> after first determining via conditionals (`hasattr`) whether the received data is an object or a string. This ensures robust operation despite framework version mismatches between local test and cloud deployment environments.">
-                                        UI 프레임워크의 버전에 의존하지 않도록, 전송받은 데이터가 객체인지 문자열인지 조건문으로 먼저 판별(`hasattr`)하여 <strong>안전하게 파일 절대 경로만 반환하는 추출 함수(Wrapper)</strong>를 구현했습니다. 이를 통해 로컬 테스트 환경과 클라우드 배포 환경의 프레임워크 버전 불일치에도 견고하게 작동합니다.
-                                    </span>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </section>
-
-                <!-- 5. Impact -->
-                <section id="impact" class="scroll-mt-24 mb-10">
-                    <div class="flex items-center mb-6">
-                        <div class="bg-indigo-100 p-2 rounded-lg mr-4">
-                            <svg class="w-7 h-7 text-indigo-600" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"></path></svg>
-                        </div>
-                        <h2 class="text-3xl font-extrabold m-0" data-ko="5. Business Impact" data-en="5. Business Impact">5. Business Impact</h2>
-                    </div>
-
-                    <div class="grid md:grid-cols-2 gap-6 mt-6 max-w-4xl">
-                        <!-- Impact 1 -->
-                        <div class="bg-indigo-600 text-white p-8 rounded-2xl shadow-lg relative overflow-hidden">
-                            <!-- Decorative Circle -->
-                            <div class="absolute -right-10 -top-10 w-40 h-40 bg-white opacity-10 rounded-full"></div>
-                            <h4 class="text-indigo-100 font-bold mb-4 text-xl" data-ko="엔터프라이즈급 음성 파이프라인 확보" data-en="Secured Enterprise-Grade Voice Pipeline">엔터프라이즈급 음성 파이프라인 확보</h4>
-                            <p class="text-indigo-50 font-medium text-lg leading-relaxed mt-2" data-ko="가벼운 스타트업용 B2C 음성 툴을 넘어, 노이즈 없는 깨끗한 음질과 강력한 다국어 지원을 바탕으로 뉴스 리딩, 대규모 콜센터(CS), 공공 안내 방송 등 실무(Production) 영역에 투입 가능한 보이스 복제(Voice Cloning) 인프라를 증명했습니다." data-en="Moving beyond light B2C voice tools for startups, we demonstrated a Voice Cloning infrastructure ready for production areas like news reading, large-scale call centers (CS), and public announcements, based on noise-free, clear sound quality and strong multilingual support.">
-                                가벼운 스타트업용 B2C 음성 툴을 넘어, 노이즈 없는 깨끗한 음질과 강력한 다국어 지원을 바탕으로 뉴스 리딩, 대규모 콜센터(CS), 공공 안내 방송 등 실무(Production) 영역에 투입 가능한 보이스 복제(Voice Cloning) 인프라를 증명했습니다.
-                            </p>
-                        </div>
-
-                        <!-- Impact 2 -->
-                        <div class="bg-white p-8 rounded-2xl border border-indigo-100 shadow-sm flex flex-col justify-center">
-                            <h4 class="text-slate-900 font-bold mb-4 text-xl" data-ko="API 실패율 제로(0)에 수렴하는 UX" data-en="UX Converging on Zero API Failure Rate">API 실패율 제로(0)에 수렴하는 UX</h4>
-                            <ul class="space-y-4">
-                                <li class="flex items-start">
-                                    <svg class="w-6 h-6 text-indigo-500 mr-2 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
-                                    <span class="text-slate-700 text-sm" data-ko="<strong>오류 방어형 미들웨어</strong>: 사용자가 긴 파일을 업로드하거나 규격에 맞지 않는 녹음본을 올려도, 내부 파이프라인이 이를 자동으로 교정하여 클라우드 모델 엔진에 전송하므로 비전문가도 스트레스 없이 시스템을 사용할 수 있습니다." data-en="<strong>Error-Defensive Middleware</strong>: Even if a user uploads a long file or a non-compliant recording, the internal pipeline automatically corrects it before sending it to the cloud model engine, allowing non-experts to use the system without stress.">
-                                        <strong>오류 방어형 미들웨어</strong>: 사용자가 긴 파일을 업로드하거나 규격에 맞지 않는 녹음본을 올려도, 내부 파이프라인이 이를 자동으로 교정하여 클라우드 모델 엔진에 전송하므로 비전문가도 스트레스 없이 시스템을 사용할 수 있습니다.
-                                    </span>
-                                </li>
-                                <li class="flex items-start">
-                                    <svg class="w-6 h-6 text-indigo-500 mr-2 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
-                                    <span class="text-slate-700 text-sm" data-ko="<strong>보안 규정 철저 준수</strong>: 프론트엔드 레벨에서 화자 인증 스크립트(Consent Script) 가이던스를 분리하여 시각화함으로써, AI 악용을 막기 위한 엄격한 화자 검증(Verification) 통과율을 극대화했습니다." data-en="<strong>Strict Compliance with Security Regulations</strong>: By visually separating and providing guidance for the Consent Script at the frontend level, we maximized the pass rate of strict speaker verification designed to prevent AI misuse.">
-                                        <strong>보안 규정 철저 준수</strong>: 프론트엔드 레벨에서 화자 인증 스크립트(Consent Script) 가이던스를 분리하여 시각화함으로써, AI 악용을 막기 위한 엄격한 화자 검증(Verification) 통과율을 극대화했습니다.
-                                    </span>
-                                </li>
-                            </ul>
-                        </div>
-                    </div>
-                </section>
-                
-            </main>
         </div>
-        
-        <!-- Footer -->
-        <footer class="text-center mt-20 pt-8 border-t border-slate-200 text-slate-500 text-sm">
-            <p>&copy; 2025 Architectural Implementation Reference. Built for showcasing technical architecture.</p>
-        </footer>
-    </div>
 
-    <!-- Mermaid.js -->
-    <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
-    <script>
+        <div class="grid lg:grid-cols-12 gap-12 items-start">
+            <div class="lg:col-span-7 space-y-12">
+                <div class="bg-white border border-slate-200 rounded-2xl p-7 shadow-sm">
+                    <p class="text-base leading-8 text-slate-600">
+                        <span class="lang lang-ko">이 프로젝트의 핵심은 모델 자체보다 그 앞단의 실패 방어 로직입니다. 사용자가 어떤 파일을 올리든 API 규격에 맞게 자동 보정하고, UI 프레임워크 차이까지 백엔드에서 흡수하는 middleware design에 초점을 뒀습니다.</span>
+                        <span class="lang lang-en">The core of this project is less about the model itself and more about the failure-defense logic in front of it. It focuses on middleware design that automatically normalizes uploads to API requirements and absorbs UI framework differences in the backend.</span>
+                    </p>
+                </div>
+
+                <div class="prose prose-lg max-w-none text-slate-600">
+                    <h2 class="text-2xl font-bold border-b border-slate-200 pb-2 mb-6">
+                        <span class="lang lang-ko">Solution</span>
+                        <span class="lang lang-en">Solution</span>
+                    </h2>
+                    <p>
+                        <span class="lang lang-ko">사용자가 올린 참조 음성을 바로 API에 보내지 않고, `librosa` 기반 미들웨어가 먼저 24kHz 리샘플링과 길이 보정을 수행하도록 만들었습니다. 이 과정에서 10초 제한을 넘는 오디오는 안전한 길이로 잘라 새로운 임시 객체로 재생성합니다.</span>
+                        <span class="lang lang-en">Instead of sending uploaded reference audio directly to the API, a `librosa`-based middleware first performs 24kHz resampling and duration normalization. Audio exceeding the limit is trimmed into a safe temporary object before the request proceeds.</span>
+                    </p>
+                    <p>
+                        <span class="lang lang-ko">프론트엔드에는 명확한 가이드를 두되, 실제 실패 방어는 백엔드가 맡도록 설계했습니다. 덕분에 사용자가 규격을 잘못 이해하거나 브라우저 환경이 달라도 voice generation workflow 전체의 안정성을 높일 수 있었습니다.</span>
+                        <span class="lang lang-en">The frontend provides explicit guidance, but real failure defense happens in the backend. This keeps the full voice generation workflow stable even when users misunderstand requirements or browser environments vary.</span>
+                    </p>
+
+                    <h2 class="text-2xl font-bold border-b border-slate-200 pb-2 mb-6 mt-12">
+                        <span class="lang lang-ko">Architecture</span>
+                        <span class="lang lang-en">Architecture</span>
+                    </h2>
+                    <p>
+                        <span class="lang lang-ko">업로드된 파일은 먼저 입력 객체 판별기를 지나면서 문자열 경로인지 객체형 데이터인지 정규화됩니다. 그다음 오디오 전처리 계층에서 리샘플링과 트리밍을 거치고, 검증이 끝난 후에만 Chirp 3 API 호출과 TTS 생성을 이어갑니다.</span>
+                        <span class="lang lang-en">Uploaded files first pass through an input discriminator that normalizes whether the payload is a string path or an object. Audio preprocessing then handles resampling and trimming, and only after validation does the workflow proceed to Chirp 3 API calls and TTS generation.</span>
+                    </p>
+                    <p>
+                        <span class="lang lang-ko">즉, API 호출부를 똑똑하게 만드는 것이 아니라 API 앞단을 견고하게 만드는 구조입니다. 서비스 실패율을 낮추는 책임을 모델이 아니라 middleware layer가 가지도록 설계한 점이 핵심입니다.</span>
+                        <span class="lang lang-en">In other words, the structure strengthens the layer before the API rather than trying to make the API call itself smarter. The middleware layer, not the model, carries responsibility for reducing service failure rates.</span>
+                    </p>
+
+                    <h2 class="text-2xl font-bold border-b border-slate-200 pb-2 mb-6 mt-12">
+                        <span class="lang lang-ko">Technical Decisions</span>
+                        <span class="lang lang-en">Technical Decisions</span>
+                    </h2>
+                </div>
+
+                <div class="grid sm:grid-cols-2 gap-6 mt-8">
+                    <div class="p-6 bg-white border border-slate-200 rounded-2xl shadow-sm hover:shadow-md transition">
+                        <div class="w-12 h-12 bg-indigo-50 text-indigo-600 rounded-xl flex items-center justify-center mb-4">
+                            <i data-lucide="waveform" class="w-6 h-6"></i>
+                        </div>
+                        <h3 class="text-lg font-bold text-slate-900 mb-2">
+                            <span class="lang lang-ko">Librosa Safe Wrapper</span>
+                            <span class="lang lang-en">Librosa Safe Wrapper</span>
+                        </h3>
+                        <p class="text-sm text-slate-500 leading-relaxed">
+                            <span class="lang lang-ko">프론트 가이드만 믿지 않고 backend에서 강제로 리샘플링과 트리밍을 수행하도록 설계했습니다. 업로드 품질이 제각각인 실제 환경을 전제로 한 결정입니다.</span>
+                            <span class="lang lang-en">We did not rely on frontend guidance alone. Resampling and trimming are enforced in the backend to handle real-world upload variability.</span>
+                        </p>
+                    </div>
+
+                    <div class="p-6 bg-white border border-slate-200 rounded-2xl shadow-sm hover:shadow-md transition">
+                        <div class="w-12 h-12 bg-teal-50 text-teal-600 rounded-xl flex items-center justify-center mb-4">
+                            <i data-lucide="shield" class="w-6 h-6"></i>
+                        </div>
+                        <h3 class="text-lg font-bold text-slate-900 mb-2">
+                            <span class="lang lang-ko">Compatibility-Centric Parsing</span>
+                            <span class="lang lang-en">Compatibility-Centric Parsing</span>
+                        </h3>
+                        <p class="text-sm text-slate-500 leading-relaxed">
+                            <span class="lang lang-ko">UI 라이브러리 버전이 바뀌면 오디오 입력 객체 구조도 달라집니다. 입력 타입을 먼저 판별해 절대 경로만 안전하게 추출하는 wrapper를 두어 환경 차이를 흡수했습니다.</span>
+                            <span class="lang lang-en">Audio input object structures change across UI library versions. We absorbed those differences with a wrapper that first identifies the input type and safely extracts only the absolute file path.</span>
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="lg:col-span-5">
+                <div class="sticky top-24 space-y-8">
+                    <div class="bg-white rounded-2xl p-6 border border-slate-200 shadow-sm">
+                        <h3 class="text-sm font-bold text-slate-900 uppercase tracking-wider mb-4">Tech Stack</h3>
+                        <div class="flex flex-wrap gap-2">
+                            <span class="px-3 py-1 bg-slate-100 border border-slate-200 rounded-full text-xs font-semibold text-slate-600">Google Chirp 3</span>
+                            <span class="px-3 py-1 bg-slate-100 border border-slate-200 rounded-full text-xs font-semibold text-slate-600">Librosa</span>
+                            <span class="px-3 py-1 bg-slate-100 border border-slate-200 rounded-full text-xs font-semibold text-slate-600">Gradio</span>
+                            <span class="px-3 py-1 bg-slate-100 border border-slate-200 rounded-full text-xs font-semibold text-slate-600">Audio Middleware</span>
+                            <span class="px-3 py-1 bg-slate-100 border border-slate-200 rounded-full text-xs font-semibold text-slate-600">TTS Pipeline</span>
+                        </div>
+                    </div>
+
+                    <div class="mermaid-container">
+                        <div class="mermaid">
+graph TD
+    User([Audio Upload]) --> Parse[Input Parser]
+    Parse --> Preprocess[Librosa Preprocess]
+    Preprocess --> Verify[Validation]
+    Verify --> Chirp[Chirp 3 API]
+    Chirp --> TTS[TTS Generation]
+    TTS --> Output([Generated Voice])
+
+    style User fill:#f8fafc,stroke:#94a3b8
+    style Parse fill:#eff6ff,stroke:#3b82f6
+    style Preprocess fill:#eff6ff,stroke:#3b82f6
+    style Verify fill:#fef3c7,stroke:#f59e0b
+    style Chirp fill:#fefce8,stroke:#eab308
+    style TTS fill:#f1f5f9,stroke:#64748b
+    style Output fill:#ecfdf5,stroke:#10b981
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script type="module">
+        import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.esm.min.mjs';
         mermaid.initialize({ startOnLoad: true, theme: 'neutral' });
+    </script>
 
-        // Mobile TOC Toggle
-        const mobileMenuBtn = document.getElementById('mobile-menu-btn');
-        const mobileToc = document.getElementById('mobile-toc');
-        
-        mobileMenuBtn.addEventListener('click', (e) => {
-            e.stopPropagation();
-            mobileToc.classList.toggle('hidden');
-            mobileToc.classList.toggle('open');
-        });
-
-        // Close TOC when clicking outside or clicking a link
-        document.addEventListener('click', (e) => {
-            if (!mobileToc.contains(e.target) && !mobileMenuBtn.contains(e.target)) {
-                mobileToc.classList.add('hidden');
-                mobileToc.classList.remove('open');
-            }
-        });
-
-        mobileToc.querySelectorAll('a').forEach(link => {
-            link.addEventListener('click', () => {
-                mobileToc.classList.add('hidden');
-                mobileToc.classList.remove('open');
-            });
-        });
-
-        // Function to update internal links with current language
-        function updateLinksWithLang(lang) {
-            document.querySelectorAll('a').forEach(link => {
-                const href = link.getAttribute('href');
-                // Target only local HTML files or index.html
-                if (href && !href.startsWith('http') && !href.startsWith('#') && (href.includes('.html') || href === '/')) {
-                    const url = new URL(link.href, window.location.origin);
-                    url.searchParams.set('lang', lang);
-                    link.href = url.pathname + url.search + url.hash;
-                }
-            });
-        }
-
-        // Function to switch language
-        function switchLanguage(lang) {
-            document.querySelectorAll('[data-ko]').forEach(el => {
-                if (el.dataset[lang]) {
-                    el.innerHTML = el.dataset[lang];
-                }
-            });
+    <script>
+        lucide.createIcons();
+        function switchLang(lang) {
             document.documentElement.lang = lang;
-            document.title = document.querySelector('title').dataset[lang];
-            
-            // Save preference
+            document.documentElement.className = lang;
             localStorage.setItem('language', lang);
-
-            // Update button active state
-            document.getElementById('btn-ko').classList.toggle('active', lang === 'ko');
-            document.getElementById('btn-ko').classList.toggle('text-slate-600', lang !== 'ko');
-            document.getElementById('btn-ko').classList.toggle('bg-white', lang !== 'ko');
-            
-            document.getElementById('btn-en').classList.toggle('active', lang === 'en');
-            document.getElementById('btn-en').classList.toggle('text-slate-600', lang !== 'en');
-            document.getElementById('btn-en').classList.toggle('bg-white', lang !== 'en');
-
-            // Update all internal links with the selected language
-            updateLinksWithLang(lang);
+            document.querySelectorAll('.lang').forEach(el => {
+                if (el.classList.contains(`lang-${lang}`)) { el.style.display = ''; } else { el.style.display = 'none'; }
+            });
+            document.querySelectorAll('.lang-btn').forEach(btn => { btn.classList.remove('active'); });
+            const activeBtn = document.getElementById(`btn-${lang}`);
+            if (activeBtn) activeBtn.classList.add('active');
         }
-
-        // Set initial language
         document.addEventListener('DOMContentLoaded', () => {
             const urlParams = new URLSearchParams(window.location.search);
             const langFromUrl = urlParams.get('lang');
             const langFromStorage = localStorage.getItem('language');
             const browserLang = (navigator.language || navigator.userLanguage).startsWith('en') ? 'en' : 'ko';
-            
-            const initialLang = langFromUrl || langFromStorage || browserLang;
-            switchLanguage(initialLang);
+            switchLang(langFromUrl || langFromStorage || browserLang);
         });
     </script>
 </body>
