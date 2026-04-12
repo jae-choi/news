@@ -173,12 +173,13 @@
             </div>
             <nav class="space-y-2">
                 <a href="index.html#intro" class="sidebar-link flex items-center px-4 py-2 rounded-lg text-secondary font-medium"><i data-lucide="home" class="w-4 h-4 mr-3"></i><span class="lang lang-ko">소개</span><span class="lang lang-en">Intro</span></a>
-                <a href="https://jae-choi.github.io/news/vertexAI.html" class="sidebar-link flex items-center px-4 py-2 rounded-lg text-secondary font-medium"><i data-lucide="brain-circuit" class="w-4 h-4 mr-3"></i><span class="lang lang-ko">VertexAI 소개</span><span class="lang lang-en">VertexAI Intro</span></a>
-                <a href="https://jae-choi.github.io/news/bigquery_tunning_latest.html" class="sidebar-link flex items-center px-4 py-2 rounded-lg text-secondary font-medium"><i data-lucide="database" class="w-4 h-4 mr-3"></i><span class="lang lang-ko">GCP 데이터 플랫폼</span><span class="lang lang-en">GCP Data Platform</span></a>
                 <a href="index.html#articles" class="sidebar-link flex items-center px-4 py-2 rounded-lg text-secondary font-medium"><i data-lucide="pen-square" class="w-4 h-4 mr-3"></i><span class="lang lang-ko">사유의 기록</span><span class="lang lang-en">Articles</span></a>
                 <a href="index.html#works" class="sidebar-link flex items-center px-4 py-2 rounded-lg text-secondary font-medium"><i data-lucide="code" class="w-4 h-4 mr-3"></i><span class="lang lang-ko">기술의 증명</span><span class="lang lang-en">Works</span></a>
                 <a href="index.html#math" class="sidebar-link flex items-center px-4 py-2 rounded-lg text-secondary font-medium"><i data-lucide="sigma" class="w-4 h-4 mr-3"></i><span class="lang lang-ko">수학</span><span class="lang lang-en">Math</span></a>
+                <a href="#cases" class="sidebar-link flex items-center px-4 py-2 rounded-lg text-secondary font-medium"><i data-lucide="briefcase" class="w-4 h-4 mr-3"></i><span class="lang lang-ko">문제 해결 사례</span><span class="lang lang-en">Cases</span></a>
                 <a href="#projects" class="sidebar-link flex items-center px-4 py-2 rounded-lg text-secondary font-medium"><i data-lucide="flask-conical" class="w-4 h-4 mr-3"></i><span class="lang lang-ko">프로젝트</span><span class="lang lang-en">Projects</span></a>
+                <a href="https://jae-choi.github.io/news/vertexAI.html" class="sidebar-link flex items-center px-4 py-2 rounded-lg text-secondary font-medium"><i data-lucide="brain-circuit" class="w-4 h-4 mr-3"></i><span class="lang lang-ko">VertexAI 소개</span><span class="lang lang-en">VertexAI Intro</span></a>
+                <a href="https://jae-choi.github.io/news/bigquery_tunning_latest.html" class="sidebar-link flex items-center px-4 py-2 rounded-lg text-secondary font-medium"><i data-lucide="database" class="w-4 h-4 mr-3"></i><span class="lang lang-ko">GCP 데이터 플랫폼</span><span class="lang lang-en">GCP Data Platform</span></a>
                 <a href="index.html#about" class="sidebar-link flex items-center px-4 py-2 rounded-lg text-secondary font-medium"><i data-lucide="user" class="w-4 h-4 mr-3"></i><span class="lang lang-ko">About Me</span><span class="lang lang-en">About Me</span></a>
             </nav>
         </aside>
@@ -697,7 +698,32 @@
                     </div>
                 </section>
 
-                <section id="projects" class="py-16 fade-in-section">
+                <section id="cases" class="py-16 fade-in-section">
+                    <h2 class="font-serif text-4xl md:text-5xl font-bold text-primary mb-12 text-center">
+                        <span class="lang lang-ko">고객 문제 해결 사례</span>
+                        <span class="lang lang-en">Customer Problem Solving Cases</span>
+                    </h2>
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                        <!-- Card 1: RAG Case -->
+                        <a href="case_rag.html" class="project-item-link p-6">
+                            <h3 class="font-serif text-2xl font-bold mb-3 text-primary">
+                                <span class="lang lang-ko">의도 분석 기반 RAG 아키텍처</span>
+                                <span class="lang lang-en">Intent-driven RAG Architecture</span>
+                            </h3>
+                            <p class="text-secondary mb-4">
+                                <span class="lang lang-ko">가벼운 의도 분류기를 앞단에 두어 복잡한 질의를 분기하고 응답 속도와 검색 품질의 균형을 맞춘 하이브리드 설계 사례.</span>
+                                <span class="lang lang-en">A hybrid design case that balances response speed and search quality by routing complex queries through a lightweight intent classifier.</span>
+                            </p>
+                            <div class="flex flex-wrap gap-2">
+                                <span class="tag">Intent Classification</span>
+                                <span class="tag">Hybrid Search</span>
+                                <span class="tag">RAG</span>
+                            </div>
+                        </a>
+                    </div>
+                </section>
+
+                <section id="projects" class="py-16 fade-in-section border-t border-border-color">
                     <h2 class="font-serif text-4xl md:text-5xl font-bold text-primary mb-12 text-center">
                         <span class="lang lang-ko">프로젝트</span>
                         <span class="lang lang-en">Projects</span>
