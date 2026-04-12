@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" href="https://avatars.githubusercontent.com/u/35217573?v=4" type="image/x-icon">
+    <title>초저지연 커스텀 음성 복제 아키텍처</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700&family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Noto Sans KR', sans-serif; -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; }
+        .en body { font-family: 'Roboto', sans-serif; }
+        .prose h1, .prose h2, .prose h3, .prose strong { color: #1f2937; }
+        .prose p, .prose li, .prose th, .prose td { color: #4b5563; }
+        .quote-block { border-left: 4px solid #93c5fd; padding-left: 1rem; font-style: italic; color: #374151; }
+        .tip-box { background-color: #eff6ff; border: 1px solid #dbeafe; border-radius: 0.5rem; padding: 1.5rem; margin-top: 2rem; margin-bottom: 2rem; }
+        .lang-ko .lang-en, .lang-en .lang-ko { display: none; }
+        .lang-btn { transition: all 0.2s ease-in-out; border-radius: 9999px; padding: 0.25rem 0.75rem; font-size: 0.875rem; }
+        .lang-btn.active { font-weight: 600; background-color: #2dd4bf; color: #0f172a; }
+        .lang-btn:not(.active) { color: #94a3b8; background-color: transparent; }
+        .mermaid { display: flex; justify-content: center; background-color: #f8fafc; padding: 2rem; border-radius: 0.5rem; border: 1px solid #e2e8f0; margin-top: 2rem; margin-bottom: 2rem; }
+    </style>
+</head>
+<body class="bg-slate-50">
+    <div class="container mx-auto max-w-4xl px-4 py-12 sm:py-20">
+        <div class="flex justify-between items-center mb-4">
+            <a href="index_latest.html#cases" class="text-sm font-medium text-slate-500 hover:text-slate-800 transition">&larr; <span class="lang lang-ko">목록으로 돌아가기</span><span class="lang lang-en" style="display:none;">Back to list</span></a>
+            <div class="flex items-center bg-gray-800 rounded-full p-1">
+                <button id="btn-ko" class="lang-btn" onclick="switchLang('ko')">KOR</button>
+                <button id="btn-en" class="lang-btn" onclick="switchLang('en')">ENG</button>
+            </div>
+        </div>
+
+        <article class="bg-white rounded-lg shadow-lg p-8 sm:p-12 prose lg:prose-lg max-w-none">
+            <header class="mb-8 text-center">
+                <h1 class="lang lang-ko text-4xl font-bold tracking-tight text-gray-900 sm:text-5xl">초저지연 커스텀 음성 복제</h1>
+                <h1 class="lang lang-en text-4xl font-bold tracking-tight text-gray-900 sm:text-5xl" style="display:none;">Instant Custom Voice Cloning</h1>
+                <p class="mt-4 text-gray-500 font-medium">Customer Problem Solving Case 4</p>
+            </header>
+
+            <div class="quote-block my-12">
+                <h2 class="lang lang-ko text-2xl font-semibold mb-4">“오디오 입력 편차를 사용자에게 넘기지 않고, 백엔드에서 흡수하다”</h2>
+                <h2 class="lang lang-en text-2xl font-semibold mb-4" style="display:none;">“Absorbing audio variability in the backend instead of the user”</h2>
+                <p class="lang lang-ko text-lg leading-relaxed">상용 음성 복제 모델은 입력 오디오 조건이 매우 엄격해 작은 포맷 차이에도 실패가 자주 발생했습니다. 이 사례는 사용자 가이드를 늘리는 대신, <strong>백엔드 전처리 미들웨어에서 리샘플링과 트리밍을 강제해 운영 안정성을 확보한 구조</strong>를 다룹니다.</p>
+                <p class="lang lang-en text-lg leading-relaxed" style="display:none;">Commercial voice-cloning models were highly sensitive to input audio conditions, causing frequent failures even with small format deviations. This case focuses on a structure that secured operational stability by <strong>forcing resampling and trimming inside a backend preprocessing middleware</strong> rather than pushing more guidance onto the user.</p>
+            </div>
+
+            <section class="mt-12">
+                <h2 class="lang lang-ko text-3xl font-bold mb-6 border-b pb-2"><span class="text-blue-600 mr-2">1.</span> Need: 도입 배경</h2>
+                <h2 class="lang lang-en text-3xl font-bold mb-6 border-b pb-2" style="display:none;"><span class="text-blue-600 mr-2">1.</span> Need: Background</h2>
+                <div class="lang lang-ko"><p>음성 기반 사용자 경험을 빠르게 제공하려면, 입력 품질이 들쑥날쑥한 실제 환경에서도 안정적으로 작동하는 복제 파이프라인이 필요했습니다.</p></div>
+                <div class="lang lang-en" style="display:none;"><p>A stable cloning pipeline was needed to deliver voice-based experiences quickly, even in real environments where input quality varied widely.</p></div>
+            </section>
+
+            <section class="mt-12">
+                <h2 class="lang lang-ko text-3xl font-bold mb-6 border-b pb-2"><span class="text-blue-600 mr-2">2.</span> Problem Definition: 문제 정의</h2>
+                <h2 class="lang lang-en text-3xl font-bold mb-6 border-b pb-2" style="display:none;"><span class="text-blue-600 mr-2">2.</span> Problem Definition: Problem Statement</h2>
+                <div class="lang lang-ko"><p>모델 API는 오디오 길이, 샘플레이트, 포맷 제약이 매우 엄격했고, 이 조건을 벗어나면 사용자는 실패를 경험해야 했습니다.</p><p>클라이언트에서 모든 조건을 맞추게 하면 UX가 복잡해지고 실패 책임이 사용자에게 전가되는 문제가 있었습니다.</p></div>
+                <div class="lang lang-en" style="display:none;"><p>The model API imposed strict constraints on audio length, sample rate, and format, and users experienced direct failures whenever inputs fell outside those boundaries.</p><p>If all those conditions were enforced on the client side, UX would become more complex and failure responsibility would be pushed onto the user.</p></div>
+            </section>
+
+            <section class="mt-12">
+                <h2 class="lang lang-ko text-3xl font-bold mb-6 border-b pb-2"><span class="text-blue-600 mr-2">3.</span> Key View: 접근 방식</h2>
+                <h2 class="lang lang-en text-3xl font-bold mb-6 border-b pb-2" style="display:none;"><span class="text-blue-600 mr-2">3.</span> Key View: Approach</h2>
+                <div class="lang lang-ko"><p>핵심은 입력 제약을 UI 가이드로 풀지 않고, <strong>백엔드에서 안전한 포맷으로 강제 변환하는 미들웨어 계층</strong>을 두는 것이었습니다.</p><p>이 방식은 서버 자원을 더 쓰더라도 실패를 중앙에서 통제하고 응답 일관성을 높이는 데 유리했습니다.</p></div>
+                <div class="lang lang-en" style="display:none;"><p>The key was to avoid solving input constraints through UI guidance alone and instead introduce a <strong>middleware layer that forcibly converts audio into a safe backend format</strong>.</p><p>Although this consumed more server resources, it centralized failure control and improved response consistency.</p></div>
+            </section>
+
+            <section class="mt-12">
+                <h2 class="lang lang-ko text-3xl font-bold mb-6 border-b pb-2"><span class="text-blue-600 mr-2">4.</span> Design / Framing: 아키텍처 설계</h2>
+                <h2 class="lang lang-en text-3xl font-bold mb-6 border-b pb-2" style="display:none;"><span class="text-blue-600 mr-2">4.</span> Design / Framing: Architecture Design</h2>
+                <div class="lang lang-ko"><p>사용자가 업로드한 음성은 바로 모델로 전달하지 않고, 백엔드에서 <strong>리샘플링, 트리밍, 타입 판별</strong>을 먼저 수행했습니다.</p><p>이후 정규화된 오디오만 복제 엔진에 전달하고, 출력 결과를 다시 사용자에게 반환하는 구조로 실패 원인을 시스템 안에서 흡수했습니다.</p></div>
+                <div class="lang lang-en" style="display:none;"><p>User audio was not sent directly to the model. Instead, the backend first performed <strong>resampling, trimming, and type detection</strong>.</p><p>Only normalized audio was passed to the cloning engine, allowing the system to absorb failure causes before returning results to the user.</p></div>
+
+                <div class="mermaid">
+graph TD
+    User([User Audio]) --> API[Upload API];
+    API --> Prep[Audio Preprocess Middleware];
+    Prep --> Check{Format Check};
+    Check -->|Normalize| Clone[Voice Cloning Engine];
+    Clone --> Out[Audio Output];
+    Out --> UserResp([Playable Voice Result]);
+
+    style User fill:#f8fafc,stroke:#94a3b8
+    style API fill:#eff6ff,stroke:#3b82f6
+    style Prep fill:#fefce8,stroke:#eab308
+    style Check fill:#fee2e2,stroke:#ef4444
+    style Clone fill:#fefce8,stroke:#eab308
+    style Out fill:#ecfeff,stroke:#06b6d4
+    style UserResp fill:#ecfdf5,stroke:#10b981
+                </div>
+            </section>
+
+            <section class="mt-12">
+                <h2 class="lang lang-ko text-3xl font-bold mb-6 border-b pb-2"><span class="text-blue-600 mr-2">5.</span> Impact: 적용 결과</h2>
+                <h2 class="lang lang-en text-3xl font-bold mb-6 border-b pb-2" style="display:none;"><span class="text-blue-600 mr-2">5.</span> Impact: Results</h2>
+                <div class="tip-box">
+                    <ul class="list-none space-y-4 text-lg p-0 m-0">
+                        <li class="lang lang-ko flex items-start"><span class="text-green-600 font-bold text-2xl mr-3 leading-none">✓</span><div><strong class="font-bold text-gray-900 block mb-1">입력 실패 흡수</strong><span class="text-gray-700">오디오 입력 편차로 인한 실패를 사용자 대신 백엔드가 처리하도록 설계했습니다.</span></div></li>
+                        <li class="lang lang-ko flex items-start"><span class="text-green-600 font-bold text-2xl mr-3 leading-none">✓</span><div><strong class="font-bold text-gray-900 block mb-1">응답 일관성 확보</strong><span class="text-gray-700">음성 입력 품질이 달라도 모델에 전달되는 데이터 형식을 일정하게 유지했습니다.</span></div></li>
+                        <li class="lang lang-ko flex items-start"><span class="text-green-600 font-bold text-2xl mr-3 leading-none">✓</span><div><strong class="font-bold text-gray-900 block mb-1">운영 안정성 향상</strong><span class="text-gray-700">실패 원인을 시스템 내부에서 관리해 서비스 운영 통제력을 높였습니다.</span></div></li>
+                        <li class="lang lang-en flex items-start" style="display:none;"><span class="text-green-600 font-bold text-2xl mr-3 leading-none">✓</span><div><strong class="font-bold text-gray-900 block mb-1">Failure absorption in the backend</strong><span class="text-gray-700">Audio variability was handled by the backend instead of being pushed onto the user.</span></div></li>
+                        <li class="lang lang-en flex items-start" style="display:none;"><span class="text-green-600 font-bold text-2xl mr-3 leading-none">✓</span><div><strong class="font-bold text-gray-900 block mb-1">More consistent responses</strong><span class="text-gray-700">The format delivered to the model became more predictable regardless of raw input quality.</span></div></li>
+                        <li class="lang lang-en flex items-start" style="display:none;"><span class="text-green-600 font-bold text-2xl mr-3 leading-none">✓</span><div><strong class="font-bold text-gray-900 block mb-1">Higher operational stability</strong><span class="text-gray-700">Managing failure causes internally improved service-level operational control.</span></div></li>
+                    </ul>
+                </div>
+            </section>
+        </article>
+    </div>
+
+    <script type="module">
+        import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.esm.min.mjs';
+        mermaid.initialize({ startOnLoad: true, theme: 'neutral' });
+    </script>
+    <script>
+        const titles = { ko: '초저지연 커스텀 음성 복제', en: 'Instant Custom Voice Cloning' };
+        function switchLang(lang) {
+            document.documentElement.lang = lang;
+            document.documentElement.className = lang;
+            localStorage.setItem('language', lang);
+            document.title = titles[lang];
+            document.querySelectorAll('.lang').forEach(el => { el.style.display = el.classList.contains(`lang-${lang}`) ? '' : 'none'; });
+            document.querySelectorAll('.lang-btn').forEach(btn => btn.classList.remove('active'));
+            const activeBtn = document.getElementById(`btn-${lang}`);
+            if (activeBtn) activeBtn.classList.add('active');
+        }
+        document.addEventListener('DOMContentLoaded', () => {
+            const urlParams = new URLSearchParams(window.location.search);
+            const langFromUrl = urlParams.get('lang');
+            const langFromStorage = localStorage.getItem('language');
+            const browserLang = (navigator.language || navigator.userLanguage).startsWith('en') ? 'en' : 'ko';
+            switchLang(langFromUrl || langFromStorage || browserLang);
+        });
+    </script>
+</body>
+</html>

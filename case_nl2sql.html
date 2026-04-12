@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" href="https://avatars.githubusercontent.com/u/35217573?v=4" type="image/x-icon">
+    <title>대규모 데이터 분석 NL2SQL</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700&family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Noto Sans KR', sans-serif; -webkit-font-smoothing: antialiased; }
+        .en body { font-family: 'Roboto', sans-serif; }
+        .prose h1, .prose h2, .prose h3, .prose strong { color: #1f2937; }
+        .prose p, .prose li, .prose th, .prose td { color: #4b5563; }
+        .quote-block { border-left: 4px solid #93c5fd; padding-left: 1rem; font-style: italic; color: #374151; }
+        .tip-box { background-color: #eff6ff; border: 1px solid #dbeafe; border-radius: 0.5rem; padding: 1.5rem; margin-top: 2rem; margin-bottom: 2rem; }
+        .lang-ko .lang-en, .lang-en .lang-ko { display: none; }
+        .lang-btn { transition: all 0.2s ease-in-out; border-radius: 9999px; padding: 0.25rem 0.75rem; font-size: 0.875rem; }
+        .lang-btn.active { font-weight: 600; background-color: #2dd4bf; color: #0f172a; }
+        .lang-btn:not(.active) { color: #94a3b8; background-color: transparent; }
+        .mermaid { display: flex; justify-content: center; background-color: #f8fafc; padding: 2rem; border-radius: 0.5rem; border: 1px solid #e2e8f0; margin-top: 2rem; margin-bottom: 2rem; }
+    </style>
+</head>
+<body class="bg-slate-50">
+    <div class="container mx-auto max-w-4xl px-4 py-12 sm:py-20">
+        
+        <div class="flex justify-between items-center mb-4">
+            <a href="index_latest.html#cases" class="text-sm font-medium text-slate-500 hover:text-slate-800 transition">
+                &larr; <span class="lang lang-ko">목록으로 돌아가기</span><span class="lang lang-en" style="display:none;">Back to list</span>
+            </a>
+            <div class="flex items-center bg-gray-800 rounded-full p-1">
+                <button id="btn-ko" class="lang-btn" onclick="switchLang('ko')">KOR</button>
+                <button id="btn-en" class="lang-btn" onclick="switchLang('en')">ENG</button>
+            </div>
+        </div>
+
+        <article class="bg-white rounded-lg shadow-lg p-8 sm:p-12 prose lg:prose-lg max-w-none">
+            
+            <header class="mb-8 text-center">
+                <h1 class="lang lang-ko text-4xl font-bold tracking-tight text-gray-900 sm:text-5xl">대규모 데이터 분석 NL2SQL</h1>
+                <h1 class="lang lang-en text-4xl font-bold tracking-tight text-gray-900 sm:text-5xl" style="display:none;">NL2SQL for Large-Scale Data Analysis</h1>
+                <p class="mt-4 text-gray-500 font-medium">Customer Problem Solving Case 2</p>
+            </header>
+
+            <div class="quote-block my-12">
+                <h2 class="lang lang-ko text-2xl font-semibold mb-4">“동적 패턴 캐싱과 자가 수정이 결합된 강건한 쿼리 엔진”</h2>
+                <h2 class="lang lang-en text-2xl font-semibold mb-4" style="display:none;">“Robust Query Engine with Dynamic Pattern Caching and Self-Correction”</h2>
+                <p class="lang lang-ko text-lg leading-relaxed">비개발자 현업 부서가 거대한 BigQuery 데이터를 자연어로 직접 조회하려 할 때 발생하는 LLM 추론 지연과 문법 오류(Syntax Error)를 어떻게 시스템 구조로 흡수하여 안정적으로 런타임에 서비스할 수 있는지 다룬 설계 사례입니다.</p>
+                <p class="lang lang-en text-lg leading-relaxed" style="display:none;">This design case covers how to absorb LLM inference latency and syntax errors into the system structure to provide stable runtime services when non-developer departments try to directly query massive BigQuery data using natural language.</p>
+            </div>
+
+            <section class="mt-12">
+                <h2 class="lang lang-ko text-3xl font-bold mb-6 border-b pb-2"><span class="text-blue-600 mr-2">1.</span> Need: 도입 배경</h2>
+                <h2 class="lang lang-en text-3xl font-bold mb-6 border-b pb-2" style="display:none;"><span class="text-blue-600 mr-2">1.</span> Need: Background</h2>
+                <div class="lang lang-ko">
+                    <p>기획, 마케팅 부서가 수억 건의 결제/로그 데이터를 바탕으로 의사결정을 내리기 위해서는 데이터 분석가의 SQL 작성을 기다려야만 하는 병목이 있었습니다.</p>
+                    <p>현업에서 일상적인 자연어 질문만 던지면 즉시 SQL로 변환하여 데이터를 시각화해주는 자연어-데이터 인터페이스(NL2SQL) 도입이 시급했습니다.</p>
+                </div>
+                <div class="lang lang-en" style="display:none;">
+                    <p>There was a bottleneck where planning and marketing departments had to wait for data analysts to write SQL queries to make decisions based on hundreds of millions of payment/log data records.</p>
+                    <p>It was urgent to introduce a Natural Language-to-Data interface (NL2SQL) that would immediately convert everyday natural language questions from the field into SQL and visualize the data.</p>
+                </div>
+            </section>
+
+            <section class="mt-12">
+                <h2 class="lang lang-ko text-3xl font-bold mb-6 border-b pb-2"><span class="text-blue-600 mr-2">2.</span> Problem Definition: 문제 정의</h2>
+                <h2 class="lang lang-en text-3xl font-bold mb-6 border-b pb-2" style="display:none;"><span class="text-blue-600 mr-2">2.</span> Problem Definition: Problem Statement</h2>
+                <div class="lang lang-ko">
+                    <p>LLM에게 단순히 "이 질문을 SQL로 바꿔줘"라고 요청하면, 기업 고유의 복잡한 스키마를 잘못 해석하여 실행 불가능한 쿼리(Syntax Error)를 반환하는 빈도가 매우 높았습니다.</p>
+                    <p>또한 매번 무거운 LLM 추론 API를 호출하느라 응답이 지연되고 비용이 낭비되는 문제가 있었습니다.</p>
+                </div>
+                <div class="lang lang-en" style="display:none;">
+                    <p>When simply asking the LLM to "convert this question to SQL," the frequency of it misinterpreting the enterprise's complex, proprietary schemas and returning unexecutable queries (Syntax Errors) was very high.</p>
+                    <p>Additionally, calling heavy LLM inference APIs every time caused response delays and wasted costs.</p>
+                </div>
+            </section>
+
+            <section class="mt-12">
+                <h2 class="lang lang-ko text-3xl font-bold mb-6 border-b pb-2"><span class="text-blue-600 mr-2">3.</span> Key View: 접근 방식</h2>
+                <h2 class="lang lang-en text-3xl font-bold mb-6 border-b pb-2" style="display:none;"><span class="text-blue-600 mr-2">3.</span> Key View: Approach</h2>
+                <div class="lang lang-ko">
+                    <p>LLM의 1-Pass 생성을 100% 신뢰하지 않고, 생성된 SQL이 데이터베이스에서 에러를 뱉으면 <strong>그 에러 메시지를 LLM에게 다시 먹여 스스로 수정하게 하는 자가 수정(Self-Correction) 루프</strong>를 에이전트에 탑재했습니다.</p>
+                    <p>더불어, LLM API 의존도를 낮추기 위해 이전에 성공한 SQL 변환 패턴을 인메모리에 저장해두고, 새로운 질의가 기존 의도와 유사하면 <strong>LLM 없이 변수만 치환하여 반환하는 동적 패턴 매칭(Dynamic Pattern Caching)</strong> 계층을 앞단에 배치했습니다.</p>
+                </div>
+                <div class="lang lang-en" style="display:none;">
+                    <p>Instead of trusting the LLM's 1-Pass generation 100%, we equipped the agent with a <strong>Self-Correction loop that feeds any database execution errors back into the LLM to fix itself.</strong></p>
+                    <p>Furthermore, to reduce reliance on the LLM API, we stored previously successful SQL conversion patterns in-memory. If a new query is similar to an existing intent, we placed a <strong>Dynamic Pattern Caching layer at the front that swaps only variables and returns the SQL without hitting the LLM.</strong></p>
+                </div>
+            </section>
+
+            <section class="mt-12">
+                <h2 class="lang lang-ko text-3xl font-bold mb-6 border-b pb-2"><span class="text-blue-600 mr-2">4.</span> Design / Framing: 아키텍처 설계</h2>
+                <h2 class="lang lang-en text-3xl font-bold mb-6 border-b pb-2" style="display:none;"><span class="text-blue-600 mr-2">4.</span> Design / Framing: Architecture Design</h2>
+                <div class="lang lang-ko">
+                    <p>Cloud Run에 배포된 FastAPI 봇이 사용자 요청을 수신합니다. 먼저 Redis(K-Means 유사도 군집 캐시)를 조회하여 패턴이 맞으면 즉시 반환하고, 캐시 미스 시에만 Gemini LLM에 요청합니다.</p>
+                    <p>Gemini가 만든 쿼리가 BigQuery에서 실행 실패하면, Validator 노드가 실패 원인을 Gemini로 다시 보내 쿼리를 재작성(Correction)시킵니다. 이 다단계 오케스트레이션을 통해 런타임의 치명적 중단을 막았습니다.</p>
+                </div>
+                <div class="lang lang-en" style="display:none;">
+                    <p>A FastAPI bot deployed on Cloud Run receives user requests. It first checks Redis (K-Means similarity cluster cache). If the pattern matches, it returns immediately; it requests the Gemini LLM only on a cache miss.</p>
+                    <p>If the query generated by Gemini fails to execute in BigQuery, the Validator node sends the failure cause back to Gemini to rewrite the query (Correction). Through this multi-step orchestration, we prevented critical runtime interruptions.</p>
+                </div>
+
+                <div class="mermaid">
+graph TD
+    User([Slack / Web UI]) --> API[FastAPI Server]
+    
+    subgraph Routing_Cache_Layer [Routing & Cache Layer]
+        API --> K[K-Means Vector Cluster]
+        K --> Cache{Redis Cache <br> Dynamic Pattern Match}
+        Cache -->|Hit| BQ[(BigQuery)]
+    end
+
+    subgraph LLM_Generation_Correction_Loop [LLM Generation & Correction Loop]
+        Cache -->|Miss| NL2SQL[Gemini LLM]
+        NL2SQL --> Valid{Validator}
+        Valid -.->|Syntax Error| NL2SQL
+        Valid -->|Valid SQL| BQ
+    end
+
+    subgraph Data_Output [Data & Output]
+        BQ --> Chart[Visualization Node]
+        Chart --> UpdateCache[Update Pattern Cache]
+        UpdateCache --> Result([Dashboard / Message])
+    end
+    
+    style User fill:#f8fafc,stroke:#94a3b8
+    style API fill:#eff6ff,stroke:#3b82f6
+    style K fill:#f3f4f6,stroke:#9ca3af
+    style Cache fill:#fefce8,stroke:#eab308
+    style NL2SQL fill:#fefce8,stroke:#eab308
+    style Valid fill:#fee2e2,stroke:#ef4444
+    style BQ fill:#f1f5f9,stroke:#64748b
+    style Chart fill:#f1f5f9,stroke:#64748b
+    style UpdateCache fill:#f3f4f6,stroke:#9ca3af
+    style Result fill:#ecfdf5,stroke:#10b981
+                </div>
+            </section>
+
+            <section class="mt-12">
+                <h2 class="lang lang-ko text-3xl font-bold mb-6 border-b pb-2"><span class="text-blue-600 mr-2">5.</span> Impact: 적용 결과</h2>
+                <h2 class="lang lang-en text-3xl font-bold mb-6 border-b pb-2" style="display:none;"><span class="text-blue-600 mr-2">5.</span> Impact: Results</h2>
+                <div class="lang lang-ko">
+                    <p>이 아키텍처는 데이터 분석의 병목을 없애고 조직의 진정한 데이터 민주화를 가속했습니다.</p>
+                </div>
+                <div class="lang lang-en" style="display:none;">
+                    <p>This architecture eliminated data analysis bottlenecks and accelerated true data democratization in the organization.</p>
+                </div>
+
+                <div class="tip-box">
+                    <ul class="list-none space-y-4 text-lg p-0 m-0">
+                        <li class="lang lang-ko flex items-start">
+                            <span class="text-green-600 font-bold text-2xl mr-3 leading-none">✓</span>
+                            <div>
+                                <strong class="font-bold text-gray-900 block mb-1">런타임 안정성 보장</strong>
+                                <span class="text-gray-700">Self-Correction 루프 덕분에 초기 1-Pass 생성에서 구문 오류가 발생하더라도 사용자에게는 올바른 최종 데이터가 전달됩니다.</span>
+                            </div>
+                        </li>
+                        <li class="lang lang-ko flex items-start">
+                            <span class="text-green-600 font-bold text-2xl mr-3 leading-none">✓</span>
+                            <div>
+                                <strong class="font-bold text-gray-900 block mb-1">캐싱을 통한 비용 절감</strong>
+                                <span class="text-gray-700">빈번한 조회 요청(매출 현황 등)을 캐시 레이어가 방어하여 불필요한 LLM 호출 지연과 과금을 억제했습니다.</span>
+                            </div>
+                        </li>
+                        
+                        <li class="lang lang-en flex items-start" style="display:none;">
+                            <span class="text-green-600 font-bold text-2xl mr-3 leading-none">✓</span>
+                            <div>
+                                <strong class="font-bold text-gray-900 block mb-1">Runtime Stability Guaranteed</strong>
+                                <span class="text-gray-700">Thanks to the Self-Correction loop, even if syntax errors occur in the initial 1-Pass generation, correct final data is delivered to the user.</span>
+                            </div>
+                        </li>
+                        <li class="lang lang-en flex items-start" style="display:none;">
+                            <span class="text-green-600 font-bold text-2xl mr-3 leading-none">✓</span>
+                            <div>
+                                <strong class="font-bold text-gray-900 block mb-1">Cost Reduction via Caching</strong>
+                                <span class="text-gray-700">The cache layer defended against frequent query requests (like sales statuses), curbing unnecessary LLM call delays and billing.</span>
+                            </div>
+                        </li>
+                    </ul>
+                </div>
+            </section>
+
+        </article>
+    </div>
+
+    <!-- Mermaid.js -->
+    <script type="module">
+        import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.esm.min.mjs';
+        mermaid.initialize({ startOnLoad: true, theme: 'neutral' });
+    </script>
+
+    <script>
+        const titles = { ko: '대규모 데이터 분석 NL2SQL', en: 'NL2SQL for Large-Scale Data Analysis' };
+        function switchLang(lang) {
+            document.documentElement.lang = lang;
+            document.documentElement.className = lang;
+            localStorage.setItem('language', lang);
+            document.title = titles[lang];
+            document.querySelectorAll('.lang').forEach(el => {
+                if (el.classList.contains(`lang-${lang}`)) { el.style.display = ''; } else { el.style.display = 'none'; }
+            });
+            document.querySelectorAll('.lang-btn').forEach(btn => { btn.classList.remove('active'); });
+            const activeBtn = document.getElementById(`btn-${lang}`);
+            if (activeBtn) activeBtn.classList.add('active');
+        }
+        document.addEventListener('DOMContentLoaded', () => {
+            const urlParams = new URLSearchParams(window.location.search);
+            const langFromUrl = urlParams.get('lang');
+            const langFromStorage = localStorage.getItem('language');
+            const browserLang = (navigator.language || navigator.userLanguage).startsWith('en') ? 'en' : 'ko';
+            switchLang(langFromUrl || langFromStorage || browserLang);
+        });
+    </script>
+</body>
+</html>

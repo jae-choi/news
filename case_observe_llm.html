@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" href="https://avatars.githubusercontent.com/u/35217573?v=4" type="image/x-icon">
+    <title>Self-Correcting AI Agent 체계</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700&family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Noto Sans KR', sans-serif; -webkit-font-smoothing: antialiased; }
+        .en body { font-family: 'Roboto', sans-serif; }
+        .prose h1, .prose h2, .prose h3, .prose strong { color: #1f2937; }
+        .prose p, .prose li, .prose th, .prose td { color: #4b5563; }
+        .quote-block { border-left: 4px solid #93c5fd; padding-left: 1rem; font-style: italic; color: #374151; }
+        .tip-box { background-color: #eff6ff; border: 1px solid #dbeafe; border-radius: 0.5rem; padding: 1.5rem; margin-top: 2rem; margin-bottom: 2rem; }
+        .lang-ko .lang-en, .lang-en .lang-ko { display: none; }
+        .lang-btn { transition: all 0.2s ease-in-out; border-radius: 9999px; padding: 0.25rem 0.75rem; font-size: 0.875rem; }
+        .lang-btn.active { font-weight: 600; background-color: #2dd4bf; color: #0f172a; }
+        .lang-btn:not(.active) { color: #94a3b8; background-color: transparent; }
+        .mermaid { display: flex; justify-content: center; background-color: #f8fafc; padding: 2rem; border-radius: 0.5rem; border: 1px solid #e2e8f0; margin-top: 2rem; margin-bottom: 2rem; }
+    </style>
+</head>
+<body class="bg-slate-50">
+    <div class="container mx-auto max-w-4xl px-4 py-12 sm:py-20">
+        
+        <div class="flex justify-between items-center mb-4">
+            <a href="index_latest.html#cases" class="text-sm font-medium text-slate-500 hover:text-slate-800 transition">
+                &larr; <span class="lang lang-ko">목록으로 돌아가기</span><span class="lang lang-en" style="display:none;">Back to list</span>
+            </a>
+            <div class="flex items-center bg-gray-800 rounded-full p-1">
+                <button id="btn-ko" class="lang-btn" onclick="switchLang('ko')">KOR</button>
+                <button id="btn-en" class="lang-btn" onclick="switchLang('en')">ENG</button>
+            </div>
+        </div>
+
+        <article class="bg-white rounded-lg shadow-lg p-8 sm:p-12 prose lg:prose-lg max-w-none">
+            
+            <header class="mb-8 text-center">
+                <h1 class="lang lang-ko text-4xl font-bold tracking-tight text-gray-900 sm:text-5xl">Self-Correcting AI Agent 체계</h1>
+                <h1 class="lang lang-en text-4xl font-bold tracking-tight text-gray-900 sm:text-5xl" style="display:none;">Self-Correcting AI Agent System</h1>
+                <p class="mt-4 text-gray-500 font-medium">Customer Problem Solving Case 9</p>
+            </header>
+
+            <div class="quote-block my-12">
+                <h2 class="lang lang-ko text-2xl font-semibold mb-4">“블랙박스를 투명하게: 운영 가능한 에이전트를 위한 관측과 자가 수정”</h2>
+                <h2 class="lang lang-en text-2xl font-semibold mb-4" style="display:none;">“Making the Black Box Transparent: Observability and Self-Correction for Operable Agents”</h2>
+                <p class="lang lang-ko text-lg leading-relaxed">자율적으로 판단하고 행동하는 AI 에이전트는 필연적으로 내부 추론 과정을 추적하기 힘든 '블랙박스' 현상을 낳습니다. Langfuse 기반의 관찰 가능성(Observability)과 조건부 노드(Conditional Edge)를 결합하여, 기업이 안심하고 운영할 수 있도록 에이전트의 행동을 통제하고 오류를 스스로 바로잡는 아키텍처 사례입니다.</p>
+                <p class="lang lang-en text-lg leading-relaxed" style="display:none;">Autonomously reasoning and acting AI agents inevitably create a 'black box' phenomenon where internal thought processes are hard to track. This is an architectural case that combines Langfuse-based Observability with Conditional Edges to control agent behavior and autonomously correct errors, allowing enterprises to operate with peace of mind.</p>
+            </div>
+
+            <section class="mt-12">
+                <h2 class="lang lang-ko text-3xl font-bold mb-6 border-b pb-2"><span class="text-blue-600 mr-2">1.</span> Need: 도입 배경</h2>
+                <h2 class="lang lang-en text-3xl font-bold mb-6 border-b pb-2" style="display:none;"><span class="text-blue-600 mr-2">1.</span> Need: Background</h2>
+                <div class="lang lang-ko">
+                    <p>도구를 스스로 선택하고 여러 단계를 거쳐 답을 도출하는 멀티 에이전트(Multi-Agent) 시스템을 도입하려는 조직이 늘고 있습니다.</p>
+                    <p>그러나 에이전트가 어떤 툴을 왜 호출했는지, 중간에 왜 실패했는지 알 수 없는 상태로는 운영 단계에서 장애 원인을 파악하거나 감사(Audit)에 대응하는 것이 불가능했습니다.</p>
+                </div>
+                <div class="lang lang-en" style="display:none;">
+                    <p>More organizations are looking to adopt Multi-Agent systems that autonomously select tools and go through multiple steps to derive answers.</p>
+                    <p>However, without knowing which tool the agent called, why it called it, or why it failed midway, it was impossible to identify the root causes of failures or respond to audits during the operational phase.</p>
+                </div>
+            </section>
+
+            <section class="mt-12">
+                <h2 class="lang lang-ko text-3xl font-bold mb-6 border-b pb-2"><span class="text-blue-600 mr-2">2.</span> Problem Definition: 문제 정의</h2>
+                <h2 class="lang lang-en text-3xl font-bold mb-6 border-b pb-2" style="display:none;"><span class="text-blue-600 mr-2">2.</span> Problem Definition: Problem Statement</h2>
+                <div class="lang lang-ko">
+                    <p>가장 큰 장애물은 <strong>'오류 전파(Error Propagation)'</strong>와 <strong>'관측성 부재(Lack of Observability)'</strong>였습니다.</p>
+                    <p>단일 프롬프트-응답(1-Pass) 구조와 달리 에이전트 체인에서는 초기 단계의 환각이나 도구(API) 호출 에러가 후속 단계로 눈덩이처럼 커지며 전체 시스템의 신뢰도를 파괴하는 문제가 발생했습니다.</p>
+                </div>
+                <div class="lang lang-en" style="display:none;">
+                    <p>The biggest hurdles were <strong>'Error Propagation'</strong> and a <strong>'Lack of Observability'</strong>.</p>
+                    <p>Unlike a single prompt-response (1-Pass) structure, in an agent chain, an initial hallucination or tool (API) call error would snowball into subsequent steps, destroying the reliability of the entire system.</p>
+                </div>
+            </section>
+
+            <section class="mt-12">
+                <h2 class="lang lang-ko text-3xl font-bold mb-6 border-b pb-2"><span class="text-blue-600 mr-2">3.</span> Key View: 접근 방식</h2>
+                <h2 class="lang lang-en text-3xl font-bold mb-6 border-b pb-2" style="display:none;"><span class="text-blue-600 mr-2">3.</span> Key View: Approach</h2>
+                <div class="lang lang-ko">
+                    <p>에이전트를 통제하기 위해 두 가지 장치가 필수적이라 판단했습니다.</p>
+                    <p>첫째, 에이전트의 모든 사고 과정(Reasoning)과 도구 호출(Action)을 투명하게 기록하는 <strong>추적(Tracing) 미들웨어</strong>가 필요합니다. 둘째, 각 노드가 실행된 후 논리적/기술적 결함을 검사하여 에러 시 이전 노드로 돌아가 <strong>스스로 해결책을 다시 찾는 조건부 루프(Self-Correction Loop)</strong>가 요구되었습니다.</p>
+                </div>
+                <div class="lang lang-en" style="display:none;">
+                    <p>We determined that two mechanisms were essential to control the agents.</p>
+                    <p>First, a <strong>Tracing Middleware</strong> that transparently logs all reasoning processes and tool calls (actions) of the agent. Second, a <strong>Self-Correction Loop</strong> where after each node executes, it is inspected for logical/technical flaws; upon error, it returns to the previous node to find a new solution.</p>
+                </div>
+            </section>
+
+            <section class="mt-12">
+                <h2 class="lang lang-ko text-3xl font-bold mb-6 border-b pb-2"><span class="text-blue-600 mr-2">4.</span> Design / Framing: 아키텍처 설계</h2>
+                <h2 class="lang lang-en text-3xl font-bold mb-6 border-b pb-2" style="display:none;"><span class="text-blue-600 mr-2">4.</span> Design / Framing: Architecture Design</h2>
+                <div class="lang lang-ko">
+                    <p>LangGraph 기반의 오케스트레이터에 <strong>Langfuse 관측성 도구를 연동</strong>하여 토큰 사용량, 지연 시간, 그리고 프롬프트 체인을 실시간 대시보드로 시각화했습니다.</p>
+                    <p>더불어, 에이전트의 실행 그래프 내에 'Validator(검증기)' 노드와 <strong>조건부 엣지(Conditional Edge)</strong>를 설계하여, API 실패나 형식 오류가 감지되면 <code>end</code> 노드가 아닌 <code>retry/correct</code> 엣지를 타고 LLM이 이전 오류 컨텍스트를 인지한 상태로 재추론하도록 강제했습니다.</p>
+                </div>
+                <div class="lang lang-en" style="display:none;">
+                    <p>We integrated the <strong>Langfuse observability tool</strong> into a LangGraph-based orchestrator, visualizing token usage, latency, and prompt chains on a real-time dashboard.</p>
+                    <p>Furthermore, we designed a 'Validator' node and <strong>Conditional Edges</strong> within the agent's execution graph. If an API failure or format error is detected, instead of hitting the <code>end</code> node, it traverses a <code>retry/correct</code> edge, forcing the LLM to re-reason while aware of the previous error context.</p>
+                </div>
+
+                <div class="mermaid">
+graph TD
+    User([User Request]) --> Orch[Agent Orchestrator <br> LangGraph]
+    
+    subgraph Observability Layer
+        Orch -.->|Streaming Telemetry| Langfuse[(Langfuse Dashboard <br> Tracing / Tokens)]
+    end
+
+    subgraph Self-Correction Execution
+        Orch --> Action[LLM Tool Call / Reasoning]
+        Action --> Tool{Execute External API}
+        Tool -->|Success| Validator[Logic Validator]
+        Tool -->|API Error| CorrectionEdge
+        
+        Validator -->|Pass| Output([Final Answer])
+        Validator -->|Logic Fail| CorrectionEdge((Conditional Edge <br> Context Inject))
+        
+        CorrectionEdge -.->|Retry with Error Context| Action
+    end
+    
+    style User fill:#f8fafc,stroke:#94a3b8
+    style Orch fill:#eff6ff,stroke:#3b82f6
+    style Langfuse fill:#fefce8,stroke:#eab308
+    style Action fill:#f1f5f9,stroke:#64748b
+    style Tool fill:#f1f5f9,stroke:#64748b
+    style Validator fill:#fefce8,stroke:#eab308
+    style CorrectionEdge fill:#fee2e2,stroke:#ef4444
+    style Output fill:#ecfdf5,stroke:#10b981
+                </div>
+            </section>
+
+            <section class="mt-12">
+                <h2 class="lang lang-ko text-3xl font-bold mb-6 border-b pb-2"><span class="text-blue-600 mr-2">5.</span> Impact: 적용 결과</h2>
+                <h2 class="lang lang-en text-3xl font-bold mb-6 border-b pb-2" style="display:none;"><span class="text-blue-600 mr-2">5.</span> Impact: Results</h2>
+                <div class="lang lang-ko">
+                    <p>블랙박스였던 에이전트의 두뇌를 투명하게 열어보고 통제함으로써, 조직이 실제 비즈니스 로직에 자율형 AI를 안심하고 도입할 수 있는 거버넌스를 확립했습니다.</p>
+                </div>
+                <div class="lang lang-en" style="display:none;">
+                    <p>By transparently opening and controlling the previously black-box brain of the agent, we established governance that allows the organization to confidently introduce autonomous AI into real business logic.</p>
+                </div>
+
+                <div class="tip-box">
+                    <ul class="list-none space-y-4 text-lg p-0 m-0">
+                        <li class="lang lang-ko flex items-start">
+                            <span class="text-green-600 font-bold text-2xl mr-3 leading-none">✓</span>
+                            <div>
+                                <strong class="font-bold text-gray-900 block mb-1">장애 추적성 확보</strong>
+                                <span class="text-gray-700">에이전트가 어떤 단계에서 잘못된 추론을 했는지 직관적으로 파악할 수 있어, 프롬프트 튜닝과 디버깅 시간이 획기적으로 줄어들었습니다.</span>
+                            </div>
+                        </li>
+                        <li class="lang lang-ko flex items-start">
+                            <span class="text-green-600 font-bold text-2xl mr-3 leading-none">✓</span>
+                            <div>
+                                <strong class="font-bold text-gray-900 block mb-1">엔드투엔드 처리 성공률 극대화</strong>
+                                <span class="text-gray-700">1회성 오류로 시스템이 다운되는 대신 에이전트가 스스로 실수를 보정(Self-Correction)하므로, 사용자에게 올바른 최종 결과값이 도달하는 확률을 비약적으로 높였습니다.</span>
+                            </div>
+                        </li>
+                        
+                        <li class="lang lang-en flex items-start" style="display:none;">
+                            <span class="text-green-600 font-bold text-2xl mr-3 leading-none">✓</span>
+                            <div>
+                                <strong class="font-bold text-gray-900 block mb-1">Secured Fault Traceability</strong>
+                                <span class="text-gray-700">By intuitively identifying at which step the agent made incorrect inferences, the time required for prompt tuning and debugging was drastically reduced.</span>
+                            </div>
+                        </li>
+                        <li class="lang lang-en flex items-start" style="display:none;">
+                            <span class="text-green-600 font-bold text-2xl mr-3 leading-none">✓</span>
+                            <div>
+                                <strong class="font-bold text-gray-900 block mb-1">Maximized End-to-End Success Rate</strong>
+                                <span class="text-gray-700">Instead of the system crashing on a single error, the agent self-corrects its mistakes, vastly increasing the probability of delivering correct final outcomes to users.</span>
+                            </div>
+                        </li>
+                    </ul>
+                </div>
+            </section>
+
+        </article>
+    </div>
+
+    <script type="module">
+        import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.esm.min.mjs';
+        mermaid.initialize({ startOnLoad: true, theme: 'neutral' });
+    </script>
+
+    <script>
+        const titles = { ko: 'Self-Correcting AI Agent 체계', en: 'Self-Correcting AI Agent System' };
+        function switchLang(lang) {
+            document.documentElement.lang = lang;
+            document.documentElement.className = lang;
+            localStorage.setItem('language', lang);
+            document.title = titles[lang];
+            document.querySelectorAll('.lang').forEach(el => {
+                if (el.classList.contains(`lang-${lang}`)) { el.style.display = ''; } else { el.style.display = 'none'; }
+            });
+            document.querySelectorAll('.lang-btn').forEach(btn => { btn.classList.remove('active'); });
+            const activeBtn = document.getElementById(`btn-${lang}`);
+            if (activeBtn) activeBtn.classList.add('active');
+        }
+        document.addEventListener('DOMContentLoaded', () => {
+            const urlParams = new URLSearchParams(window.location.search);
+            const langFromUrl = urlParams.get('lang');
+            const langFromStorage = localStorage.getItem('language');
+            const browserLang = (navigator.language || navigator.userLanguage).startsWith('en') ? 'en' : 'ko';
+            switchLang(langFromUrl || langFromStorage || browserLang);
+        });
+    </script>
+</body>
+</html>

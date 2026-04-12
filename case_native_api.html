@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" href="https://avatars.githubusercontent.com/u/35217573?v=4" type="image/x-icon">
+    <title>Native Multimodal 음성 챗봇 전략</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700&family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Noto Sans KR', sans-serif; -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; }
+        .en body { font-family: 'Roboto', sans-serif; }
+        .prose h1, .prose h2, .prose h3, .prose strong { color: #1f2937; }
+        .prose p, .prose li, .prose th, .prose td { color: #4b5563; }
+        .quote-block { border-left: 4px solid #93c5fd; padding-left: 1rem; font-style: italic; color: #374151; }
+        .tip-box { background-color: #eff6ff; border: 1px solid #dbeafe; border-radius: 0.5rem; padding: 1.5rem; margin-top: 2rem; margin-bottom: 2rem; }
+        .lang-ko .lang-en, .lang-en .lang-ko { display: none; }
+        .lang-btn { transition: all 0.2s ease-in-out; border-radius: 9999px; padding: 0.25rem 0.75rem; font-size: 0.875rem; }
+        .lang-btn.active { font-weight: 600; background-color: #2dd4bf; color: #0f172a; }
+        .lang-btn:not(.active) { color: #94a3b8; background-color: transparent; }
+        .mermaid { display: flex; justify-content: center; background-color: #f8fafc; padding: 2rem; border-radius: 0.5rem; border: 1px solid #e2e8f0; margin-top: 2rem; margin-bottom: 2rem; }
+    </style>
+</head>
+<body class="bg-slate-50">
+    <div class="container mx-auto max-w-4xl px-4 py-12 sm:py-20">
+        <div class="flex justify-between items-center mb-4">
+            <a href="index_latest.html#cases" class="text-sm font-medium text-slate-500 hover:text-slate-800 transition">&larr; <span class="lang lang-ko">목록으로 돌아가기</span><span class="lang lang-en" style="display:none;">Back to list</span></a>
+            <div class="flex items-center bg-gray-800 rounded-full p-1">
+                <button id="btn-ko" class="lang-btn" onclick="switchLang('ko')">KOR</button>
+                <button id="btn-en" class="lang-btn" onclick="switchLang('en')">ENG</button>
+            </div>
+        </div>
+
+        <article class="bg-white rounded-lg shadow-lg p-8 sm:p-12 prose lg:prose-lg max-w-none">
+            <header class="mb-8 text-center">
+                <h1 class="lang lang-ko text-4xl font-bold tracking-tight text-gray-900 sm:text-5xl">Native Multimodal 음성 챗봇 전략</h1>
+                <h1 class="lang lang-en text-4xl font-bold tracking-tight text-gray-900 sm:text-5xl" style="display:none;">Native Multimodal Voice Chatbot Strategy</h1>
+                <p class="mt-4 text-gray-500 font-medium">Customer Problem Solving Case 7</p>
+            </header>
+
+            <div class="quote-block my-12">
+                <h2 class="lang lang-ko text-2xl font-semibold mb-4">“STT 단계를 제거해 음성 처리 지연과 비용 구조를 다시 설계하다”</h2>
+                <h2 class="lang lang-en text-2xl font-semibold mb-4" style="display:none;">“Removing the STT stage to redesign latency and cost in voice processing”</h2>
+                <p class="lang lang-ko text-lg leading-relaxed">기존 음성 챗봇은 STT, 텍스트 처리, TTS를 거치면서 지연과 비용이 누적되었습니다. 이 사례는 <strong>STT 없이 오디오를 직접 입력받는 Native API 구조</strong>와, 최신 대형 모델 대신 <strong>2.5 Flash + Context Caching</strong> 조합으로 최적화한 전략 브리프입니다.</p>
+                <p class="lang lang-en text-lg leading-relaxed" style="display:none;">Traditional voice chatbots accumulated latency and cost by chaining STT, text processing, and TTS. This case brief focuses on a <strong>Native API structure that accepts audio directly without STT</strong>, optimized through a <strong>2.5 Flash + context caching</strong> strategy instead of relying on the newest heavy model.</p>
+            </div>
+
+            <section class="mt-12">
+                <h2 class="lang lang-ko text-3xl font-bold mb-6 border-b pb-2"><span class="text-blue-600 mr-2">1.</span> Need: 도입 배경</h2>
+                <h2 class="lang lang-en text-3xl font-bold mb-6 border-b pb-2" style="display:none;"><span class="text-blue-600 mr-2">1.</span> Need: Background</h2>
+                <div class="lang lang-ko"><p>대규모 음성 트래픽 환경에서는 음성 처리 단계가 길어질수록 대기 시간과 인프라 비용이 빠르게 증가했습니다.</p></div>
+                <div class="lang lang-en" style="display:none;"><p>In large-scale voice traffic environments, every extra stage in the speech pipeline increased both waiting time and infrastructure cost.</p></div>
+            </section>
+
+            <section class="mt-12">
+                <h2 class="lang lang-ko text-3xl font-bold mb-6 border-b pb-2"><span class="text-blue-600 mr-2">2.</span> Problem Definition: 문제 정의</h2>
+                <h2 class="lang lang-en text-3xl font-bold mb-6 border-b pb-2" style="display:none;"><span class="text-blue-600 mr-2">2.</span> Problem Definition: Problem Statement</h2>
+                <div class="lang lang-ko"><p>STT 기반 구조는 지연을 유발할 뿐 아니라, 트래픽이 커질수록 API 비용과 처리 단계가 함께 늘어나는 구조적 한계가 있었습니다.</p><p>최신 모델을 곧바로 도입하면 성능은 높을 수 있지만 운영비와 예산 예측 가능성 측면에서 부담이 컸습니다.</p></div>
+                <div class="lang lang-en" style="display:none;"><p>STT-based architectures introduced latency and a structural increase in API cost and processing stages as traffic grew.</p><p>Using the newest frontier model directly might improve performance, but it also created significant pressure on operating cost and budget predictability.</p></div>
+            </section>
+
+            <section class="mt-12">
+                <h2 class="lang lang-ko text-3xl font-bold mb-6 border-b pb-2"><span class="text-blue-600 mr-2">3.</span> Key View: 접근 방식</h2>
+                <h2 class="lang lang-en text-3xl font-bold mb-6 border-b pb-2" style="display:none;"><span class="text-blue-600 mr-2">3.</span> Key View: Approach</h2>
+                <div class="lang lang-ko"><p>핵심은 음성을 텍스트로 꼭 바꿔야 한다는 전제를 버리고, <strong>오디오를 직접 다루는 Native API 구조</strong>로 전환하는 것이었습니다.</p><p>여기에 2.5 Flash와 Context Caching을 결합하면, 성능과 비용의 균형을 현실적인 수준으로 맞출 수 있다고 판단했습니다.</p></div>
+                <div class="lang lang-en" style="display:none;"><p>The key was to abandon the assumption that audio must first be converted into text and instead move to a <strong>Native API structure that handles audio directly</strong>.</p><p>Combining that with 2.5 Flash and context caching offered a more realistic balance between performance and cost.</p></div>
+            </section>
+
+            <section class="mt-12">
+                <h2 class="lang lang-ko text-3xl font-bold mb-6 border-b pb-2"><span class="text-blue-600 mr-2">4.</span> Design / Framing: 아키텍처 설계</h2>
+                <h2 class="lang lang-en text-3xl font-bold mb-6 border-b pb-2" style="display:none;"><span class="text-blue-600 mr-2">4.</span> Design / Framing: Architecture Design</h2>
+                <div class="lang lang-ko"><p>사용자 오디오는 중간 STT 계층 없이 Native Multimodal API로 직접 전달되고, 세션 맥락은 <strong>Context Caching</strong>으로 유지하도록 설계했습니다.</p><p>모델 선택은 최신 프리뷰보다, 가성비가 검증된 2.5 Flash를 주력으로 배치해 대규모 트래픽 시뮬레이션에 대비하는 방향으로 정리했습니다.</p></div>
+                <div class="lang lang-en" style="display:none;"><p>User audio is sent directly into a Native Multimodal API without an intermediate STT layer, while session context is maintained through <strong>context caching</strong>.</p><p>Instead of centering the newest preview model, the design chose the more cost-proven 2.5 Flash as the main serving model for large-scale traffic scenarios.</p></div>
+
+                <div class="mermaid">
+graph TD
+    User([Audio Input]) --> Native[Native Multimodal API];
+    Native --> Cache[Context Cache];
+    Cache --> Model[Gemini 2.5 Flash];
+    Model --> Voice[Voice Response];
+    Voice --> Resp([Direct Audio Conversation]);
+
+    style User fill:#f8fafc,stroke:#94a3b8
+    style Native fill:#eff6ff,stroke:#3b82f6
+    style Cache fill:#fefce8,stroke:#eab308
+    style Model fill:#fefce8,stroke:#eab308
+    style Voice fill:#ecfeff,stroke:#06b6d4
+    style Resp fill:#ecfdf5,stroke:#10b981
+                </div>
+            </section>
+
+            <section class="mt-12">
+                <h2 class="lang lang-ko text-3xl font-bold mb-6 border-b pb-2"><span class="text-blue-600 mr-2">5.</span> Impact: 적용 결과</h2>
+                <h2 class="lang lang-en text-3xl font-bold mb-6 border-b pb-2" style="display:none;"><span class="text-blue-600 mr-2">5.</span> Impact: Results</h2>
+                <div class="tip-box">
+                    <ul class="list-none space-y-4 text-lg p-0 m-0">
+                        <li class="lang lang-ko flex items-start"><span class="text-green-600 font-bold text-2xl mr-3 leading-none">✓</span><div><strong class="font-bold text-gray-900 block mb-1">처리 단계 단순화</strong><span class="text-gray-700">STT 단계를 제거해 음성 파이프라인 구조를 줄였습니다.</span></div></li>
+                        <li class="lang lang-ko flex items-start"><span class="text-green-600 font-bold text-2xl mr-3 leading-none">✓</span><div><strong class="font-bold text-gray-900 block mb-1">지연 및 인프라 부담 완화</strong><span class="text-gray-700">음성 처리 단계가 줄어들면서 지연과 인프라 부담이 함께 낮아졌습니다.</span></div></li>
+                        <li class="lang lang-ko flex items-start"><span class="text-green-600 font-bold text-2xl mr-3 leading-none">✓</span><div><strong class="font-bold text-gray-900 block mb-1">비용 시뮬레이션 기준 최적화</strong><span class="text-gray-700">대규모 트래픽 시뮬레이션 기준 연간 인프라 예산을 약 85% 절감하는 전략적 가능성을 확인했습니다.</span></div></li>
+                        <li class="lang lang-en flex items-start" style="display:none;"><span class="text-green-600 font-bold text-2xl mr-3 leading-none">✓</span><div><strong class="font-bold text-gray-900 block mb-1">Simpler processing chain</strong><span class="text-gray-700">Removing the STT stage reduced the number of voice-processing layers.</span></div></li>
+                        <li class="lang lang-en flex items-start" style="display:none;"><span class="text-green-600 font-bold text-2xl mr-3 leading-none">✓</span><div><strong class="font-bold text-gray-900 block mb-1">Lower latency and infrastructure burden</strong><span class="text-gray-700">Fewer processing steps reduced both latency and infrastructure load.</span></div></li>
+                        <li class="lang lang-en flex items-start" style="display:none;"><span class="text-green-600 font-bold text-2xl mr-3 leading-none">✓</span><div><strong class="font-bold text-gray-900 block mb-1">Optimization validated in simulation</strong><span class="text-gray-700">Annual infrastructure budget could be reduced by roughly 85% under large-scale traffic simulation conditions.</span></div></li>
+                    </ul>
+                </div>
+            </section>
+        </article>
+    </div>
+
+    <script type="module">
+        import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.esm.min.mjs';
+        mermaid.initialize({ startOnLoad: true, theme: 'neutral' });
+    </script>
+    <script>
+        const titles = { ko: 'Native Multimodal 음성 챗봇 전략', en: 'Native Multimodal Voice Chatbot Strategy' };
+        function switchLang(lang) {
+            document.documentElement.lang = lang;
+            document.documentElement.className = lang;
+            localStorage.setItem('language', lang);
+            document.title = titles[lang];
+            document.querySelectorAll('.lang').forEach(el => { el.style.display = el.classList.contains(`lang-${lang}`) ? '' : 'none'; });
+            document.querySelectorAll('.lang-btn').forEach(btn => btn.classList.remove('active'));
+            const activeBtn = document.getElementById(`btn-${lang}`);
+            if (activeBtn) activeBtn.classList.add('active');
+        }
+        document.addEventListener('DOMContentLoaded', () => {
+            const urlParams = new URLSearchParams(window.location.search);
+            const langFromUrl = urlParams.get('lang');
+            const langFromStorage = localStorage.getItem('language');
+            const browserLang = (navigator.language || navigator.userLanguage).startsWith('en') ? 'en' : 'ko';
+            switchLang(langFromUrl || langFromStorage || browserLang);
+        });
+    </script>
+</body>
+</html>

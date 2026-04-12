@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" href="https://avatars.githubusercontent.com/u/35217573?v=4" type="image/x-icon">
+    <title>엔터프라이즈 RAG 챗봇 아키텍처</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700&family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Noto Sans KR', sans-serif; -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; }
+        .en body { font-family: 'Roboto', sans-serif; }
+        .prose h1, .prose h2, .prose h3, .prose strong { color: #1f2937; }
+        .prose p, .prose li, .prose th, .prose td { color: #4b5563; }
+        .quote-block { border-left: 4px solid #93c5fd; padding-left: 1rem; font-style: italic; color: #374151; }
+        .tip-box { background-color: #eff6ff; border: 1px solid #dbeafe; border-radius: 0.5rem; padding: 1.5rem; margin-top: 2rem; margin-bottom: 2rem; }
+        .lang-ko .lang-en, .lang-en .lang-ko { display: none; }
+        .lang-btn { transition: all 0.2s ease-in-out; border-radius: 9999px; padding: 0.25rem 0.75rem; font-size: 0.875rem; }
+        .lang-btn.active { font-weight: 600; background-color: #2dd4bf; color: #0f172a; }
+        .lang-btn:not(.active) { color: #94a3b8; background-color: transparent; }
+        .mermaid { display: flex; justify-content: center; background-color: #f8fafc; padding: 2rem; border-radius: 0.5rem; border: 1px solid #e2e8f0; margin-top: 2rem; margin-bottom: 2rem; }
+    </style>
+</head>
+<body class="bg-slate-50">
+    <div class="container mx-auto max-w-4xl px-4 py-12 sm:py-20">
+        <div class="flex justify-between items-center mb-4">
+            <a href="index_latest.html#cases" class="text-sm font-medium text-slate-500 hover:text-slate-800 transition">
+                &larr; <span class="lang lang-ko">목록으로 돌아가기</span><span class="lang lang-en" style="display:none;">Back to list</span>
+            </a>
+            <div class="flex items-center bg-gray-800 rounded-full p-1">
+                <button id="btn-ko" class="lang-btn" onclick="switchLang('ko')">KOR</button>
+                <button id="btn-en" class="lang-btn" onclick="switchLang('en')">ENG</button>
+            </div>
+        </div>
+
+        <article class="bg-white rounded-lg shadow-lg p-8 sm:p-12 prose lg:prose-lg max-w-none">
+            <header class="mb-8 text-center">
+                <h1 class="lang lang-ko text-4xl font-bold tracking-tight text-gray-900 sm:text-5xl">엔터프라이즈 RAG 챗봇 아키텍처</h1>
+                <h1 class="lang lang-en text-4xl font-bold tracking-tight text-gray-900 sm:text-5xl" style="display:none;">Enterprise RAG Chatbot Architecture</h1>
+                <p class="mt-4 text-gray-500 font-medium">Customer Problem Solving Case 3</p>
+            </header>
+
+            <div class="quote-block my-12">
+                <h2 class="lang lang-ko text-2xl font-semibold mb-4">“환각을 줄이고, 근거 문서 중심의 답변을 운영 가능한 수준으로 만들다”</h2>
+                <h2 class="lang lang-en text-2xl font-semibold mb-4" style="display:none;">“Reducing hallucinations and operationalizing grounded answers”</h2>
+                <p class="lang lang-ko text-lg leading-relaxed">범용 생성형 AI만으로는 교육용 또는 사내용 콘텐츠에서 사실 기반 응답을 안정적으로 보장하기 어려웠습니다. 이 사례는 기업 고유 지식을 인덱싱하고, 검색된 문서를 기반으로만 답하도록 설계한 <strong>운영형 엔터프라이즈 RAG 아키텍처</strong>입니다.</p>
+                <p class="lang lang-en text-lg leading-relaxed" style="display:none;">General-purpose generative AI alone could not reliably guarantee fact-based answers for internal or educational content. This case describes an <strong>operational enterprise RAG architecture</strong> that indexes proprietary knowledge and constrains answers to retrieved evidence.</p>
+            </div>
+
+            <section class="mt-12">
+                <h2 class="lang lang-ko text-3xl font-bold mb-6 border-b pb-2"><span class="text-blue-600 mr-2">1.</span> Need: 도입 배경</h2>
+                <h2 class="lang lang-en text-3xl font-bold mb-6 border-b pb-2" style="display:none;"><span class="text-blue-600 mr-2">1.</span> Need: Background</h2>
+                <div class="lang lang-ko">
+                    <p>기업 내 교육 자료와 업무 지식은 정확성이 중요한데, 기존 범용 모델은 사실 확인 없이 그럴듯한 문장을 생성하는 한계가 있었습니다.</p>
+                    <p>따라서 근거 문서를 우선 검색하고, 그 범위 안에서만 답변을 생성하는 구조가 필요했습니다.</p>
+                </div>
+                <div class="lang lang-en" style="display:none;">
+                    <p>Internal training materials and work knowledge demand factual reliability, but general-purpose models often generated plausible answers without evidence.</p>
+                    <p>A structure was needed that retrieves grounding documents first and generates answers only within that evidence boundary.</p>
+                </div>
+            </section>
+
+            <section class="mt-12">
+                <h2 class="lang lang-ko text-3xl font-bold mb-6 border-b pb-2"><span class="text-blue-600 mr-2">2.</span> Problem Definition: 문제 정의</h2>
+                <h2 class="lang lang-en text-3xl font-bold mb-6 border-b pb-2" style="display:none;"><span class="text-blue-600 mr-2">2.</span> Problem Definition: Problem Statement</h2>
+                <div class="lang lang-ko">
+                    <p>문제는 단순히 문서를 검색하는 것이 아니라, 기업 고유 지식을 안전하게 인덱싱하고 검색 정확도와 응답 속도를 함께 만족시키는 것이었습니다.</p>
+                    <p>검색 품질이 낮으면 환각이 늘고, 반대로 모든 처리를 무겁게 하면 운영 비용과 지연이 증가하는 딜레마가 있었습니다.</p>
+                </div>
+                <div class="lang lang-en" style="display:none;">
+                    <p>The challenge was not just retrieving documents, but indexing proprietary knowledge safely while balancing retrieval quality and response speed.</p>
+                    <p>Weak retrieval increases hallucinations, while making every step heavy raises cost and latency.</p>
+                </div>
+            </section>
+
+            <section class="mt-12">
+                <h2 class="lang lang-ko text-3xl font-bold mb-6 border-b pb-2"><span class="text-blue-600 mr-2">3.</span> Key View: 접근 방식</h2>
+                <h2 class="lang lang-en text-3xl font-bold mb-6 border-b pb-2" style="display:none;"><span class="text-blue-600 mr-2">3.</span> Key View: Approach</h2>
+                <div class="lang lang-ko">
+                    <p>핵심은 모델을 더 키우는 것이 아니라, <strong>Retrieval 단계를 강화해 정확한 근거 문서를 먼저 확보</strong>하는 것이었습니다.</p>
+                    <p>그 위에 완전 관리형 서버리스 런타임을 결합해, 보안성과 운영 편의성을 함께 유지하는 방향이 적절하다고 판단했습니다.</p>
+                </div>
+                <div class="lang lang-en" style="display:none;">
+                    <p>The key was not simply using a bigger model, but <strong>strengthening retrieval so that accurate grounding documents are secured first</strong>.</p>
+                    <p>We paired that with a fully managed serverless runtime to preserve both security and operational simplicity.</p>
+                </div>
+            </section>
+
+            <section class="mt-12">
+                <h2 class="lang lang-ko text-3xl font-bold mb-6 border-b pb-2"><span class="text-blue-600 mr-2">4.</span> Design / Framing: 아키텍처 설계</h2>
+                <h2 class="lang lang-en text-3xl font-bold mb-6 border-b pb-2" style="display:none;"><span class="text-blue-600 mr-2">4.</span> Design / Framing: Architecture Design</h2>
+                <div class="lang lang-ko">
+                    <p>문서 인덱싱과 검색은 관리형 클라우드 스택 위에 두고, 질의 처리와 생성은 <strong>Cloud Run 중심의 서버리스 엔진</strong>으로 구성했습니다.</p>
+                    <p>문서 스토리지와 메타데이터를 분리하고, 검색 결과를 프롬프트에 주입하는 구조로 환각을 통제하면서도 운영 복잡도를 낮췄습니다.</p>
+                </div>
+                <div class="lang lang-en" style="display:none;">
+                    <p>Document indexing and retrieval were placed on a managed cloud stack, while query orchestration and generation ran on a <strong>Cloud Run-centered serverless engine</strong>.</p>
+                    <p>By separating storage from metadata and injecting retrieved evidence into prompts, the design reduced hallucinations without increasing operational complexity too much.</p>
+                </div>
+
+                <div class="mermaid">
+graph TD
+    User([Employee / Learner]) --> FE[Web UI];
+    FE --> API[Cloud Run RAG Engine];
+    API --> SQL[(Cloud SQL Metadata)];
+    API --> RET[Retriever];
+    RET --> STORE[(Document Store)];
+    RET --> IDX[(Search Index)];
+    RET --> API;
+    API --> LLM[Answer Generator];
+    LLM --> Resp([Grounded Response]);
+
+    style User fill:#f8fafc,stroke:#94a3b8
+    style FE fill:#eff6ff,stroke:#3b82f6
+    style API fill:#eff6ff,stroke:#3b82f6
+    style SQL fill:#f1f5f9,stroke:#64748b
+    style RET fill:#fefce8,stroke:#eab308
+    style STORE fill:#f1f5f9,stroke:#64748b
+    style IDX fill:#f1f5f9,stroke:#64748b
+    style LLM fill:#fefce8,stroke:#eab308
+    style Resp fill:#ecfdf5,stroke:#10b981
+                </div>
+            </section>
+
+            <section class="mt-12">
+                <h2 class="lang lang-ko text-3xl font-bold mb-6 border-b pb-2"><span class="text-blue-600 mr-2">5.</span> Impact: 적용 결과</h2>
+                <h2 class="lang lang-en text-3xl font-bold mb-6 border-b pb-2" style="display:none;"><span class="text-blue-600 mr-2">5.</span> Impact: Results</h2>
+                <div class="tip-box">
+                    <ul class="list-none space-y-4 text-lg p-0 m-0">
+                        <li class="lang lang-ko flex items-start"><span class="text-green-600 font-bold text-2xl mr-3 leading-none">✓</span><div><strong class="font-bold text-gray-900 block mb-1">팩트 기반 응답 안정화</strong><span class="text-gray-700">근거 문서를 우선 검색하는 구조를 통해 교육·업무 지식 응답의 신뢰도를 높였습니다.</span></div></li>
+                        <li class="lang lang-ko flex items-start"><span class="text-green-600 font-bold text-2xl mr-3 leading-none">✓</span><div><strong class="font-bold text-gray-900 block mb-1">응답 속도 개선</strong><span class="text-gray-700">운영 관찰치 기준 레이턴시는 20초대 중반에서 10초 이내, 평균 약 8초 수준으로 단축되었습니다.</span></div></li>
+                        <li class="lang lang-ko flex items-start"><span class="text-green-600 font-bold text-2xl mr-3 leading-none">✓</span><div><strong class="font-bold text-gray-900 block mb-1">관리형 운영 체계 확보</strong><span class="text-gray-700">검색, 생성, 메타데이터 관리를 서버리스와 관리형 구성으로 묶어 운영 부담을 줄였습니다.</span></div></li>
+
+                        <li class="lang lang-en flex items-start" style="display:none;"><span class="text-green-600 font-bold text-2xl mr-3 leading-none">✓</span><div><strong class="font-bold text-gray-900 block mb-1">More reliable grounded answers</strong><span class="text-gray-700">Prioritizing retrieval of evidence documents improved trust in educational and operational responses.</span></div></li>
+                        <li class="lang lang-en flex items-start" style="display:none;"><span class="text-green-600 font-bold text-2xl mr-3 leading-none">✓</span><div><strong class="font-bold text-gray-900 block mb-1">Lower latency</strong><span class="text-gray-700">Observed latency dropped from the mid-20-second range to under 10 seconds, averaging around 8 seconds.</span></div></li>
+                        <li class="lang lang-en flex items-start" style="display:none;"><span class="text-green-600 font-bold text-2xl mr-3 leading-none">✓</span><div><strong class="font-bold text-gray-900 block mb-1">Managed operating model</strong><span class="text-gray-700">Search, generation, and metadata management were consolidated into a managed serverless pattern.</span></div></li>
+                    </ul>
+                </div>
+            </section>
+        </article>
+    </div>
+
+    <script type="module">
+        import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.esm.min.mjs';
+        mermaid.initialize({ startOnLoad: true, theme: 'neutral' });
+    </script>
+    <script>
+        const titles = { ko: '엔터프라이즈 RAG 챗봇 아키텍처', en: 'Enterprise RAG Chatbot Architecture' };
+        function switchLang(lang) {
+            document.documentElement.lang = lang;
+            document.documentElement.className = lang;
+            localStorage.setItem('language', lang);
+            document.title = titles[lang];
+            document.querySelectorAll('.lang').forEach(el => { el.style.display = el.classList.contains(`lang-${lang}`) ? '' : 'none'; });
+            document.querySelectorAll('.lang-btn').forEach(btn => btn.classList.remove('active'));
+            const activeBtn = document.getElementById(`btn-${lang}`);
+            if (activeBtn) activeBtn.classList.add('active');
+        }
+        document.addEventListener('DOMContentLoaded', () => {
+            const urlParams = new URLSearchParams(window.location.search);
+            const langFromUrl = urlParams.get('lang');
+            const langFromStorage = localStorage.getItem('language');
+            const browserLang = (navigator.language || navigator.userLanguage).startsWith('en') ? 'en' : 'ko';
+            switchLang(langFromUrl || langFromStorage || browserLang);
+        });
+    </script>
+</body>
+</html>
