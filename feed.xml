@@ -7,26 +7,25 @@
   <link rel="alternate" type="text/html" href="https://jae-choi.github.io/news/"/>
 
   <!-- 전체 피드 갱신 시각 (UTC) -->
-  <updated>2025-10-18T12:00:00Z</updated>
+  <updated>2026-04-12T12:00:00Z</updated>
   <id>https://jae-choi.github.io/news/</id>
 
   <entry>
-    <title>삼각함수 관계 시각화 도구</title>
+    <title>의도 분석 기반 RAG 아키텍처</title>
 
     <link rel="alternate" type="text/html"
-          href="https://jae-choi.github.io/news/Trigonometry.html"/>
+          href="https://jae-choi.github.io/news/case_rag.html"/>
 
-    <id>https://jae-choi.github.io/news/Trigonometry.html</id>
+    <id>https://jae-choi.github.io/news/case_rag.html</id>
     <!-- 글 갱신 시각 (UTC) -->
-    <updated>2025-10-18T12:00:00Z</updated>
+    <updated>2026-04-12T12:00:00Z</updated>
 
     <!-- 요약: HTML 이스케이프 유지 -->
     <summary type="html">
-      &lt;p&gt;슬라이더로 각도 α를 조절하며 cos(α), sin(α), cos(α+90°)=-sin(α)를 직관적으로 확인하고,
-      회전 행렬로 덧셈공식 cos(θ+α)=cosθcosα−sinθsinα를 단계적으로 유도하는 인터랙티브 도구.&lt;/p&gt;
+      &lt;p&gt;단순 키워드 기반 RAG 시스템의 한계를 극복하기 위해, 가벼운 의도 분류기(Intent Classifier)를 앞단에 두어 사용자의 복합 질의를 처리하는 엔터프라이즈 환경의 하이브리드(Lexical + Semantic) 검색 라우팅 아키텍처 최적화 사례입니다.&lt;/p&gt;
     </summary>
 
     <!-- 선택: 간단 설명(플레인 텍스트) -->
-    <description>슬라이더로 각도 α를 조절하며 cos(α), sin(α), cos(α+90°)=-sin(α)를 시각화하고, 회전 행렬로 덧셈공식을 유도하는 인터랙티브 도구.</description>
+    <description>단순 RAG를 넘어, 의도를 식별하고 적합한 에이전트로 라우팅하여 응답 속도와 검색 품질의 균형을 맞춘 하이브리드 RAG 아키텍처 설계 사례.</description>
   </entry>
 </feed>
