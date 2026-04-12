@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" href="https://avatars.githubusercontent.com/u/35217573?v=4" type="image/x-icon">
+    <title>대규모 데이터 분석 NL2SQL 아키텍처</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700&family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Noto Sans KR', sans-serif;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+        .en body {
+            font-family: 'Roboto', sans-serif;
+        }
+        .prose h1, .prose h2, .prose h3, .prose strong {
+            color: #1f2937;
+        }
+        .prose p, .prose li, .prose th, .prose td {
+            color: #4b5563;
+        }
+        .quote-block {
+            border-left: 4px solid #93c5fd;
+            padding-left: 1rem;
+            font-style: italic;
+            color: #374151;
+        }
+        .tip-box {
+            background-color: #eff6ff;
+            border: 1px solid #dbeafe;
+            border-radius: 0.5rem;
+            padding: 1.5rem;
+            margin-top: 2rem;
+            margin-bottom: 2rem;
+        }
+        .lang-ko .lang-en,
+        .lang-en .lang-ko {
+            display: none;
+        }
+        .lang-btn {
+            transition: all 0.2s ease-in-out;
+            border-radius: 9999px;
+            padding: 0.25rem 0.75rem;
+            font-size: 0.875rem;
+        }
+        .lang-btn.active {
+            font-weight: 600;
+            background-color: #2dd4bf;
+            color: #0f172a;
+        }
+        .lang-btn:not(.active) {
+            color: #94a3b8;
+            background-color: transparent;
+        }
+        .mermaid {
+            display: flex;
+            justify-content: center;
+            background-color: #f8fafc;
+            padding: 2rem;
+            border-radius: 0.5rem;
+            border: 1px solid #e2e8f0;
+            margin-top: 2rem;
+            margin-bottom: 2rem;
+        }
+    </style>
+</head>
+<body class="bg-slate-50">
+    <div class="container mx-auto max-w-4xl px-4 py-12 sm:py-20">
+
+        <div class="flex justify-between items-center mb-4">
+            <a href="index.html#cases" class="text-sm font-medium text-slate-500 hover:text-slate-800 transition">
+                &larr; <span class="lang lang-ko">목록으로 돌아가기</span><span class="lang lang-en" style="display:none;">Back to list</span>
+            </a>
+            <div class="flex items-center bg-gray-800 rounded-full p-1">
+                <button id="btn-ko" class="lang-btn" onclick="switchLang('ko')">KOR</button>
+                <button id="btn-en" class="lang-btn" onclick="switchLang('en')">ENG</button>
+            </div>
+        </div>
+
+        <article class="bg-white rounded-lg shadow-lg p-8 sm:p-12 prose lg:prose-lg max-w-none">
+
+            <header class="mb-8 text-center">
+                <h1 class="lang lang-ko text-4xl font-bold tracking-tight text-gray-900 sm:text-5xl">대규모 데이터 분석 NL2SQL 아키텍처</h1>
+                <h1 class="lang lang-en text-4xl font-bold tracking-tight text-gray-900 sm:text-5xl" style="display:none;">NL2SQL Architecture for Large-Scale Data Analysis</h1>
+                <p class="mt-4 text-gray-500 font-medium">Customer Problem Solving Case 2</p>
+            </header>
+
+            <div class="quote-block my-12">
+                <h2 class="lang lang-ko text-2xl font-semibold mb-4">“자연어 질문을, 운영 가능한 SQL 추론 엔진으로 연결하다”</h2>
+                <h2 class="lang lang-en text-2xl font-semibold mb-4" style="display:none;">“Connecting natural-language questions to an operable SQL inference engine”</h2>
+                <p class="lang lang-ko text-lg leading-relaxed">
+                    비개발 부서가 대규모 데이터를 활용하려면 늘 SQL 작성 지원이 필요했습니다. 이 사례는 자연어 질문을 SQL과 시각화 결과로 연결하되, 단순 생성이 아니라 <strong>자가 수정(Self-Correction)과 동적 패턴 캐싱(Dynamic Pattern Caching)을 결합한 운영형 NL2SQL 구조</strong>로 분석 병목을 줄인 설계 브리프입니다.
+                </p>
+                <p class="lang lang-en text-lg leading-relaxed" style="display:none;">
+                    Non-technical teams often needed analyst support whenever they wanted to use large-scale data. This case brief shows how natural-language questions were connected to SQL and visualization outputs through an <strong>operational NL2SQL architecture combining self-correction and dynamic pattern caching</strong>, rather than relying on one-shot generation alone.
+                </p>
+            </div>
+
+            <section class="mt-12">
+                <h2 class="lang lang-ko text-3xl font-bold mb-6 border-b pb-2"><span class="text-blue-600 mr-2">1.</span> Need: 도입 배경</h2>
+                <h2 class="lang lang-en text-3xl font-bold mb-6 border-b pb-2" style="display:none;"><span class="text-blue-600 mr-2">1.</span> Need: Background</h2>
+                <div class="lang lang-ko">
+                    <p>기업 내 데이터 활용 요구가 고도화되면서, 단순 대시보드 조회를 넘어 현업 부서가 직접 질문을 던지고 즉시 답을 얻을 수 있는 구조가 필요해졌습니다.</p>
+                    <p>하지만 대규모 데이터 환경에서는 여전히 SQL 작성 역량이 진입 장벽으로 작동했고, 기획, 마케팅, 운영 부서의 질문은 데이터 분석가를 거쳐야만 처리되는 병목으로 남아 있었습니다.</p>
+                </div>
+                <div class="lang lang-en" style="display:none;">
+                    <p>As enterprise demand for data access grew more sophisticated, teams needed a structure that allowed business users to ask questions directly and get immediate answers beyond static dashboard lookup.</p>
+                    <p>However, in large-scale data environments, SQL expertise still acted as a barrier, and planning, marketing, and operations teams had to rely on analysts, creating a persistent bottleneck.</p>
+                </div>
+            </section>
+
+            <section class="mt-12">
+                <h2 class="lang lang-ko text-3xl font-bold mb-6 border-b pb-2"><span class="text-blue-600 mr-2">2.</span> Problem Definition: 문제 정의</h2>
+                <h2 class="lang lang-en text-3xl font-bold mb-6 border-b pb-2" style="display:none;"><span class="text-blue-600 mr-2">2.</span> Problem Definition: Problem Statement</h2>
+                <div class="lang lang-ko">
+                    <p>단순 NL2SQL 파이프라인만으로는 사용자의 자연어 질의를 안정적으로 실행 가능한 SQL로 변환하는 데 한계가 있었습니다.</p>
+                    <p>기업 고유의 스키마를 잘못 해석해 실행되지 않는 쿼리(Syntax Error)를 만들거나, 반복되는 유사 질의에도 매번 LLM을 다시 호출해 지연과 토큰 비용이 누적되는 문제가 발생했습니다.</p>
+                </div>
+                <div class="lang lang-en" style="display:none;">
+                    <p>A naive NL2SQL pipeline was not sufficient to convert natural-language questions into consistently executable SQL.</p>
+                    <p>It frequently misread enterprise-specific schemas, produced invalid queries, and repeatedly called the LLM even for recurring queries, increasing latency and token cost.</p>
+                </div>
+            </section>
+
+            <section class="mt-12">
+                <h2 class="lang lang-ko text-3xl font-bold mb-6 border-b pb-2"><span class="text-blue-600 mr-2">3.</span> Key View: 접근 방식</h2>
+                <h2 class="lang lang-en text-3xl font-bold mb-6 border-b pb-2" style="display:none;"><span class="text-blue-600 mr-2">3.</span> Key View: Approach</h2>
+                <div class="lang lang-ko">
+                    <p>핵심은 자연어를 한 번에 SQL로 번역하는 것이 아니라, <strong>실행 가능한 쿼리로 수렴시키는 추론 체계</strong>를 운영 관점에서 설계하는 것이라고 판단했습니다.</p>
+                    <p>이를 위해 생성 이후 검증과 재작성 단계를 두는 <strong>자가 수정(Self-Correction) 루프</strong>와, 자주 반복되는 질의를 빠르게 흡수하는 <strong>동적 패턴 캐싱(Dynamic Pattern Caching)</strong>을 결합하는 것이 효과적이라고 보았습니다.</p>
+                </div>
+                <div class="lang lang-en" style="display:none;">
+                    <p>The key was not translating natural language into SQL in one shot, but designing an operational inference system that converges on <strong>an executable query</strong>.</p>
+                    <p>To achieve this, we combined a <strong>self-correction loop</strong> that validates and rewrites generated SQL with <strong>dynamic pattern caching</strong> that absorbs recurring query patterns efficiently.</p>
+                </div>
+            </section>
+
+            <section class="mt-12">
+                <h2 class="lang lang-ko text-3xl font-bold mb-6 border-b pb-2"><span class="text-blue-600 mr-2">4.</span> Design / Framing: 아키텍처 설계</h2>
+                <h2 class="lang lang-en text-3xl font-bold mb-6 border-b pb-2" style="display:none;"><span class="text-blue-600 mr-2">4.</span> Design / Framing: Architecture Design</h2>
+                <div class="lang lang-ko">
+                    <p>모든 질의를 무거운 거대 모델에 그대로 위임하는 대신, 자연어 질의를 SQL로 생성한 뒤 <strong>Validator 계층에서 구문 오류를 감지하고 LLM으로 다시 되돌리는 Self-Correction 구조</strong>를 두었습니다.</p>
+                    <p>또한 문장을 통째로 저장하는 단순 캐시 대신, <strong>기간, 필터, 조회 범위 같은 SQL 변수 패턴을 추출해 저장하는 동적 패턴 캐싱 계층</strong>을 별도로 두어 성능과 응답 속도를 최적화했습니다. 쿼리 실행 대상은 BigQuery에 두고, 결과는 시각화 처리 후 캐시에 재적재하는 방식으로 반복 질의 대응력을 높였습니다.</p>
+                </div>
+                <div class="lang lang-en" style="display:none;">
+                    <p>Instead of delegating every query directly to a heavy model, we generated SQL first and placed a <strong>validator layer that detects syntax issues and routes failures back into the LLM through a self-correction loop</strong>.</p>
+                    <p>We also introduced a <strong>dynamic pattern caching layer</strong> that stores reusable SQL variable patterns such as time ranges, filters, and scopes instead of caching entire sentences. Queries were executed against BigQuery, then visualization-ready results were stored back into the cache to improve repeated-query responsiveness.</p>
+                </div>
+
+                <div class="mermaid">
+graph TD
+    User([Business User]) --> FE[Frontend App];
+    FE --> API[Backend Orchestrator];
+
+    API --> Cache{Pattern Cache <br/> Variable-aware Cache Layer};
+    Cache -->|Hit| Viz[Visualization Processor];
+    Viz --> Result([Chart + Answer]);
+
+    Cache -->|Miss| Engine[Gemini NL2SQL Engine];
+    Engine --> Validator{SQL Validator};
+    Validator -->|Syntax Error| Engine;
+    Validator -->|Valid SQL| BQ[(BigQuery)];
+    BQ --> Viz;
+    Viz --> Store[Store Result & Pattern];
+    Store --> Cache;
+
+    style User fill:#f8fafc,stroke:#94a3b8
+    style FE fill:#eff6ff,stroke:#3b82f6
+    style API fill:#eff6ff,stroke:#3b82f6
+    style Cache fill:#fefce8,stroke:#eab308
+    style Engine fill:#fefce8,stroke:#eab308
+    style Validator fill:#fee2e2,stroke:#ef4444
+    style BQ fill:#f1f5f9,stroke:#64748b
+    style Viz fill:#ecfeff,stroke:#06b6d4
+    style Store fill:#ecfdf5,stroke:#10b981
+    style Result fill:#ecfdf5,stroke:#10b981
+                </div>
+            </section>
+
+            <section class="mt-12">
+                <h2 class="lang lang-ko text-3xl font-bold mb-6 border-b pb-2"><span class="text-blue-600 mr-2">5.</span> Impact: 적용 결과</h2>
+                <h2 class="lang lang-en text-3xl font-bold mb-6 border-b pb-2" style="display:none;"><span class="text-blue-600 mr-2">5.</span> Impact: Results</h2>
+                <div class="lang lang-ko">
+                    <p>반복되는 유사 질의에 대해 불필요한 LLM 호출을 줄이고, 실행 오류를 시스템 내부에서 흡수하면서 전반적인 응답 품질과 운영 안정성을 높였습니다.</p>
+                </div>
+                <div class="lang lang-en" style="display:none;">
+                    <p>By reducing unnecessary LLM calls for recurring queries and absorbing execution failures inside the system, we improved both response quality and operational stability.</p>
+                </div>
+
+                <div class="tip-box">
+                    <ul class="list-none space-y-4 text-lg p-0 m-0">
+                        <li class="lang lang-ko flex items-start">
+                            <span class="text-green-600 font-bold text-2xl mr-3 leading-none">✓</span>
+                            <div>
+                                <strong class="font-bold text-gray-900 block mb-1">분석 병목 완화</strong>
+                                <span class="text-gray-700">비개발 부서가 자연어로 질문하고 답을 얻는 구조를 마련해 데이터 분석 요청 집중도를 낮췄습니다.</span>
+                            </div>
+                        </li>
+                        <li class="lang lang-ko flex items-start">
+                            <span class="text-green-600 font-bold text-2xl mr-3 leading-none">✓</span>
+                            <div>
+                                <strong class="font-bold text-gray-900 block mb-1">응답 속도와 비용 구조 개선</strong>
+                                <span class="text-gray-700">응답 속도를 평균 8초 이하로 단축하고, 반복 호출 감소를 통해 운영 비용의 예측 가능성을 높였습니다.</span>
+                            </div>
+                        </li>
+                        <li class="lang lang-ko flex items-start">
+                            <span class="text-green-600 font-bold text-2xl mr-3 leading-none">✓</span>
+                            <div>
+                                <strong class="font-bold text-gray-900 block mb-1">SQL 변환 성공률 향상</strong>
+                                <span class="text-gray-700">자가 수정 루프를 통해 자연어 질의의 상당수를 실행 가능한 SQL로 전환해 오답과 재시도를 줄였습니다.</span>
+                            </div>
+                        </li>
+
+                        <li class="lang lang-en flex items-start" style="display:none;">
+                            <span class="text-green-600 font-bold text-2xl mr-3 leading-none">✓</span>
+                            <div>
+                                <strong class="font-bold text-gray-900 block mb-1">Reduced analysis bottlenecks</strong>
+                                <span class="text-gray-700">Enabled business teams to ask questions in natural language, reducing concentration of requests on analysts.</span>
+                            </div>
+                        </li>
+                        <li class="lang lang-en flex items-start" style="display:none;">
+                            <span class="text-green-600 font-bold text-2xl mr-3 leading-none">✓</span>
+                            <div>
+                                <strong class="font-bold text-gray-900 block mb-1">Improved response speed and cost structure</strong>
+                                <span class="text-gray-700">Reduced average response time to under 8 seconds and improved predictability of operating costs by decreasing repeated model calls.</span>
+                            </div>
+                        </li>
+                        <li class="lang lang-en flex items-start" style="display:none;">
+                            <span class="text-green-600 font-bold text-2xl mr-3 leading-none">✓</span>
+                            <div>
+                                <strong class="font-bold text-gray-900 block mb-1">Higher SQL conversion reliability</strong>
+                                <span class="text-gray-700">The self-correction loop converted a substantial portion of natural-language requests into executable SQL, reducing retries and incorrect outputs.</span>
+                            </div>
+                        </li>
+                    </ul>
+                </div>
+
+                <p class="lang lang-ko text-sm text-slate-500 leading-relaxed mt-8">
+                    이 문서는 공개용으로 재구성된 사례 브리프입니다. 고객 식별 정보, 내부 운영 데이터, 정확한 처리량 및 성과 수치는 제외하거나 범주화했습니다.
+                </p>
+                <p class="lang lang-en text-sm text-slate-500 leading-relaxed mt-8" style="display:none;">
+                    This document is a reconstructed public-facing case brief. Client-identifying details, internal operating data, and exact throughput or performance figures have been removed or generalized.
+                </p>
+            </section>
+
+        </article>
+    </div>
+
+    <script type="module">
+        import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.esm.min.mjs';
+        mermaid.initialize({ startOnLoad: true, theme: 'neutral' });
+    </script>
+
+    <script>
+        const titles = {
+            ko: '대규모 데이터 분석 NL2SQL 아키텍처',
+            en: 'NL2SQL Architecture for Large-Scale Data Analysis'
+        };
+
+        function switchLang(lang) {
+            document.documentElement.lang = lang;
+            document.documentElement.className = lang;
+            localStorage.setItem('language', lang);
+            document.title = titles[lang];
+
+            document.querySelectorAll('.lang').forEach(el => {
+                if (el.classList.contains(`lang-${lang}`)) {
+                    el.style.display = '';
+                } else {
+                    el.style.display = 'none';
+                }
+            });
+
+            document.querySelectorAll('.lang-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            const activeBtn = document.getElementById(`btn-${lang}`);
+            if (activeBtn) activeBtn.classList.add('active');
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const urlParams = new URLSearchParams(window.location.search);
+            const langFromUrl = urlParams.get('lang');
+            const langFromStorage = localStorage.getItem('language');
+            const browserLang = (navigator.language || navigator.userLanguage).startsWith('en') ? 'en' : 'ko';
+
+            const initialLang = langFromUrl || langFromStorage || browserLang;
+            switchLang(initialLang);
+        });
+    </script>
+</body>
+</html>
