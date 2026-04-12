@@ -114,6 +114,34 @@
             opacity: 1;
             transform: translateY(0);
         }
+
+        .collapsible-panel {
+            max-height: 0;
+            opacity: 0;
+            overflow: hidden;
+            transform: translateY(-8px);
+            transition: max-height 0.35s ease, opacity 0.25s ease, transform 0.35s ease, margin-top 0.35s ease;
+            margin-top: 0;
+        }
+
+        .collapsible-panel.open {
+            max-height: 32rem;
+            opacity: 1;
+            transform: translateY(0);
+            margin-top: 1rem;
+        }
+
+        .collapse-chevron {
+            transition: transform 0.2s ease;
+        }
+
+        .collapse-chevron.open {
+            transform: rotate(180deg);
+        }
+
+        .text-balance {
+            text-wrap: balance;
+        }
         
         /* SVG animation */
         .svg-pulse {
@@ -703,21 +731,237 @@
                         <span class="lang lang-ko">고객 문제 해결 사례</span>
                         <span class="lang lang-en">Customer Problem Solving Cases</span>
                     </h2>
+                    <div class="max-w-5xl mx-auto mb-10 text-center">
+                        <p class="text-secondary text-base md:text-lg leading-relaxed text-balance max-w-4xl mx-auto">
+                            <span class="lang lang-ko">이 섹션은 개별 기술 데모보다, 실제 업무 문제를 어떤 기준으로 정의하고<br />어떤 운영 원칙으로 풀어내는지를 보여주기 위한 공개용 브리프입니다.</span>
+                            <span class="lang lang-en">This section is a public-facing brief focused less on isolated demos and more on how real operational problems are defined, governed, and solved.</span>
+                        </p>
+                    </div>
+                    <div class="mb-12 rounded-3xl border border-slate-700 bg-gradient-to-br from-slate-800 via-slate-800 to-slate-900 p-8 md:p-10 shadow-2xl">
+                        <div class="grid gap-8 lg:grid-cols-[1.2fr_0.8fr] lg:items-start">
+                            <div>
+                                <div class="inline-flex items-center px-4 py-1.5 mb-5 text-xs font-semibold tracking-[0.22em] uppercase text-teal-300 bg-teal-400/10 border border-teal-400/20 rounded-full">
+                                    <span class="lang lang-ko">핵심 메시지</span>
+                                    <span class="lang lang-en">Featured Message</span>
+                                </div>
+                                <h3 class="font-serif text-3xl md:text-4xl font-bold text-slate-50 mb-4">
+                                    <span class="lang lang-ko">속도에서 통제와 조율로</span>
+                                    <span class="lang lang-en">From Speed to Control and Orchestration</span>
+                                </h3>
+                                <p class="text-slate-300 text-base md:text-lg leading-relaxed mb-4">
+                                    <span class="lang lang-ko">AI 도입의 경쟁력은 더 많이 시도하는 것만으로 생기지 않습니다. 이제 중요한 것은 비용·속도·리스크를 함께 통제하면서, 반복 운영 가능한 기준과 워크플로우를 세우는 일입니다.</span>
+                                    <span class="lang lang-en">Competitive advantage in AI no longer comes from trying more things faster. What matters now is establishing repeatable operating standards and workflows while controlling cost, latency, and risk together.</span>
+                                </p>
+                                <p class="text-slate-400 leading-relaxed mb-6">
+                                    <span class="lang lang-ko">아래 사례들은 단순한 기능 구현이 아니라, 거버넌스와 오케스트레이션을 통해 실제 조직 안에서 운영 가능한 구조를 설계한 작업들입니다.</span>
+                                    <span class="lang lang-en">The cases below are not just feature implementations. They are design briefs for systems made operable inside real organizations through governance and orchestration.</span>
+                                </p>
+                                <div class="flex flex-wrap gap-2 mb-6">
+                                    <span class="tag">Governance</span>
+                                    <span class="tag">Orchestration</span>
+                                    <span class="tag">Enterprise Outcome</span>
+                                </div>
+                                <div class="rounded-2xl border border-slate-700 bg-slate-900/70 px-5 py-4">
+                                    <p class="text-sm text-slate-400 leading-relaxed">
+                                        <span class="lang lang-ko">공개용으로 재구성된 메시지입니다. 고객 식별 정보, 내부 운영 데이터, 정확한 성과 수치는 제외하거나 범주화했습니다.</span>
+                                        <span class="lang lang-en">This message has been reconstructed for public viewing. Client-identifying details, internal operating data, and exact performance metrics have been removed or generalized.</span>
+                                    </p>
+                                </div>
+                            </div>
+                            <div class="grid gap-4">
+                                <div class="rounded-2xl border border-slate-700 bg-slate-900/50 p-5">
+                                    <h4 class="text-base font-bold text-slate-100 mb-2">
+                                        <span class="lang lang-ko">Governance</span>
+                                        <span class="lang lang-en">Governance</span>
+                                    </h4>
+                                    <p class="text-sm text-slate-400 leading-relaxed">
+                                        <span class="lang lang-ko">근거, 정책, 품질 기준 없이 빠르게 만드는 것만으로는 운영 안정성을 확보할 수 없습니다.</span>
+                                        <span class="lang lang-en">Speed alone does not create operational stability without evidence, policy, and quality standards.</span>
+                                    </p>
+                                    <button
+                                        type="button"
+                                        id="governance-toggle"
+                                        aria-expanded="false"
+                                        aria-controls="governance-details"
+                                        class="mt-4 inline-flex items-center gap-2 text-sm font-semibold text-teal-300 hover:text-teal-200 transition-colors"
+                                    >
+                                        <span class="lang lang-ko">통제의 3가지 보기</span>
+                                        <span class="lang lang-en">View 3 Control Layers</span>
+                                        <svg class="collapse-chevron w-4 h-4" id="governance-toggle-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                                        </svg>
+                                    </button>
+                                    <div id="governance-details" class="collapsible-panel">
+                                        <div class="grid gap-3">
+                                            <div class="rounded-2xl border border-slate-700 bg-slate-950/60 p-4">
+                                                <h5 class="text-sm font-bold text-slate-100 mb-1">
+                                                    <span class="lang lang-ko">데이터 정합성의 통제</span>
+                                                    <span class="lang lang-en">Control of Data Integrity</span>
+                                                </h5>
+                                                <p class="text-xs font-semibold uppercase tracking-[0.18em] text-teal-300 mb-2">ACID &amp; Iceberg (BigLake)</p>
+                                                <p class="text-sm text-slate-400 leading-relaxed">
+                                                    <span class="lang lang-ko">데이터 레이크의 무질서를 통제하고, 깨짐과 중복을 막아 신뢰 가능한 기반 데이터를 확보합니다.</span>
+                                                    <span class="lang lang-en">Control data lake disorder and prevent corruption or duplication to secure a reliable base for AI systems.</span>
+                                                </p>
+                                            </div>
+                                            <div class="rounded-2xl border border-slate-700 bg-slate-950/60 p-4">
+                                                <h5 class="text-sm font-bold text-slate-100 mb-1">
+                                                    <span class="lang lang-ko">시점의 통제</span>
+                                                    <span class="lang lang-en">Control of Time Context</span>
+                                                </h5>
+                                                <p class="text-xs font-semibold uppercase tracking-[0.18em] text-teal-300 mb-2">Time-travel &amp; Feature Store</p>
+                                                <p class="text-sm text-slate-400 leading-relaxed">
+                                                    <span class="lang lang-ko">과거 특정 시점을 복원해 데이터 누수를 방지하고, 입력과 예측 결과를 재현 가능하게 관리합니다.</span>
+                                                    <span class="lang lang-en">Restore past states to prevent leakage and make model inputs and predictions reproducible over time.</span>
+                                                </p>
+                                            </div>
+                                            <div class="rounded-2xl border border-slate-700 bg-slate-950/60 p-4">
+                                                <h5 class="text-sm font-bold text-slate-100 mb-1">
+                                                    <span class="lang lang-ko">품질의 통제</span>
+                                                    <span class="lang lang-en">Control of Quality</span>
+                                                </h5>
+                                                <p class="text-xs font-semibold uppercase tracking-[0.18em] text-teal-300 mb-2">RAGAS &amp; Dataplex</p>
+                                                <p class="text-sm text-slate-400 leading-relaxed">
+                                                    <span class="lang lang-ko">LLM 품질을 감이 아니라 지표로 측정하고, 품질 관리 체계 안에서 운영되도록 편입합니다.</span>
+                                                    <span class="lang lang-en">Measure LLM quality with metrics instead of intuition and bring it under an explicit quality governance framework.</span>
+                                                </p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="rounded-2xl border border-slate-700 bg-slate-900/50 p-5">
+                                    <h4 class="text-base font-bold text-slate-100 mb-2">
+                                        <span class="lang lang-ko">Orchestration</span>
+                                        <span class="lang lang-en">Orchestration</span>
+                                    </h4>
+                                    <p class="text-sm text-slate-400 leading-relaxed">
+                                        <span class="lang lang-ko">여러 모델과 도구를 업무 흐름에 맞게 조율해야 실제 생산성과 통제력이 함께 올라갑니다.</span>
+                                        <span class="lang lang-en">Real productivity comes from orchestrating models and tools around workflow, not from using them in isolation.</span>
+                                    </p>
+                                </div>
+                                <div class="rounded-2xl border border-slate-700 bg-slate-900/50 p-5">
+                                    <h4 class="text-base font-bold text-slate-100 mb-2">
+                                        <span class="lang lang-ko">Enterprise Outcome</span>
+                                        <span class="lang lang-en">Enterprise Outcome</span>
+                                    </h4>
+                                    <p class="text-sm text-slate-400 leading-relaxed">
+                                        <span class="lang lang-ko">결국 승패는 빠른 실험이 아니라, 반복 운영 가능한 기업 역량으로 내재화했는지에 달려 있습니다.</span>
+                                        <span class="lang lang-en">The outcome that matters is whether experimentation becomes a repeatable enterprise capability.</span>
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-                        <!-- Card 1: RAG Case -->
                         <a href="case_rag.html" class="project-item-link p-6">
                             <h3 class="font-serif text-2xl font-bold mb-3 text-primary">
                                 <span class="lang lang-ko">의도 분석 기반 RAG 아키텍처</span>
                                 <span class="lang lang-en">Intent-driven RAG Architecture</span>
                             </h3>
                             <p class="text-secondary mb-4">
-                                <span class="lang lang-ko">가벼운 의도 분류기를 앞단에 두어 복잡한 질의를 분기하고 응답 속도와 검색 품질의 균형을 맞춘 하이브리드 설계 사례.</span>
-                                <span class="lang lang-en">A hybrid design case that balances response speed and search quality by routing complex queries through a lightweight intent classifier.</span>
+                                <span class="lang lang-ko">가벼운 의도 분류기를 앞단에 두어 복합 질의를 분기하고 검색 품질과 응답 속도의 균형을 맞춘 사례입니다.</span>
+                                <span class="lang lang-en">A case that balances search quality and responsiveness by routing complex queries through a lightweight intent classifier.</span>
                             </p>
                             <div class="flex flex-wrap gap-2">
                                 <span class="tag">Intent Classification</span>
                                 <span class="tag">Hybrid Search</span>
                                 <span class="tag">RAG</span>
+                            </div>
+                        </a>
+
+                        <a href="case_nl2sql.html" class="project-item-link p-6">
+                            <h3 class="font-serif text-2xl font-bold mb-3 text-primary">
+                                <span class="lang lang-ko">대규모 데이터 분석 NL2SQL</span>
+                                <span class="lang lang-en">NL2SQL for Large-Scale Data Analysis</span>
+                            </h3>
+                            <p class="text-secondary mb-4">
+                                <span class="lang lang-ko">자가 수정 루프와 동적 패턴 캐싱을 결합해 자연어 질의를 운영 가능한 SQL 추론 엔진으로 바꾼 사례입니다.</span>
+                                <span class="lang lang-en">A case that turns natural-language queries into an operable SQL inference engine through self-correction and dynamic pattern caching.</span>
+                            </p>
+                            <div class="flex flex-wrap gap-2">
+                                <span class="tag">NL2SQL</span>
+                                <span class="tag">Self-Correction</span>
+                                <span class="tag">Caching</span>
+                            </div>
+                        </a>
+
+                        <a href="case_custom_voice.html" class="project-item-link p-6">
+                            <h3 class="font-serif text-2xl font-bold mb-3 text-primary">
+                                <span class="lang lang-ko">초저지연 커스텀 음성 복제</span>
+                                <span class="lang lang-en">Instant Custom Voice Cloning</span>
+                            </h3>
+                            <p class="text-secondary mb-4">
+                                <span class="lang lang-ko">오디오 입력 편차를 백엔드 전처리 미들웨어에서 흡수해 실패를 줄이고 응답 일관성을 높인 사례입니다.</span>
+                                <span class="lang lang-en">A case that absorbed audio variability in backend preprocessing middleware to reduce failures and improve response consistency.</span>
+                            </p>
+                            <div class="flex flex-wrap gap-2">
+                                <span class="tag">Audio Middleware</span>
+                                <span class="tag">Voice Cloning</span>
+                                <span class="tag">Reliability</span>
+                            </div>
+                        </a>
+
+                        <a href="case_nanobanana.html" class="project-item-link p-6">
+                            <h3 class="font-serif text-2xl font-bold mb-3 text-primary">
+                                <span class="lang lang-ko">단일 LLM 디자인 에셋 파이프라인</span>
+                                <span class="lang lang-en">Unified LLM Design Asset Pipeline</span>
+                            </h3>
+                            <p class="text-secondary mb-4">
+                                <span class="lang lang-ko">다중 비전 스택을 단일 VLM과 OpenCV 조합으로 단순화해 운영 복잡도와 인프라 의존성을 줄인 사례입니다.</span>
+                                <span class="lang lang-en">A case that simplified a multi-vision stack into a single VLM plus OpenCV to reduce operational complexity and infrastructure dependence.</span>
+                            </p>
+                            <div class="flex flex-wrap gap-2">
+                                <span class="tag">VLM</span>
+                                <span class="tag">OpenCV</span>
+                                <span class="tag">Computer Vision</span>
+                            </div>
+                        </a>
+
+                        <a href="case_brand_ai.html" class="project-item-link p-6">
+                            <h3 class="font-serif text-2xl font-bold mb-3 text-primary">
+                                <span class="lang lang-ko">AI 마케팅 콘텐츠 팩토리</span>
+                                <span class="lang lang-en">AI Marketing Content Factory</span>
+                            </h3>
+                            <p class="text-secondary mb-4">
+                                <span class="lang lang-ko">단일 소스 입력에서 다중 채널 에셋을 생성하되, Human-in-the-Loop로 품질 통제력을 확보한 사례입니다.</span>
+                                <span class="lang lang-en">A case that generates multi-channel assets from a single source while preserving quality control through Human-in-the-Loop.</span>
+                            </p>
+                            <div class="flex flex-wrap gap-2">
+                                <span class="tag">Multimodal</span>
+                                <span class="tag">OSMU</span>
+                                <span class="tag">HITL</span>
+                            </div>
+                        </a>
+
+                        <a href="case_native_api.html" class="project-item-link p-6">
+                            <h3 class="font-serif text-2xl font-bold mb-3 text-primary">
+                                <span class="lang lang-ko">Native Multimodal 음성 챗봇 전략</span>
+                                <span class="lang lang-en">Native Multimodal Voice Strategy</span>
+                            </h3>
+                            <p class="text-secondary mb-4">
+                                <span class="lang lang-ko">STT 단계를 제거하고 Native API와 Context Caching으로 지연과 비용 구조를 다시 설계한 전략 사례입니다.</span>
+                                <span class="lang lang-en">A strategic case that removed STT and redesigned latency and cost through Native API plus context caching.</span>
+                            </p>
+                            <div class="flex flex-wrap gap-2">
+                                <span class="tag">Native Audio</span>
+                                <span class="tag">Context Cache</span>
+                                <span class="tag">Cost Optimization</span>
+                            </div>
+                        </a>
+
+                        <a href="case_observe_llm.html" class="project-item-link p-6">
+                            <h3 class="font-serif text-2xl font-bold mb-3 text-primary">
+                                <span class="lang lang-ko">Self-Correcting AI Agent 체계</span>
+                                <span class="lang lang-en">Self-Correcting AI Agent System</span>
+                            </h3>
+                            <p class="text-secondary mb-4">
+                                <span class="lang lang-ko">관찰 가능성 미들웨어와 조건부 자가 수정 루프를 결합해 운영 통제력을 높인 사례입니다.</span>
+                                <span class="lang lang-en">A case that increased operational control by combining observability middleware with a conditional self-correction loop.</span>
+                            </p>
+                            <div class="flex flex-wrap gap-2">
+                                <span class="tag">Observability</span>
+                                <span class="tag">Conditional Edge</span>
+                                <span class="tag">Multi-Agent</span>
                             </div>
                         </a>
                     </div>
@@ -732,136 +976,102 @@
                         <!-- Card 1 -->
                         <a href="observe-llm.html" class="project-item-link p-6">
                             <h3 class="font-serif text-2xl font-bold mb-3 text-primary">
-                                <span class="lang lang-ko">운영 가능한 Self-Correcting AI Agent</span>
-                                <span class="lang lang-en">Production-Ready Self-Correcting AI Agent</span>
+                                <span class="lang lang-ko">AI Agent Observability Lab</span>
+                                <span class="lang lang-en">AI Agent Observability Lab</span>
                             </h3>
                             <p class="text-secondary mb-4">
-                                <span class="lang lang-ko">Langfuse를 활용하여 완전한 관찰 가능성을 확보한 AI 에이전트입니다.</span>
-                                <span class="lang lang-en">An AI agent with full observability using Langfuse.</span>
+                                <span class="lang lang-ko">Langfuse 추적과 조건부 재시도 흐름을 확인할 수 있도록 구성한 에이전트 프로토타입입니다.</span>
+                                <span class="lang lang-en">An agent prototype built to inspect Langfuse tracing and conditional retry flows in action.</span>
                             </p>
                             <div class="flex flex-wrap gap-2">
-                                <span class="tag">LangGraph</span>
-                                <span class="tag">Langfuse</span>
-                                <span class="tag">Docker</span>
+                                <span class="tag"><span class="lang lang-ko">관측성</span><span class="lang lang-en">Observability</span></span>
+                                <span class="tag"><span class="lang lang-ko">Langfuse</span><span class="lang lang-en">Langfuse</span></span>
+                                <span class="tag"><span class="lang lang-ko">프로토타입</span><span class="lang lang-en">Prototype</span></span>
                             </div>
                         </a>
                         
                         <!-- Card 2: Brand-AI -->
                         <a href="brand-AI.html" class="project-item-link p-6">
                             <h3 class="font-serif text-2xl font-bold mb-3 text-primary">
-                                <span class="lang lang-ko">AI 마케팅 콘텐츠 팩토리</span>
-                                <span class="lang lang-en">AI Marketing Content Factory</span>
+                                <span class="lang lang-ko">Brand Content Studio</span>
+                                <span class="lang lang-en">Brand Content Studio</span>
                             </h3>
                             <p class="text-secondary mb-4">
-                                <span class="lang lang-ko">멀티모달 입력을 받아 다양한 마케팅 콘텐츠(블로그, 인스타, 유튜브)를 생성합니다.</span>
-                                <span class="lang lang-en">Generates various marketing content (blogs, Instagram, YouTube) from multimodal input.</span>
+                                <span class="lang lang-ko">멀티모달 입력에서 블로그, SNS, 영상 초안을 생성하는 콘텐츠 제작 데모입니다.</span>
+                                <span class="lang lang-en">A content workflow demo that generates blog, social, and video drafts from multimodal input.</span>
                             </p>
                             <div class="flex flex-wrap gap-2">
-                                <span class="tag">Generative AI</span>
-                                <span class="tag">Multimodal</span>
-                                <span class="tag">Gemini</span>
-                            </div>
-                        </a>
-                        
-                        <!-- Card 3: RAG Enterprise -->
-                        <a href="RAG.html" class="project-item-link p-6">
-                            <h3 class="font-serif text-2xl font-bold mb-3 text-primary">
-                                <span class="lang lang-ko">엔터프라이즈 RAG 챗봇 구축 사례</span>
-                                <span class="lang lang-en">Enterprise RAG Chatbot Use Case</span>
-                            </h3>
-                            <p class="text-secondary mb-4">
-                                <span class="lang lang-ko">자체 지식 데이터베이스 기반으로 환각을 통제하는 클라우드 네이티브 맞춤형 챗봇 아키텍처입니다.</span>
-                                <span class="lang lang-en">A cloud-native customized chatbot architecture that controls hallucinations based on proprietary knowledge databases.</span>
-                            </p>
-                            <div class="flex flex-wrap gap-2">
-                                <span class="tag">RAG</span>
-                                <span class="tag">Cloud Run</span>
-                                <span class="tag">Enterprise</span>
-                            </div>
-                        </a>
-                        
-                        <!-- Card 4: Intent-Driven KMS -->
-                        <a href="intent.html" class="project-item-link p-6">
-                            <h3 class="font-serif text-2xl font-bold mb-3 text-primary">
-                                <span class="lang lang-ko">의도 분석 기반 사내 검색 (KMS)</span>
-                                <span class="lang lang-en">Intent-Driven Enterprise KMS Search</span>
-                            </h3>
-                            <p class="text-secondary mb-4">
-                                <span class="lang lang-ko">사용자 질의의 복합 의도를 파악하고 전문 에이전트를 라우팅하는 지능형 사내 검색 아키텍처입니다.</span>
-                                <span class="lang lang-en">An intelligent internal search architecture that identifies complex user intents and routes them to specialized agents.</span>
-                            </p>
-                            <div class="flex flex-wrap gap-2">
-                                <span class="tag">Multi-Agent</span>
-                                <span class="tag">Intent Routing</span>
-                                <span class="tag">Vertex Search</span>
+                                <span class="tag"><span class="lang lang-ko">작업 흐름 데모</span><span class="lang lang-en">Workflow Demo</span></span>
+                                <span class="tag"><span class="lang lang-ko">멀티모달</span><span class="lang lang-en">Multimodal</span></span>
+                                <span class="tag"><span class="lang lang-ko">콘텐츠 파이프라인</span><span class="lang lang-en">Content Pipeline</span></span>
                             </div>
                         </a>
 
-                        <!-- Card 5: NL2SQL Architecture -->
+                        <!-- Card 3: NL2SQL Copilot -->
                         <a href="NL2SQL.html" class="project-item-link p-6">
                             <h3 class="font-serif text-2xl font-bold mb-3 text-primary">
-                                <span class="lang lang-ko">대규모 데이터 분석을 위한 NL2SQL 아키텍처</span>
-                                <span class="lang lang-en">NL2SQL Architecture for Large-Scale Data Analysis</span>
+                                <span class="lang lang-ko">NL2SQL Analyst Copilot</span>
+                                <span class="lang lang-en">NL2SQL Analyst Copilot</span>
                             </h3>
                             <p class="text-secondary mb-4">
-                                <span class="lang lang-ko">자가 수정(Self-Correction) LLM과 인메모리 캐싱 시스템을 결합하여 자연어로 데이터를 분석하는 검증 아키텍처입니다.</span>
-                                <span class="lang lang-en">A validation architecture that analyzes data using natural language by combining a self-correcting LLM with an in-memory caching system.</span>
+                                <span class="lang lang-ko">자연어 질의를 SQL과 시각화 결과로 연결하는 데이터 분석 프로토타입입니다.</span>
+                                <span class="lang lang-en">A data-analysis prototype that connects natural-language queries to SQL and visualization outputs.</span>
                             </p>
                             <div class="flex flex-wrap gap-2">
-                                <span class="tag">NL2SQL</span>
-                                <span class="tag">Self-Correction</span>
-                                <span class="tag">Caching</span>
+                                <span class="tag"><span class="lang lang-ko">NL2SQL</span><span class="lang lang-en">NL2SQL</span></span>
+                                <span class="tag"><span class="lang lang-ko">데이터 데모</span><span class="lang lang-en">Data Demo</span></span>
+                                <span class="tag"><span class="lang lang-ko">시각화</span><span class="lang lang-en">Visualization</span></span>
                             </div>
                         </a>
 
-                        <!-- Card 6: Custom Voice POC -->
+                        <!-- Card 4: Custom Voice Demo -->
                         <a href="customVoice.html" class="project-item-link p-6">
                             <h3 class="font-serif text-2xl font-bold mb-3 text-primary">
-                                <span class="lang lang-ko">초저지연 커스텀 음성 복제</span>
-                                <span class="lang lang-en">Instant Voice Cloning</span>
+                                <span class="lang lang-ko">Custom Voice Cloning Demo</span>
+                                <span class="lang lang-en">Custom Voice Cloning Demo</span>
                             </h3>
                             <p class="text-secondary mb-4">
-                                <span class="lang lang-ko">Google Chirp 3 기반으로 사용자의 목소리를 즉석에서 복제하고 오디오 파이프라인을 자동화한 아키텍처입니다.</span>
-                                <span class="lang lang-en">An automated architecture that instantly clones a user's voice based on Google Chirp 3.</span>
+                                <span class="lang lang-ko">음성 업로드 전처리와 복제 결과를 하나의 흐름으로 연결한 맞춤 음성 프로토타입입니다.</span>
+                                <span class="lang lang-en">A custom voice prototype that connects upload preprocessing and cloning output in one flow.</span>
                             </p>
                             <div class="flex flex-wrap gap-2">
-                                <span class="tag">Voice Cloning</span>
-                                <span class="tag">Chirp 3</span>
-                                <span class="tag">Audio Processing</span>
+                                <span class="tag"><span class="lang lang-ko">음성 복제</span><span class="lang lang-en">Voice Cloning</span></span>
+                                <span class="tag"><span class="lang lang-ko">오디오 데모</span><span class="lang lang-en">Audio Demo</span></span>
+                                <span class="tag"><span class="lang lang-ko">프로토타입</span><span class="lang lang-en">Prototype</span></span>
                             </div>
                         </a>
 
-                        <!-- Card 7: Native Multimodal Chatbot -->
+                        <!-- Card 5: Native Audio Demo -->
                         <a href="NativeApi.html" class="project-item-link p-6">
                             <h3 class="font-serif text-2xl font-bold mb-3 text-primary">
-                                <span class="lang lang-ko">Native Multimodal 음성 챗봇 전략</span>
-                                <span class="lang lang-en">Native Multimodal Voice Chatbot Strategy</span>
+                                <span class="lang lang-ko">Realtime Native Audio Demo</span>
+                                <span class="lang lang-en">Realtime Native Audio Demo</span>
                             </h3>
                             <p class="text-secondary mb-4">
-                                <span class="lang lang-ko">Gemini 2.5 Flash 기반 오디오 다이렉트 처리 아키텍처 및 비용 최적화(시뮬레이션) 설계입니다.</span>
-                                <span class="lang lang-en">Gemini 2.5 Flash-based direct audio processing architecture and cost optimization (simulation) design.</span>
+                                <span class="lang lang-ko">오디오 직접 입력과 컨텍스트 캐싱 전략을 시뮬레이션한 음성 챗봇 설계 데모입니다.</span>
+                                <span class="lang lang-en">A voice-chatbot design demo simulating direct audio input and context-caching strategy.</span>
                             </p>
                             <div class="flex flex-wrap gap-2">
-                                <span class="tag">Native Audio</span>
-                                <span class="tag">Gemini 2.5 Flash</span>
-                                <span class="tag">Cost Optimization</span>
+                                <span class="tag"><span class="lang lang-ko">네이티브 오디오</span><span class="lang lang-en">Native Audio</span></span>
+                                <span class="tag"><span class="lang lang-ko">시뮬레이션</span><span class="lang lang-en">Simulation</span></span>
+                                <span class="tag"><span class="lang lang-ko">음성 경험</span><span class="lang lang-en">Voice UX</span></span>
                             </div>
                         </a>
 
-                        <!-- Card 8: Nano Banana (Unified Asset Pipeline) -->
+                        <!-- Card 6: Visual Asset Automation -->
                         <a href="Nanobanana.html" class="project-item-link p-6">
                             <h3 class="font-serif text-2xl font-bold mb-3 text-primary">
-                                <span class="lang lang-ko">단일 LLM 기반 디자인 에셋 생성</span>
-                                <span class="lang lang-en">Unified LLM Design Asset Generation</span>
+                                <span class="lang lang-ko">Visual Asset Automation Studio</span>
+                                <span class="lang lang-en">Visual Asset Automation Studio</span>
                             </h3>
                             <p class="text-secondary mb-4">
-                                <span class="lang lang-ko">다중 비전 모델을 걷어내고 Gemini 하나와 OpenCV만으로 객체 탐지부터 누끼, 확장까지 일괄 처리하는 파이프라인입니다.</span>
-                                <span class="lang lang-en">A pipeline replacing multiple vision models, handling everything from object detection to background removal using only Gemini and OpenCV.</span>
+                                <span class="lang lang-ko">단일 VLM과 OpenCV로 객체 추출과 배경 제거를 처리하는 디자인 에셋 실험입니다.</span>
+                                <span class="lang lang-en">A design-asset experiment that handles object extraction and background removal with a single VLM and OpenCV.</span>
                             </p>
                             <div class="flex flex-wrap gap-2">
-                                <span class="tag">Computer Vision</span>
-                                <span class="tag">Prompt Engineering</span>
-                                <span class="tag">OpenCV</span>
+                                <span class="tag"><span class="lang lang-ko">비전 데모</span><span class="lang lang-en">Vision Demo</span></span>
+                                <span class="tag"><span class="lang lang-ko">OpenCV</span><span class="lang lang-en">OpenCV</span></span>
+                                <span class="tag"><span class="lang lang-ko">에셋 파이프라인</span><span class="lang lang-en">Asset Pipeline</span></span>
                             </div>
                         </a>
 
@@ -939,6 +1149,9 @@
             const sidebarOverlay = document.getElementById('sidebar-overlay');
             const sidebarLinks = document.querySelectorAll('.sidebar-link');
             const sections = document.querySelectorAll('section');
+            const governanceToggle = document.getElementById('governance-toggle');
+            const governanceDetails = document.getElementById('governance-details');
+            const governanceToggleIcon = document.getElementById('governance-toggle-icon');
 
             // --- Mobile Menu Toggle ---
             const toggleMenu = (isOpen) => {
@@ -946,6 +1159,14 @@
                 sidebarOverlay.classList.toggle('hidden', !isOpen);
                 document.body.classList.toggle('overflow-hidden', isOpen);
             };
+
+            if (governanceToggle && governanceDetails && governanceToggleIcon) {
+                governanceToggle.addEventListener('click', () => {
+                    const isOpen = governanceDetails.classList.toggle('open');
+                    governanceToggle.setAttribute('aria-expanded', String(isOpen));
+                    governanceToggleIcon.classList.toggle('open', isOpen);
+                });
+            }
 
             mobileMenuButton.addEventListener('click', () => toggleMenu(true));
             closeMenuButton.addEventListener('click', () => toggleMenu(false));
