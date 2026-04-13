@@ -45,22 +45,22 @@
             </header>
 
             <div class="quote-block my-12">
-                <h2 class="lang lang-ko text-2xl font-semibold mb-4">“동적 패턴 캐싱과 자가 수정이 결합된 강건한 쿼리 엔진”</h2>
-                <h2 class="lang lang-en text-2xl font-semibold mb-4" style="display:none;">“Robust Query Engine with Dynamic Pattern Caching and Self-Correction”</h2>
-                <p class="lang lang-ko text-lg leading-relaxed">비개발자 현업 부서가 거대한 BigQuery 데이터를 자연어로 직접 조회하려 할 때 발생하는 LLM 추론 지연과 문법 오류(Syntax Error)를 어떻게 시스템 구조로 흡수하여 안정적으로 런타임에 서비스할 수 있는지 다룬 설계 사례입니다.</p>
-                <p class="lang lang-en text-lg leading-relaxed" style="display:none;">This design case covers how to absorb LLM inference latency and syntax errors into the system structure to provide stable runtime services when non-developer departments try to directly query massive BigQuery data using natural language.</p>
+                <h2 class="lang lang-ko text-2xl font-semibold mb-4">“동적 패턴 캐싱과 자가 수정 루프를 적용한 안정적인 쿼리 엔진”</h2>
+                <h2 class="lang lang-en text-2xl font-semibold mb-4" style="display:none;">“Stable Query Engine applying Dynamic Pattern Caching and Self-Correction Loop”</h2>
+                <p class="lang lang-ko text-lg leading-relaxed">현업 부서에서 BigQuery 데이터를 자연어로 조회할 때 발생하는 LLM 추론 지연과 문법 오류(Syntax Error)를 개선하여, 안정적인 런타임 서비스를 제공하기 위한 아키텍처 설계 사례입니다.</p>
+                <p class="lang lang-en text-lg leading-relaxed" style="display:none;">This design case presents a system architecture that mitigates LLM inference latency and syntax errors, providing stable runtime services for natural language queries to BigQuery.</p>
             </div>
 
             <section class="mt-12">
                 <h2 class="lang lang-ko text-3xl font-bold mb-6 border-b pb-2"><span class="text-blue-600 mr-2">1.</span> Need: 도입 배경</h2>
                 <h2 class="lang lang-en text-3xl font-bold mb-6 border-b pb-2" style="display:none;"><span class="text-blue-600 mr-2">1.</span> Need: Background</h2>
                 <div class="lang lang-ko">
-                    <p>기획, 마케팅 부서가 수억 건의 결제/로그 데이터를 바탕으로 의사결정을 내리기 위해서는 데이터 분석가의 SQL 작성을 기다려야만 하는 병목이 있었습니다.</p>
-                    <p>현업에서 일상적인 자연어 질문만 던지면 즉시 SQL로 변환하여 데이터를 시각화해주는 자연어-데이터 인터페이스(NL2SQL) 도입이 시급했습니다.</p>
+                    <p>기획 및 마케팅 부서에서 대용량 데이터를 기반으로 의사결정을 내릴 때, SQL 작성 및 데이터 추출에 시간이 소요되는 병목 현상이 있었습니다.</p>
+                    <p>현업의 자연어 질의를 SQL로 변환하여 데이터를 조회하고 시각화할 수 있는 NL2SQL(Natural Language to SQL) 솔루션 도입이 필요했습니다.</p>
                 </div>
                 <div class="lang lang-en" style="display:none;">
-                    <p>There was a bottleneck where planning and marketing departments had to wait for data analysts to write SQL queries to make decisions based on hundreds of millions of payment/log data records.</p>
-                    <p>It was urgent to introduce a Natural Language-to-Data interface (NL2SQL) that would immediately convert everyday natural language questions from the field into SQL and visualize the data.</p>
+                    <p>There was a bottleneck where planning and marketing departments had to wait for SQL creation and data extraction to make decisions based on large-scale data.</p>
+                    <p>It was necessary to introduce an NL2SQL (Natural Language to SQL) solution that could convert natural language queries into SQL to retrieve and visualize data.</p>
                 </div>
             </section>
 
@@ -68,12 +68,12 @@
                 <h2 class="lang lang-ko text-3xl font-bold mb-6 border-b pb-2"><span class="text-blue-600 mr-2">2.</span> Problem Definition: 문제 정의</h2>
                 <h2 class="lang lang-en text-3xl font-bold mb-6 border-b pb-2" style="display:none;"><span class="text-blue-600 mr-2">2.</span> Problem Definition: Problem Statement</h2>
                 <div class="lang lang-ko">
-                    <p>LLM에게 단순히 "이 질문을 SQL로 바꿔줘"라고 요청하면, 기업 고유의 복잡한 스키마를 잘못 해석하여 실행 불가능한 쿼리(Syntax Error)를 반환하는 빈도가 매우 높았습니다.</p>
-                    <p>또한 매번 무거운 LLM 추론 API를 호출하느라 응답이 지연되고 비용이 낭비되는 문제가 있었습니다.</p>
+                    <p>단순 프롬프트만으로 LLM에 SQL 변환을 요청할 경우, 복잡한 데이터베이스 스키마를 잘못 해석하여 실행 불가능한 쿼리(Syntax Error)가 자주 발생했습니다.</p>
+                    <p>또한, 모든 질의에 대해 LLM API를 호출하게 되면 응답 지연 및 비용 증가의 원인이 되었습니다.</p>
                 </div>
                 <div class="lang lang-en" style="display:none;">
-                    <p>When simply asking the LLM to "convert this question to SQL," the frequency of it misinterpreting the enterprise's complex, proprietary schemas and returning unexecutable queries (Syntax Errors) was very high.</p>
-                    <p>Additionally, calling heavy LLM inference APIs every time caused response delays and wasted costs.</p>
+                    <p>When requesting SQL conversion from an LLM using simple prompts, it frequently misinterpreted complex database schemas, leading to unexecutable queries (Syntax Errors).</p>
+                    <p>Furthermore, invoking the LLM API for every query resulted in response delays and increased costs.</p>
                 </div>
             </section>
 
@@ -81,12 +81,12 @@
                 <h2 class="lang lang-ko text-3xl font-bold mb-6 border-b pb-2"><span class="text-blue-600 mr-2">3.</span> Key View: 접근 방식</h2>
                 <h2 class="lang lang-en text-3xl font-bold mb-6 border-b pb-2" style="display:none;"><span class="text-blue-600 mr-2">3.</span> Key View: Approach</h2>
                 <div class="lang lang-ko">
-                    <p>LLM의 1-Pass 생성을 100% 신뢰하지 않고, 생성된 SQL이 데이터베이스에서 에러를 뱉으면 <strong>그 에러 메시지를 LLM에게 다시 먹여 스스로 수정하게 하는 자가 수정(Self-Correction) 루프</strong>를 에이전트에 탑재했습니다.</p>
-                    <p>더불어, LLM API 의존도를 낮추기 위해 이전에 성공한 SQL 변환 패턴을 인메모리에 저장해두고, 새로운 질의가 기존 의도와 유사하면 <strong>LLM 없이 변수만 치환하여 반환하는 동적 패턴 매칭(Dynamic Pattern Caching)</strong> 계층을 앞단에 배치했습니다.</p>
+                    <p>생성된 SQL 실행 시 에러가 발생하면, <strong>해당 에러 메시지를 기반으로 LLM이 쿼리를 자체 수정하는 자가 수정(Self-Correction) 루프</strong>를 구현했습니다.</p>
+                    <p>또한, LLM API 호출을 최적화하기 위해 성공적인 SQL 변환 패턴을 캐싱하고, 유사한 질의에 대해서는 <strong>LLM을 거치지 않고 변수만 치환하여 처리하는 동적 패턴 매칭(Dynamic Pattern Caching)</strong> 방식을 적용했습니다.</p>
                 </div>
                 <div class="lang lang-en" style="display:none;">
-                    <p>Instead of trusting the LLM's 1-Pass generation 100%, we equipped the agent with a <strong>Self-Correction loop that feeds any database execution errors back into the LLM to fix itself.</strong></p>
-                    <p>Furthermore, to reduce reliance on the LLM API, we stored previously successful SQL conversion patterns in-memory. If a new query is similar to an existing intent, we placed a <strong>Dynamic Pattern Caching layer at the front that swaps only variables and returns the SQL without hitting the LLM.</strong></p>
+                    <p>We implemented a <strong>Self-Correction loop where the LLM automatically revises the query based on error messages</strong> if the generated SQL fails to execute.</p>
+                    <p>Additionally, to optimize LLM API calls, we applied a <strong>Dynamic Pattern Caching layer that caches successful SQL patterns and substitutes variables without invoking the LLM</strong> for similar queries.</p>
                 </div>
             </section>
 
@@ -94,46 +94,46 @@
                 <h2 class="lang lang-ko text-3xl font-bold mb-6 border-b pb-2"><span class="text-blue-600 mr-2">4.</span> Design / Framing: 아키텍처 설계</h2>
                 <h2 class="lang lang-en text-3xl font-bold mb-6 border-b pb-2" style="display:none;"><span class="text-blue-600 mr-2">4.</span> Design / Framing: Architecture Design</h2>
                 <div class="lang lang-ko">
-                    <p>Cloud Run에 배포된 FastAPI 봇이 사용자 요청을 수신합니다. 먼저 Redis(K-Means 유사도 군집 캐시)를 조회하여 패턴이 맞으면 즉시 반환하고, 캐시 미스 시에만 Gemini LLM에 요청합니다.</p>
-                    <p>Gemini가 만든 쿼리가 BigQuery에서 실행 실패하면, Validator 노드가 실패 원인을 Gemini로 다시 보내 쿼리를 재작성(Correction)시킵니다. 이 다단계 오케스트레이션을 통해 런타임의 치명적 중단을 막았습니다.</p>
+                    <p>FastAPI 서버가 사용자 요청을 수신하면, 먼저 Redis 기반의 유사도 캐시를 조회하여 일치하는 패턴이 있을 경우 즉시 응답하고, 없을 경우에만 LLM에 쿼리 생성을 요청합니다.</p>
+                    <p>LLM이 생성한 쿼리가 BigQuery에서 실행 실패하면, Validator가 실패 원인을 분석하여 LLM에게 쿼리 재작성을 요청합니다. 이러한 구조를 통해 서비스의 실행 안정성을 확보했습니다.</p>
                 </div>
                 <div class="lang lang-en" style="display:none;">
-                    <p>A FastAPI bot deployed on Cloud Run receives user requests. It first checks Redis (K-Means similarity cluster cache). If the pattern matches, it returns immediately; it requests the Gemini LLM only on a cache miss.</p>
-                    <p>If the query generated by Gemini fails to execute in BigQuery, the Validator node sends the failure cause back to Gemini to rewrite the query (Correction). Through this multi-step orchestration, we prevented critical runtime interruptions.</p>
+                    <p>When the API server receives a user request, it first checks a Redis-based similarity cache. If a matching pattern exists, it responds immediately; otherwise, it requests query generation from the LLM.</p>
+                    <p>If the generated query fails in the database, a Validator analyzes the error and prompts the LLM to rewrite the query. This architecture ensures the stability of the runtime service.</p>
                 </div>
 
                 <div class="mermaid">
 graph TD
-    User([Slack / Web UI]) --> API[FastAPI Server]
+    User([User Interface]) --> API[API Server]
     
-    subgraph Routing_Cache_Layer [Routing & Cache Layer]
-        API --> K[K-Means Vector Cluster]
-        K --> Cache{Redis Cache <br> Dynamic Pattern Match}
-        Cache -->|Hit| BQ[(BigQuery)]
+    subgraph Routing_Cache [Routing & Cache Layer]
+        API --> VectorSearch[Vector Similarity Search]
+        VectorSearch --> Cache{Pattern Cache}
+        Cache -->|Cache Hit| DB[(Database)]
     end
 
-    subgraph LLM_Generation_Correction_Loop [LLM Generation & Correction Loop]
-        Cache -->|Miss| NL2SQL[Gemini LLM]
-        NL2SQL --> Valid{Validator}
-        Valid -.->|Syntax Error| NL2SQL
-        Valid -->|Valid SQL| BQ
+    subgraph LLM_Correction [LLM & Correction Loop]
+        Cache -->|Cache Miss| LLM[LLM Generator]
+        LLM --> Validator{Validator}
+        Validator -.->|Execution Error| LLM
+        Validator -->|Valid Query| DB
     end
 
-    subgraph Data_Output [Data & Output]
-        BQ --> Chart[Visualization Node]
-        Chart --> UpdateCache[Update Pattern Cache]
-        UpdateCache --> Result([Dashboard / Message])
+    subgraph Output_Update [Output & Update]
+        DB --> Viz[Visualization]
+        Viz --> Update[Update Cache]
+        Update --> Result([Result Presentation])
     end
     
     style User fill:#f8fafc,stroke:#94a3b8
     style API fill:#eff6ff,stroke:#3b82f6
-    style K fill:#f3f4f6,stroke:#9ca3af
+    style VectorSearch fill:#f3f4f6,stroke:#9ca3af
     style Cache fill:#fefce8,stroke:#eab308
-    style NL2SQL fill:#fefce8,stroke:#eab308
-    style Valid fill:#fee2e2,stroke:#ef4444
-    style BQ fill:#f1f5f9,stroke:#64748b
-    style Chart fill:#f1f5f9,stroke:#64748b
-    style UpdateCache fill:#f3f4f6,stroke:#9ca3af
+    style LLM fill:#fefce8,stroke:#eab308
+    style Validator fill:#fee2e2,stroke:#ef4444
+    style DB fill:#f1f5f9,stroke:#64748b
+    style Viz fill:#f1f5f9,stroke:#64748b
+    style Update fill:#f3f4f6,stroke:#9ca3af
     style Result fill:#ecfdf5,stroke:#10b981
                 </div>
             </section>
@@ -142,10 +142,10 @@ graph TD
                 <h2 class="lang lang-ko text-3xl font-bold mb-6 border-b pb-2"><span class="text-blue-600 mr-2">5.</span> Impact: 적용 결과</h2>
                 <h2 class="lang lang-en text-3xl font-bold mb-6 border-b pb-2" style="display:none;"><span class="text-blue-600 mr-2">5.</span> Impact: Results</h2>
                 <div class="lang lang-ko">
-                    <p>이 아키텍처는 데이터 분석의 병목을 없애고 조직의 진정한 데이터 민주화를 가속했습니다.</p>
+                    <p>해당 아키텍처를 통해 데이터 분석의 병목 현상을 해소하고, 효율적인 데이터 활용 환경을 구축할 수 있었습니다.</p>
                 </div>
                 <div class="lang lang-en" style="display:none;">
-                    <p>This architecture eliminated data analysis bottlenecks and accelerated true data democratization in the organization.</p>
+                    <p>This architecture resolved data analysis bottlenecks and established an efficient environment for data utilization.</p>
                 </div>
 
                 <div class="tip-box">
@@ -153,30 +153,30 @@ graph TD
                         <li class="lang lang-ko flex items-start">
                             <span class="text-green-600 font-bold text-2xl mr-3 leading-none">✓</span>
                             <div>
-                                <strong class="font-bold text-gray-900 block mb-1">런타임 안정성 보장</strong>
-                                <span class="text-gray-700">Self-Correction 루프 덕분에 초기 1-Pass 생성에서 구문 오류가 발생하더라도 사용자에게는 올바른 최종 데이터가 전달됩니다.</span>
+                                <strong class="font-bold text-gray-900 block mb-1">서비스 안정성 확보</strong>
+                                <span class="text-gray-700">초기 생성된 SQL에 오류가 있더라도, Self-Correction 루프를 통해 최종적으로 유효한 데이터를 사용자에게 제공합니다.</span>
                             </div>
                         </li>
                         <li class="lang lang-ko flex items-start">
                             <span class="text-green-600 font-bold text-2xl mr-3 leading-none">✓</span>
                             <div>
-                                <strong class="font-bold text-gray-900 block mb-1">캐싱을 통한 비용 절감</strong>
-                                <span class="text-gray-700">빈번한 조회 요청(매출 현황 등)을 캐시 레이어가 방어하여 불필요한 LLM 호출 지연과 과금을 억제했습니다.</span>
+                                <strong class="font-bold text-gray-900 block mb-1">처리 효율 최적화</strong>
+                                <span class="text-gray-700">반복적인 조회 요청을 캐시 레이어에서 처리하여 LLM API 호출 횟수를 줄이고 응답 속도를 개선했습니다.</span>
                             </div>
                         </li>
                         
                         <li class="lang lang-en flex items-start" style="display:none;">
                             <span class="text-green-600 font-bold text-2xl mr-3 leading-none">✓</span>
                             <div>
-                                <strong class="font-bold text-gray-900 block mb-1">Runtime Stability Guaranteed</strong>
-                                <span class="text-gray-700">Thanks to the Self-Correction loop, even if syntax errors occur in the initial 1-Pass generation, correct final data is delivered to the user.</span>
+                                <strong class="font-bold text-gray-900 block mb-1">Service Stability Secured</strong>
+                                <span class="text-gray-700">Even if initial SQL generation has errors, the Self-Correction loop ensures that valid data is ultimately provided to the user.</span>
                             </div>
                         </li>
                         <li class="lang lang-en flex items-start" style="display:none;">
                             <span class="text-green-600 font-bold text-2xl mr-3 leading-none">✓</span>
                             <div>
-                                <strong class="font-bold text-gray-900 block mb-1">Cost Reduction via Caching</strong>
-                                <span class="text-gray-700">The cache layer defended against frequent query requests (like sales statuses), curbing unnecessary LLM call delays and billing.</span>
+                                <strong class="font-bold text-gray-900 block mb-1">Processing Efficiency Optimized</strong>
+                                <span class="text-gray-700">Handling repetitive query requests at the cache layer reduced LLM API calls and improved response speeds.</span>
                             </div>
                         </li>
                     </ul>
