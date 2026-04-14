@@ -165,11 +165,11 @@
                 <h2 class="lang lang-en text-3xl font-bold mb-6 border-b pb-2" style="display:none;"><span class="text-blue-600 mr-2">4.</span> Design / Framing: Architecture Design</h2>
                 <div class="lang lang-ko">
                     <p>거대 단일 모델(Heavy LLM)에 모든 연산을 의존하여 생기는 고비용·고지연 문제를 회피하기 위해, <strong>가벼운 의도 분류 모델(Lightweight Classifier 계층)을 앞단으로 분리(Decoupling)</strong>했습니다.</p>
-                    <p>이 Classifier는 질의를 분석한 뒤, 적절한 RAG Agent(Vertex AI Agent Builder 기반 하이브리드 검색)로 분기시킵니다. 질의 로그와 사용자 세션은 Cloud SQL에서 관리하고 핵심 검색 대상 문서는 BigQuery에 적재하여, 성능과 정확도의 균형을 최적화했습니다.</p>
+                    <p>이 Classifier는 질의를 분석한 뒤, 적절한 RAG Agent(Vertex AI Agent Builder 기반 하이브리드 검색)로 분기시킵니다. 질의 로그와 사용자 세션은 SQL에서 관리하고 핵심 검색 대상 문서는 BigQuery에 적재하여, 성능과 정확도의 균형을 최적화했습니다.</p>
                 </div>
                 <div class="lang lang-en" style="display:none;">
                     <p>To avoid the high-cost and high-latency issues caused by relying on a heavy single model for all computations, we <strong>decoupled a lightweight intent classification model to the front end</strong>.</p>
-                    <p>This classifier analyzes the query and branches it to the appropriate RAG Agent (hybrid search based on Vertex AI Agent Builder). By managing query logs and user sessions in Cloud SQL and loading core search target documents into BigQuery, we optimized the balance between performance and accuracy.</p>
+                    <p>This classifier analyzes the query and branches it to the appropriate RAG Agent (hybrid search based on Vertex AI Agent Builder). By managing query logs and user sessions in SQL and loading core search target documents into BigQuery, we optimized the balance between performance and accuracy.</p>
                 </div>
 
                 <!-- Mermaid Architecture Diagram -->
